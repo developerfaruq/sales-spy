@@ -476,15 +476,28 @@
           closeModal();
         }
       });
-      sendResetLink.addEventListener('click', function() {
-        if (resetEmail.value.trim() === '') {
-          resetEmail.focus();
-          return;
-        }
-        resetForm.classList.add('hidden');
-        confirmationMessage.classList.remove('hidden');
-      });
+      sendResetLink.addEventListener('click', function () {
+  if (resetEmail.value.trim() === '') {
+    resetEmail.focus();
+    return;
+  }
+
+  // Send the email to backend
+  fetch('send_reset.php', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded'
+    },
+    body: 'email=' + encodeURIComponent(resetEmail.value.trim())
+  })
+    .then(res => res.text())
+    .then(response => {
+      confirmationMessage.querySelector('p').innerHTML = response;
+      resetForm.classList.add('hidden');
+      confirmationMessage.classList.remove('hidden');
     });
+});
+});
   </script>
 </body>
 </html>
