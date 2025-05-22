@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sales -  - Ecommerce Leads Database</title>
+<script src="https://cdn.tailwindcss.com/3.4.16"></script>
+<script>tailwind.config={theme:{extend:{colors:{primary:'#1E3A8A',secondary:'#5BC0EB'},borderRadius:{'none':'0px','sm':'4px',DEFAULT:'8px','md':'12px','lg':'16px','xl':'20px','2xl':'24px','3xl':'32px','full':'9999px','button':'8px'}}}}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap"
+      rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css">
+<style>
+:where([class^="ri-"])::before { content: "\f3c2"; }
+body {
+font-family: 'Inter', sans-serif;
+color: #1F1A38;
+}
+input:focus {
+outline: none;
+}
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+-webkit-appearance: none;
+margin: 0;
+}
+</style>
+</head>
+<body class="bg-white">
+<header class="w-full bg-white/0 backdrop-blur-md shadow-sm fixed top-0 z-50 mb-8" style="box-shadow: rgba(50, 50, 93, 0.25) 0px 50px 100px -20px, rgba(0, 0, 0, 0.3) 0px 30px 60px -30px, rgba(10, 37, 64, 0.35) 0px -2px 6px 0px inset;">
+<div class="container mx-auto px-4 py-4 flex justify-between items-center">
+<div class="flex items-center">
+<a href="#" class="text-2xl font-['Pacifico'] text-primary">Sales - Spy</a>
+</div>
+<nav class="hidden md:flex space-x-8">
+<a href="#" class="text-gray-800 hover:text-primary font-medium">Home</a>
+<a href="#" class="text-gray-800 hover:text-primary font-medium">Features</a>
+<a href="#" class="text-gray-800 hover:text-primary font-medium">Pricing</a>
+<a href="#" class="text-gray-800 hover:text-primary font-medium">Blog</a>
+</nav>
+<div class="flex items-center space-x-4">
+<a href="signup.html?form=signup" class="text-gray-800 hover:text-primary font-medium hidden md:inline">Log in</a>
+<a href="signup.html?form=signup" class="bg-primary text-white px-4 py-2 !rounded-button whitespace-nowrap font-medium hover:bg-opacity-90 transition-all hidden md:inline">Try it free</a>
+<!-- Hamburger Icon (mobile only) -->
+<button id="hamburger-btn" class="md:hidden flex items-center justify-center w-10 h-10 rounded focus:outline-none" aria-label="Open menu">
+<i class="ri-align-justify"></i>
+</button>
+</div>
+</div>
+</header>
+
+<!-- Mobile Menu Overlay -->
+<div id="mobile-menu-overlay" class="fixed inset-0 z-[999] bg-black bg-opacity-40 transition-opacity duration-300 opacity-0 pointer-events-none"></div>
+<!-- Mobile Menu Drawer -->
+<nav id="mobile-menu" class="fixed left-1/2 top-0 w-full max-w-md -translate-x-1/2 bg-white/70 backdrop-blur-lg shadow-xl z-[1000] rounded-b-3xl transition-transform duration-400 ease-in-out -translate-y-full" style="height: 70vh;">
+    <div class="flex flex-col h-full">
+        <div class="flex justify-end p-6">
+            <button id="close-mobile-menu" class="text-4xl text-gray-700 hover:text-primary focus:outline-none" aria-label="Close menu">&times;</button>
+        </div>
+        <div class="flex-1 flex flex-col justify-center items-center space-y-8">
+            <a href="#" class="text-2xl font-semibold text-gray-900 hover:text-primary transition">Home</a>
+            <a href="#" class="text-2xl font-semibold text-gray-900 hover:text-primary transition">Features</a>
+            <a href="#" class="text-2xl font-semibold text-gray-900 hover:text-primary transition">Pricing</a>
+            <a href="#" class="text-2xl font-semibold text-gray-900 hover:text-primary transition">Blog</a>
+        </div>
+        <div class="flex justify-center gap-4 p-6 border-t border-gray-100">
+            <a href="signup.html?form=login" class="flex-1 text-center bg-gray-100 text-primary font-medium py-3 rounded-lg hover:bg-primary hover:text-white transition">Login</a>
+            <a href="signup.html?form=signup" class="flex-1 text-center bg-primary text-white font-medium py-3 rounded-lg hover:bg-opacity-90 transition">Sign Up</a>
+        </div>
+    </div>
+</nav>
+
+<main>
+<!-- Hero Section -->
+<section class="w-full py-16 relative overflow-hidden mt-24">
+<div class="container mx-auto px-4">
+<div class="text-center max-w-4xl mx-auto mb-12">
+<h1 class="text-3xl md:text-4xl lg:text-5xl font-bold mb-4">Easy to use and daily updated <span class="text-primary">website & ecommerce leads database</span></h1>
+<p class="text-gray-600 text-lg mb-8">Turn leads into customers by identifying the best opportunities across websites and online stores. Our database is updated daily with real-time data, traffic metrics, and revenue insights to make your lead generation process faster and more effective.</p>
+<div class="flex justify-center space-x-4">
+<a href="signup.html?form=signup" class="bg-primary text-white px-6 py-3 !rounded-button whitespace-nowrap font-medium hover:bg-opacity-90 transition-all">Get started</a>
+<a href="signup.html?form=login" class="border border-gray-300 text-gray-800 px-6 py-3 !rounded-button whitespace-nowrap font-medium hover:bg-gray-50 transition-all">Learn more</a>
+</div>
+</div>
+<div class="relative rounded-lg shadow-xl overflow-hidden max-w-5xl mx-auto">
+<img src="https://res.cloudinary.com/dtrn8j0sz/image/upload/v1747739400/rrr_yaqqmu.jpg" alt="Ecommerce leads dashboard" class="w-full object-cover object-top">
+</div>
+</div>
+</section>
+<!-- Stats Section -->
+<section class="bg-gray-50 py-16">
+<div class="container mx-auto px-4">
+<div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+<div class="text-center">
+<h3 class="text-primary text-4xl font-bold mb-2">8,000+</h3>
+<p class="text-gray-600">New websites & stores added monthly</p>
+</div>
+<div class="text-center">
+<h3 class="text-primary text-4xl font-bold mb-2">4,235,600</h3>
+<p class="text-gray-600">Active websites & stores</p>
+</div>
+<div class="text-center">
+<h3 class="text-primary text-4xl font-bold mb-2">18,750</h3>
+<p class="text-gray-600">Businesses using our platform</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Integrations Section -->
+<section class="py-16">
+<div class="container mx-auto px-4">
+<h2 class="text-2xl md:text-3xl font-bold text-center mb-12">Generate leads across multiple website & e-commerce platforms</h2>
+<div class="grid grid-cols-2 md:grid-cols-6 gap-8 max-w-5xl mx-auto">
+<div class="flex items-center justify-center p-6 bg-white rounded-lg shadow-sm hover:shadow-md transition-all">
+<img src="https://cdn.brandfetch.io/idAgPm7IvG/theme/dark/logo.svg?c=1dxbfHSJFAPEGdCLU4o5B" alt="Shopify" class="h-12 w-auto object-contain">
+</div>
+<div class="flex items-center justify-center p-6 bg-white rounded-lg shadow-sm hover:shadow-md transition-all">
+<img src="https://cdn.brandfetch.io/idzyTAzn6G/theme/dark/logo.svg?c=1dxbfHSJFAPEGdCLU4o5B" alt="Etsy" class="h-12 w-auto object-contain">
+</div>
+<div class="flex items-center justify-center p-6 bg-white rounded-lg shadow-sm hover:shadow-md transition-all">
+<img src="https://cdn.brandfetch.io/idjTS-RPU1/theme/dark/logo.svg?c=1dxbfHSJFAPEGdCLU4o5B" alt="eBay" class="h-12 w-auto object-contain">
+</div>
+<div class="flex items-center justify-center p-1 bg-white rounded-lg shadow-sm hover:shadow-md transition-all">
+<img src="https://res.cloudinary.com/dtrn8j0sz/image/upload/v1747729057/WordPress.com_idCgr3adBM_2_wdtek5.png" alt="WordPress" class="h-20 w-auto object-contain">
+</div>
+<div class="flex items-center justify-center p-6 bg-white rounded-lg shadow-sm hover:shadow-md transition-all">
+<img src="https://res.cloudinary.com/dtrn8j0sz/image/upload/v1747729369/pngwing.com_xkovmq.png" alt="Wix" class="h-12 w-auto object-contain">
+</div>
+<div class="flex items-center justify-center p-1 bg-white rounded-lg shadow-sm hover:shadow-md transition-all">
+<img src="https://res.cloudinary.com/dtrn8j0sz/image/upload/v1747729503/pngwing.com_1_h2dca5.png" alt="Squarespace" class="h-12 w-auto object-contain">
+</div>
+<div class="flex items-center justify-center p-6 bg-white rounded-lg shadow-sm hover:shadow-md transition-all">
+<img src="https://res.cloudinary.com/dtrn8j0sz/image/upload/v1747729704/pngwing.com_2_ektrc1.png" alt="WooCommerce" class="h-12 w-auto object-contain">
+</div>
+<div class="flex items-center justify-center p-6 bg-white rounded-lg shadow-sm hover:shadow-md transition-all">
+<img src="https://res.cloudinary.com/dtrn8j0sz/image/upload/v1747737997/pngwing.com_3_pdwwka.png" alt="Square" class="h-12 w-auto object-contain">
+</div>
+<div class="flex items-center justify-center p-6 bg-white rounded-lg shadow-sm hover:shadow-md transition-all">
+<img src="https://res.cloudinary.com/dtrn8j0sz/image/upload/v1747738070/pngwing.com_4_rbbiyi.png" alt="GoDaddy" class="h-12 w-auto object-contain">
+</div>
+<div class="flex items-center justify-center p-6 bg-white rounded-lg shadow-sm hover:shadow-md transition-all">
+<img src="https://res.cloudinary.com/dtrn8j0sz/image/upload/v1747738158/pngwing.com_5_viyded.png" alt="Webflow" class="h-12 w-auto object-contain">
+</div>
+<div class="flex items-center justify-center p-6 bg-white rounded-lg shadow-sm hover:shadow-md transition-all">
+<img src="https://res.cloudinary.com/dtrn8j0sz/image/upload/v1747738239/pngwing.com_6_ugpht2.png" alt="Weebly" class="h-12 w-auto object-contain">
+</div>
+<div class="flex items-center justify-center p-6 bg-white rounded-lg shadow-sm hover:shadow-md transition-all opacity-0">
+</div>
+</div>
+</div>
+</section>
+<!-- Features Section -->
+<section class="py-16 bg-gray-50">
+<div class="container mx-auto px-4">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+<div>
+<div class="flex items-start mb-8">
+<div class="w-12 h-12 rounded-full bg-primary bg-opacity-10 flex items-center justify-center mr-4">
+<i class="ri-search-line ri-lg text-primary"></i>
+</div>
+<div>
+<h3 class="text-xl font-semibold mb-2">AI-powered lead generation</h3>
+<p class="text-gray-600">Our AI algorithms analyze millions of e-commerce stores to find the most promising leads based on your criteria, saving you hours of manual research.</p>
+</div>
+</div>
+<div class="flex items-start mb-8">
+<div class="w-12 h-12 rounded-full bg-primary bg-opacity-10 flex items-center justify-center mr-4">
+<i class="ri-filter-line ri-lg text-primary"></i>
+</div>
+<div>
+<h3 class="text-xl font-semibold mb-2">Powerful filters for lead targeting</h3>
+<p class="text-gray-600">Filter leads by industry, location, revenue, employee count, technology used, and more to find the perfect match for your business.</p>
+</div>
+</div>
+<div class="flex items-start">
+<div class="w-12 h-12 rounded-full bg-primary bg-opacity-10 flex items-center justify-center mr-4">
+<i class="ri-mail-send-line ri-lg text-primary"></i>
+</div>
+<div>
+<h3 class="text-xl font-semibold mb-2">Automated outreach campaigns</h3>
+<p class="text-gray-600">Set up personalized email sequences that automatically follow up with your leads, increasing your chances of conversion.</p>
+</div>
+</div>
+</div>
+<div>
+<div class="flex items-start mb-8">
+<div class="w-12 h-12 rounded-full bg-primary bg-opacity-10 flex items-center justify-center mr-4">
+<i class="ri-dashboard-line ri-lg text-primary"></i>
+</div>
+<div>
+<h3 class="text-xl font-semibold mb-2">Real-time analytics dashboard</h3>
+<p class="text-gray-600">Track your lead generation performance with our intuitive dashboard. Monitor conversions, response rates, and ROI in real-time.</p>
+</div>
+</div>
+<div class="flex items-start mb-8">
+<div class="w-12 h-12 rounded-full bg-primary bg-opacity-10 flex items-center justify-center mr-4">
+<i class="ri-link-m ri-lg text-primary"></i>
+</div>
+<div>
+<h3 class="text-xl font-semibold mb-2">Seamless CRM integration</h3>
+<p class="text-gray-600">Connect with popular CRM platforms like Salesforce, HubSpot, and Pipedrive to keep your sales team organized and efficient.</p>
+</div>
+</div>
+<div class="flex items-start">
+<div class="w-12 h-12 rounded-full bg-primary bg-opacity-10 flex items-center justify-center mr-4">
+<i class="ri-notification-line ri-lg text-primary"></i>
+</div>
+<div>
+<h3 class="text-xl font-semibold mb-2">Lead scoring and alerts</h3>
+<p class="text-gray-600">Get notified when high-value leads are identified or when it's the perfect time to reach out based on their online behavior.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Comprehensive Data Section -->
+<section class="py-16">
+<div class="container mx-auto px-4">
+<h2 class="text-2xl md:text-3xl font-bold text-center mb-12">Comprehensive Data Coverage: Nothing Overlooked</h2>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+<div>
+<h3 class="text-xl font-semibold mb-4">Essential Information</h3>
+<div class="space-y-4">
+<div class="flex items-center">
+<div class="w-6 h-6 flex items-center justify-center mr-2">
+<i class="ri-checkbox-circle-fill text-primary"></i>
+</div>
+<span>Company name and website URL</span>
+</div>
+<div class="flex items-center">
+<div class="w-6 h-6 flex items-center justify-center mr-2">
+<i class="ri-checkbox-circle-fill text-primary"></i>
+</div>
+<span>Industry and business category</span>
+</div>
+<div class="flex items-center">
+<div class="w-6 h-6 flex items-center justify-center mr-2">
+<i class="ri-checkbox-circle-fill text-primary"></i>
+</div>
+<span>Location and geographic coverage</span>
+</div>
+<div class="flex items-center">
+<div class="w-6 h-6 flex items-center justify-center mr-2">
+<i class="ri-checkbox-circle-fill text-primary"></i>
+</div>
+<span>Company size and employee count</span>
+</div>
+<div class="flex items-center">
+<div class="w-6 h-6 flex items-center justify-center mr-2">
+<i class="ri-checkbox-circle-fill text-primary"></i>
+</div>
+<span>Annual revenue and growth metrics</span>
+</div>
+</div>
+<h3 class="text-xl font-semibold mt-8 mb-4">E-commerce Analytics</h3>
+<div class="space-y-4">
+<div class="flex items-center">
+<div class="w-6 h-6 flex items-center justify-center mr-2">
+<i class="ri-checkbox-circle-fill text-primary"></i>
+</div>
+<span>Monthly traffic and visitor statistics</span>
+</div>
+<div class="flex items-center">
+<div class="w-6 h-6 flex items-center justify-center mr-2">
+<i class="ri-checkbox-circle-fill text-primary"></i>
+</div>
+<span>Average order value and conversion rates</span>
+</div>
+<div class="flex items-center">
+<div class="w-6 h-6 flex items-center justify-center mr-2">
+<i class="ri-checkbox-circle-fill text-primary"></i>
+</div>
+<span>Product categories and inventory size</span>
+</div>
+</div>
+<h3 class="text-xl font-semibold mt-8 mb-4">Marketing & Advertising</h3>
+<div class="space-y-4">
+<div class="flex items-center">
+<div class="w-6 h-6 flex items-center justify-center mr-2">
+<i class="ri-checkbox-circle-fill text-primary"></i>
+</div>
+<span>Digital marketing channels used</span>
+</div>
+<div class="flex items-center">
+<div class="w-6 h-6 flex items-center justify-center mr-2">
+<i class="ri-checkbox-circle-fill text-primary"></i>
+</div>
+<span>Ad spend and campaign performance</span>
+</div>
+</div>
+</div>
+<div>
+<h3 class="text-xl font-semibold mb-4">Technical Stack</h3>
+<div class="space-y-4">
+<div class="flex items-center">
+<div class="w-6 h-6 flex items-center justify-center mr-2">
+<i class="ri-checkbox-circle-fill text-primary"></i>
+</div>
+<span>E-commerce platform (Shopify, WooCommerce, etc.)</span>
+</div>
+<div class="flex items-center">
+<div class="w-6 h-6 flex items-center justify-center mr-2">
+<i class="ri-checkbox-circle-fill text-primary"></i>
+</div>
+<span>Payment processors and options</span>
+</div>
+<div class="flex items-center">
+<div class="w-6 h-6 flex items-center justify-center mr-2">
+<i class="ri-checkbox-circle-fill text-primary"></i>
+</div>
+<span>Shipping and fulfillment solutions</span>
+</div>
+<div class="flex items-center">
+<div class="w-6 h-6 flex items-center justify-center mr-2">
+<i class="ri-checkbox-circle-fill text-primary"></i>
+</div>
+<span>Marketing automation tools</span>
+</div>
+<div class="flex items-center">
+<div class="w-6 h-6 flex items-center justify-center mr-2">
+<i class="ri-checkbox-circle-fill text-primary"></i>
+</div>
+<span>CRM and customer service platforms</span>
+</div>
+</div>
+<h3 class="text-xl font-semibold mt-8 mb-4">Contact Information</h3>
+<div class="space-y-4">
+<div class="flex items-center">
+<div class="w-6 h-6 flex items-center justify-center mr-2">
+<i class="ri-checkbox-circle-fill text-primary"></i>
+</div>
+<span>Decision-maker names and titles</span>
+</div>
+<div class="flex items-center">
+<div class="w-6 h-6 flex items-center justify-center mr-2">
+<i class="ri-checkbox-circle-fill text-primary"></i>
+</div>
+<span>Direct email addresses and phone numbers</span>
+</div>
+<div class="flex items-center">
+<div class="w-6 h-6 flex items-center justify-center mr-2">
+<i class="ri-checkbox-circle-fill text-primary"></i>
+</div>
+<span>LinkedIn profiles and social media accounts</span>
+</div>
+</div>
+<h3 class="text-xl font-semibold mt-8 mb-4">Compliance & Trust Indicators</h3>
+<div class="space-y-4">
+<div class="flex items-center">
+<div class="w-6 h-6 flex items-center justify-center mr-2">
+<i class="ri-checkbox-circle-fill text-primary"></i>
+</div>
+<span>Privacy policy and GDPR compliance</span>
+</div>
+<div class="flex items-center">
+<div class="w-6 h-6 flex items-center justify-center mr-2">
+<i class="ri-checkbox-circle-fill text-primary"></i>
+</div>
+<span>Security certifications and trust badges</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Pricing Section -->
+<section class="py-16 bg-gray-50">
+<div class="container mx-auto px-4">
+<h2 class="text-2xl md:text-3xl font-bold text-center mb-12">Pricing</h2>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+<div class="bg-white rounded-lg shadow-md p-8 border border-gray-200 flex flex-col">
+<h3 class="text-xl font-bold mb-4">Basic</h3>
+<div class="text-3xl font-bold mb-2">$115<span class="text-gray-500 text-lg font-normal">/mo</span></div>
+<p class="text-gray-600 mb-6">Perfect for small businesses just getting started with lead generation</p>
+<ul class="space-y-3 mb-8 flex-grow">
+<li class="flex items-center">
+<div class="w-6 h-6 flex items-center justify-center mr-2">
+<i class="ri-check-line text-primary"></i>
+</div>
+<span>500 leads per month</span>
+</li>
+<li class="flex items-center">
+<div class="w-6 h-6 flex items-center justify-center mr-2">
+<i class="ri-check-line text-primary"></i>
+</div>
+<span>Basic filtering options</span>
+</li>
+<li class="flex items-center">
+<div class="w-6 h-6 flex items-center justify-center mr-2">
+<i class="ri-check-line text-primary"></i>
+</div>
+<span>Email and phone support</span>
+</li>
+<li class="flex items-center">
+<div class="w-6 h-6 flex items-center justify-center mr-2">
+<i class="ri-check-line text-primary"></i>
+</div>
+<span>Weekly database updates</span>
+</li>
+</ul>
+<a href="#" class="bg-white border border-primary text-primary px-6 py-3 !rounded-button whitespace-nowrap font-medium hover:bg-primary hover:text-white transition-all text-center">Get started</a>
+</div>
+<div class="bg-white rounded-lg shadow-lg p-8 border-2 border-primary flex flex-col relative transform scale-105">
+<div class="absolute top-0 right-0 bg-primary text-white text-xs font-bold px-3 py-1 rounded-bl-lg rounded-tr-lg">POPULAR</div>
+<h3 class="text-xl font-bold mb-4">Pro</h3>
+<div class="text-3xl font-bold mb-2">$225<span class="text-gray-500 text-lg font-normal">/mo</span></div>
+<p class="text-gray-600 mb-6">Ideal for growing businesses with serious lead generation needs</p>
+<ul class="space-y-3 mb-8 flex-grow">
+<li class="flex items-center">
+<div class="w-6 h-6 flex items-center justify-center mr-2">
+<i class="ri-check-line text-primary"></i>
+</div>
+<span>2,000 leads per month</span>
+</li>
+<li class="flex items-center">
+<div class="w-6 h-6 flex items-center justify-center mr-2">
+<i class="ri-check-line text-primary"></i>
+</div>
+<span>Advanced filtering options</span>
+</li>
+<li class="flex items-center">
+<div class="w-6 h-6 flex items-center justify-center mr-2">
+<i class="ri-check-line text-primary"></i>
+</div>
+<span>Priority support</span>
+</li>
+<li class="flex items-center">
+<div class="w-6 h-6 flex items-center justify-center mr-2">
+<i class="ri-check-line text-primary"></i>
+</div>
+<span>Daily database updates</span>
+</li>
+<li class="flex items-center">
+<div class="w-6 h-6 flex items-center justify-center mr-2">
+<i class="ri-check-line text-primary"></i>
+</div>
+<span>CRM integration</span>
+</li>
+<li class="flex items-center">
+<div class="w-6 h-6 flex items-center justify-center mr-2">
+<i class="ri-check-line text-primary"></i>
+</div>
+<span>Email sequence automation</span>
+</li>
+</ul>
+<a href="#" class="bg-primary text-white px-6 py-3 !rounded-button whitespace-nowrap font-medium hover:bg-opacity-90 transition-all text-center">Get started</a>
+</div>
+<div class="bg-white rounded-lg shadow-md p-8 border border-gray-200 flex flex-col">
+<h3 class="text-xl font-bold mb-4">Enterprise</h3>
+<div class="text-3xl font-bold mb-2">Custom<span class="text-gray-500 text-lg font-normal"></span></div>
+<p class="text-gray-600 mb-6">For large organizations with custom lead generation requirements</p>
+<ul class="space-y-3 mb-8 flex-grow">
+<li class="flex items-center">
+<div class="w-6 h-6 flex items-center justify-center mr-2">
+<i class="ri-check-line text-primary"></i>
+</div>
+<span>Unlimited leads</span>
+</li>
+<li class="flex items-center">
+<div class="w-6 h-6 flex items-center justify-center mr-2">
+<i class="ri-check-line text-primary"></i>
+</div>
+<span>Custom filtering options</span>
+</li>
+<li class="flex items-center">
+<div class="w-6 h-6 flex items-center justify-center mr-2">
+<i class="ri-check-line text-primary"></i>
+</div>
+<span>Dedicated account manager</span>
+</li>
+<li class="flex items-center">
+<div class="w-6 h-6 flex items-center justify-center mr-2">
+<i class="ri-check-line text-primary"></i>
+</div>
+<span>Real-time database updates</span>
+</li>
+<li class="flex items-center">
+<div class="w-6 h-6 flex items-center justify-center mr-2">
+<i class="ri-check-line text-primary"></i>
+</div>
+<span>Advanced API access</span>
+</li>
+<li class="flex items-center">
+<div class="w-6 h-6 flex items-center justify-center mr-2">
+<i class="ri-check-line text-primary"></i>
+</div>
+<span>Custom integration development</span>
+</li>
+</ul>
+<a href="#" class="bg-white border border-primary text-primary px-6 py-3 !rounded-button whitespace-nowrap font-medium hover:bg-primary hover:text-white transition-all text-center">Contact sales</a>
+</div>
+</div>
+</div>
+</section>
+<!-- FAQ Section -->
+<section class="py-16">
+<div class="container mx-auto px-4">
+<h2 class="text-2xl md:text-3xl font-bold text-center mb-12">Frequently Asked Questions</h2>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+<div>
+<h3 class="text-xl font-semibold mb-3">How accurate is your website & ecommerce leads database?</h3>
+<p class="text-gray-600 mb-6">Our database is updated daily with real-time information from both websites and online stores. We employ a combination of AI algorithms and human verification to ensure 98.5% accuracy of all lead information, including traffic data, technology stack, and revenue metrics. We also provide a data freshness indicator for each lead.</p>
+<h3 class="text-xl font-semibold mb-3">What makes your leads better than competitors?</h3>
+<p class="text-gray-600 mb-6">Unlike generic lead databases, we focus exclusively on active websites and e-commerce businesses. This specialization allows us to provide deeper insights, more accurate data, and better targeting capabilities specifically for digital service providers and agencies.</p>
+<h3 class="text-xl font-semibold mb-3">Can I export the leads data?</h3>
+<p class="text-gray-600">Yes, you can export leads in various formats including CSV, Excel, and direct to your CRM. Our Pro and Enterprise plans also offer API access for seamless integration with your existing systems.</p>
+</div>
+<div>
+<h3 class="text-xl font-semibold mb-3">Do you offer a free trial?</h3>
+<p class="text-gray-600 mb-6">Yes, we offer a 7-day free trial with access to 100 leads so you can test our platform before committing. No credit card required to start your trial.</p>
+<h3 class="text-xl font-semibold mb-3">How often is the data updated?</h3>
+<p class="text-gray-600 mb-6">Our database is updated daily with new leads and refreshed information. Enterprise customers receive real-time updates as new data becomes available.</p>
+<h3 class="text-xl font-semibold mb-3">Is there a limit on how many leads I can access?</h3>
+<p class="text-gray-600">Each plan has specific limits on monthly lead access. Basic plan includes 500 leads per month, Pro plan includes 2,000 leads per month, and Enterprise plans offer unlimited access. Unused leads do not roll over to the next month.</p>
+</div>
+</div>
+</div>
+</section>
+<!-- CTA Section -->
+<section class="py-16 bg-primary bg-opacity-5">
+<div class="container mx-auto px-4 text-center">
+<h2 class="text-2xl md:text-3xl font-bold mb-4">Ready to grow your business with quality leads?</h2>
+<p class="text-gray-600 mb-8 max-w-2xl mx-auto">Join thousands of businesses that use Bootleads to find and convert high-quality e-commerce leads. Start your free trial today.</p>
+<div class="flex justify-center space-x-4">
+<a href="#" class="bg-primary text-white px-6 py-3 !rounded-button whitespace-nowrap font-medium hover:bg-opacity-90 transition-all">Start free trial</a>
+<a href="#" class="border border-gray-300 text-gray-800 px-6 py-3 !rounded-button whitespace-nowrap font-medium hover:bg-gray-50 transition-all">Schedule demo</a>
+</div>
+</div>
+</section>
+</main>
+<footer class="bg-gray-300 text-white py-6">
+<div class="container mx-auto px-4">
+<div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-4">
+<div>
+<a href="#" class="text-2xl font-['Pacifico'] text-primary">Sales - Spy</a>
+<p class="text-gray-900 mb-2">The most comprehensive website & e-commerce leads database for growing your business.</p>
+</div>
+<div>
+<!-- Nothing here just empty space for beautification -->
+</div>
+<div>
+<!-- Nothing here just empty space for beautification -->
+</div>
+<div>
+<!-- Nothing here just empty space for beautification -->
+</div>
+</div>
+<div class="border-t border-gray-800 pt-4 flex flex-col md:flex-row justify-between items-center">
+<p class="text-gray-600 text-sm mb-2 md:mb-0">© 2025 Bootleads. All rights reserved.</p>
+<div class="flex space-x-6">
+<a href="#" class="text-gray-600 hover:text-white text-sm">Privacy Policy</a>
+<a href="#" class="text-gray-600 hover:text-white text-sm">Terms of Service</a>
+<a href="#" class="text-gray-600 hover:text-white text-sm">Cookie Policy</a>
+</div>
+</div>
+</div>
+</footer>
+<style>
+/* Hamburger icon animation (optional, for a modern look) */
+#hamburger-btn.open span:nth-child(1) {
+  transform: translateY(8px) rotate(45deg);
+}
+#hamburger-btn.open span:nth-child(2) {
+  opacity: 0;
+}
+#hamburger-btn.open span:nth-child(3) {
+  transform: translateY(-8px) rotate(-45deg);
+}
+
+/* Mobile menu transitions */
+#mobile-menu {
+  transition: transform 0.4s cubic-bezier(.4,0,.2,1);
+  will-change: transform;
+}
+#mobile-menu.open {
+  transform: translate(-50%, 0);
+}
+#mobile-menu:not(.open) {
+  transform: translate(-50%, -100%);
+}
+#mobile-menu-overlay.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+</style>
+<script>
+const hamburgerBtn = document.getElementById('hamburger-btn');
+const mobileMenu = document.getElementById('mobile-menu');
+const mobileMenuOverlay = document.getElementById('mobile-menu-overlay');
+const closeBtn = document.getElementById('close-mobile-menu');
+
+function openMenu() {
+  mobileMenu.classList.add('open');
+  mobileMenuOverlay.classList.add('open');
+  hamburgerBtn.classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeMenu() {
+  mobileMenu.classList.remove('open');
+  mobileMenuOverlay.classList.remove('open');
+  hamburgerBtn.classList.remove('open');
+  document.body.style.overflow = '';
+}
+hamburgerBtn.addEventListener('click', () => {
+  if (mobileMenu.classList.contains('open')) {
+    closeMenu();
+  } else {
+    openMenu();
+  }
+});
+closeBtn.addEventListener('click', closeMenu);
+mobileMenuOverlay.addEventListener('click', closeMenu);
+
+// Optional: Close menu on ESC key
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && mobileMenu.classList.contains('open')) {
+    closeMenu();
+  }
+});
+</script>
+<style>
+/* Responsive: Hide mobile menu on desktop */
+@media (min-width: 768px) {
+  #mobile-menu,
+  #mobile-menu-overlay {
+    display: none !important;
+  }
+}
+</style>
+</body>
+</html>
