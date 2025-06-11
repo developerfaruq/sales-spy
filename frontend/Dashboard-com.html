@@ -1,0 +1,2066 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sales-Spy Websites Dashboard</title>
+    <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: { primary: "#1E3A8A", secondary: "#5BC0EB" },
+            borderRadius: {
+              none: "0px",
+              sm: "4px",
+              DEFAULT: "8px",
+              md: "12px",
+              lg: "16px",
+              xl: "20px",
+              "2xl": "24px",
+              "3xl": "32px",
+              full: "9999px",
+              button: "8px",
+            },
+          },
+        },
+      };
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.5.0/echarts.min.js"></script>
+    <style>
+      :where([class^="ri-"])::before {
+        content: "\f3c2";
+      }
+      body {
+        font-family: "Inter", sans-serif;
+        background-color: #f9fafb;
+      }
+      .glassmorphism {
+        background: rgba(255, 255, 255, 0.8);
+        backdrop-filter: blur(8px);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+      }
+      input:focus {
+        outline: none;
+      }
+      .sidebar-expanded {
+        width: 240px;
+        transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+      .sidebar-collapsed {
+        width: 80px;
+        transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+      .main-content-expanded {
+        margin-left: 240px;
+        transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+      .main-content-collapsed {
+        margin-left: 80px;
+        transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+      @media (max-width: 768px) {
+        .main-content-expanded,
+        .main-content-collapsed {
+          margin-left: 0;
+        }
+      }
+      .custom-switch {
+        position: relative;
+        display: inline-block;
+        width: 44px;
+        height: 24px;
+      }
+      .custom-switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+      }
+      .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #e2e8f0;
+        transition: 0.4s;
+        border-radius: 24px;
+      }
+      .slider:before {
+        position: absolute;
+        content: "";
+        height: 18px;
+        width: 18px;
+        left: 3px;
+        bottom: 3px;
+        background-color: white;
+        transition: 0.4s;
+        border-radius: 50%;
+      }
+      input:checked + .slider {
+        background-color: #3b82f6;
+      }
+      input:checked + .slider:before {
+        transform: translateX(20px);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="flex h-screen bg-gray-50">
+      <!-- Sidebar -->
+      <div
+        id="sidebar"
+        class="sidebar-expanded fixed h-full bg-white shadow-lg z-20 transition-all duration-700 ease-in-out"
+      >
+        <div class="flex flex-col h-full">
+          <!-- Logo -->
+          <div class="p-4 border-b flex items-center justify-center relative">
+            <img
+              src="https://res.cloudinary.com/dtrn8j0sz/image/upload/v1749075914/SS_s4jkfw.jpg"
+              alt="Logo"
+              id="sidebar-logo-img"
+              class="w-8 h-8 mr-0 hidden"
+            />
+            <h1
+              id="sidebar-logo-text"
+              class="font-['Pacifico'] text-2xl text-primary"
+            >
+              Sales-Spy
+            </h1>
+            <!-- Mobile-only collapse button -->
+            <button
+              id="sidebar-mobile-close"
+              class="absolute right-2 top-2 p-2 rounded-full hover:bg-gray-100 md:hidden"
+              aria-label="Close sidebar"
+            >
+              <i class="ri-close-line text-xl"></i>
+            </button>
+          </div>
+
+          <!-- Navigation -->
+          <nav class="flex-1 overflow-y-auto py-4">
+            <ul>
+              <li class="mb-2">
+                <a
+                  href="Dashboard-home.html"
+                   class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-r-lg hover:text-primary transition-colors"
+                >
+                  <div class="w-6 h-6 flex items-center justify-center mr-3">
+                    <i class="ri-dashboard-line"></i>
+                  </div>
+                  <span class="sidebar-text">Dashboard</span>
+                </a>
+              </li>
+              <li class="mb-2">
+                <a
+                  href="Dashboard-com.html"
+                  class="flex items-center px-4 py-3 text-primary bg-blue-50 rounded-r-lg border-l-4 border-primary"
+                >
+                  <div class="w-6 h-6 flex items-center justify-center mr-3">
+                    <i class="ri-global-line"></i>
+                  </div>
+                  <span class="sidebar-text">Websites</span>
+                </a>
+              </li>
+              <li class="mb-2">
+                <a
+                  href="Dashboard-ecc.html"
+                  class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-r-lg hover:text-primary transition-colors"
+                >
+                  <div class="w-6 h-6 flex items-center justify-center mr-3">
+                    <i class="ri-shopping-cart-line"></i>
+                  </div>
+                  <span class="sidebar-text">E-commerce</span>
+                </a>
+              </li>
+              <li class="mb-2">
+                <a
+                  href="Dashboard-pay.html"
+                  class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-r-lg hover:text-primary transition-colors"
+                >
+                  <div class="w-6 h-6 flex items-center justify-center mr-3">
+                     <i class="ri-bank-card-line"></i></i>
+                  </div>
+                  <span class="sidebar-text">Payment</span>
+                </a>
+              </li>
+              <li class="mb-2">
+                <a
+                  href="Dashboard-set.html"
+                  class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-r-lg hover:text-primary transition-colors"
+                >
+                  <div class="w-6 h-6 flex items-center justify-center mr-3">
+                    <i class="ri-settings-line"></i>
+                  </div>
+                  <span class="sidebar-text">Settings</span>
+                </a>
+              </li>
+            </ul>
+          </nav>
+
+          <!-- Upgrade section -->
+          <div id="upgrade-section" class="p-4 border-t">
+            <div id="upgrade-expanded" class="bg-gray-50 rounded-lg p-4 mb-3">
+              <p class="text-sm text-gray-600 mb-2">Credits remaining</p>
+              <div class="flex items-center justify-between">
+                <span class="font-semibold text-lg">1,250</span>
+                <span class="text-xs text-gray-500">of 2,000</span>
+              </div>
+              <div class="w-full bg-gray-200 rounded-full h-2 mt-2">
+                <div
+                  class="bg-primary rounded-full h-2"
+                  style="width: 62.5%"
+                ></div>
+              </div>
+            </div>
+            <a href="Dashboard-pay.html">
+              <button
+                id="upgrade-btn-expanded"
+                class="w-full bg-primary text-white py-2 px-4 rounded-button flex items-center justify-center whitespace-nowrap hover:bg-blue-600 transition-colors"
+              >
+                <div class="w-5 h-5 flex items-center justify-center mr-2">
+                  <i class="ri-arrow-up-line"></i>
+                </div>
+                <span>Upgrade Plan</span>
+              </button>
+            </a>
+            <a href="Dashboard-pay.html">
+              <button
+                id="upgrade-btn-collapsed"
+                class="hidden bg-primary text-white w-10 h-10 rounded-full flex items-center justify-center mx-auto mt-2 hover:bg-blue-600 transition-colors"
+                title="Upgrade"
+              >
+                <i class="ri-arrow-up-line"></i>
+              </button>
+            </a>
+          </div>
+          <script>
+            document.addEventListener("DOMContentLoaded", function () {
+              const sidebar = document.getElementById("sidebar");
+              const upgradeExpanded =
+                document.getElementById("upgrade-expanded");
+              const upgradeBtnExpanded = document.getElementById(
+                "upgrade-btn-expanded"
+              );
+              const upgradeBtnCollapsed = document.getElementById(
+                "upgrade-btn-collapsed"
+              );
+              const logoImg = document.getElementById("sidebar-logo-img");
+              const logoText = document.getElementById("sidebar-logo-text");
+
+              function updateUpgradeSection() {
+                if (sidebar.classList.contains("sidebar-collapsed")) {
+                  upgradeExpanded.style.display = "none";
+                  upgradeBtnExpanded.style.display = "none";
+                  upgradeBtnCollapsed.classList.remove("hidden");
+                } else {
+                  upgradeExpanded.style.display = "";
+                  upgradeBtnExpanded.style.display = "";
+                  upgradeBtnCollapsed.classList.add("hidden");
+                }
+              }
+
+              function updateLogo() {
+                if (sidebar.classList.contains("sidebar-collapsed")) {
+                  logoImg.classList.remove("hidden");
+                  logoText.classList.add("hidden");
+                } else {
+                  logoImg.classList.add("hidden");
+                  logoText.classList.remove("hidden");
+                }
+              }
+
+              // Initial state
+              updateUpgradeSection();
+              updateLogo();
+
+              // Listen for sidebar toggle
+              const sidebarToggle = document.getElementById("sidebar-toggle");
+              sidebarToggle.addEventListener("click", function () {
+                setTimeout(() => {
+                  updateUpgradeSection();
+                  updateLogo();
+                }, 310); // Wait for transition
+              });
+
+              // Also update on resize (for responsive)
+              window.addEventListener("resize", function () {
+                setTimeout(() => {
+                  updateUpgradeSection();
+                  updateLogo();
+                }, 310);
+              });
+            });
+          </script>
+        </div>
+      </div>
+
+      <!-- Main Content -->
+      <div
+        id="main-content"
+        class="main-content-expanded flex-1 transition-all duration-700 ease-in-out overflow-x-auto"
+      >
+        <!-- Header -->
+        <header class="bg-white shadow-sm sticky top-0 z-10">
+          <div class="flex items-center justify-between px-6 py-4">
+            <div class="flex items-center">
+              <button
+                id="sidebar-toggle"
+                class="p-2 rounded-full hover:bg-gray-100 mr-4"
+              >
+                <div class="w-5 h-5 flex items-center justify-center">
+                  <i class="ri-menu-line"></i>
+                </div>
+              </button>
+            </div>
+            <div class="flex items-center space-x-4">
+              <div class="flex items-center bg-gray-100 rounded-full px-3 py-1">
+                <div
+                  class="w-5 h-5 flex items-center justify-center mr-2 text-primary"
+                >
+                  <i class="ri-coin-line"></i>
+                </div>
+                <span class="text-sm font-medium">1,250 credits</span>
+              </div>
+              <a href="Dashboard-pay.html">
+                <button
+                  class="bg-primary text-white py-2 px-4 rounded-button whitespace-nowrap hover:bg-blue-600 transition-colors"
+                >
+                  <span>Upgrade</span>
+                </button>
+              </a>
+              <div class="relative">
+                <button class="flex items-center space-x-2">
+                  <div
+                    class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden"
+                  >
+                    <img
+                      src="https://readdy.ai/api/search-image?query=professional%20headshot%20of%20a%20young%20business%20person%2C%20neutral%20expression%2C%20high%20quality%20portrait%2C%20business%20attire&width=200&height=200&seq=1&orientation=squarish"
+                      alt="User avatar"
+                      class="w-full h-full object-cover"
+                    />
+                  </div>
+                </button>
+              </div>
+            </div>
+          </div>
+        </header>
+
+        <!-- Content -->
+        <main class="flex-1 p-6">
+          <div class="mb-6">
+           <h1 class="text-2xl font-bold text-primary mb-2" style="color: #1E3A8A;">Websites</h1>
+            <p class="text-gray-600">
+              Search, filter, and discover <span class="font-bold " style="color: #1E3A8A;">Websites leads</span> for your business.
+            </p>
+          </div>
+          <!-- Filters Section -->
+          <div class="bg-white rounded shadow-sm mb-6">
+            <div
+              class="p-4 border-b border-gray-100 flex items-center justify-between"
+            >
+              <h2 class="text-lg font-semibold text-gray-800">Filters</h2>
+              <div class="flex items-center">
+                <span class="text-sm text-gray-600 mr-2">More Filters</span>
+                <!-- Toggle Switch for Advanced Filters -->
+                <label class="custom-switch ml-2">
+                  <input type="checkbox" id="toggleAdvancedFilters" />
+                  <span class="slider"></span>
+                </label>
+              </div>
+            </div>
+            <div class="p-4">
+              <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1"
+                    >Keyword</label
+                  >
+                  <input
+                    type="text"
+                    class="w-full px-3 py-2 border border-gray-300 rounded text-sm"
+                    placeholder="Enter keywords..."
+                  />
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1"
+                    >Platform</label
+                  >
+                  <select
+                    class="w-full px-3 py-2 border border-gray-300 rounded text-sm custom-select pr-8"
+                  >
+                    <option value="">All Platforms</option>
+                    <option value="wordpress">WordPress</option>
+                    <option value="wix">Wix</option>
+                    <option value="squarespace">Squarespace</option>
+                    <option value="webflow">Webflow</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1"
+                    >SNS & Email</label
+                  >
+                  <select
+                    class="w-full px-3 py-2 border border-gray-300 rounded text-sm custom-select pr-8"
+                  >
+                    <option value="">All</option>
+                    <option value="facebook">Facebook</option>
+                    <option value="instagram">Instagram</option>
+                    <option value="twitter">Twitter</option>
+                    <option value="email">Email Available</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-1"
+                    >Indexed Date</label
+                  >
+                  <input
+                    type="date"
+                    class="w-full px-3 py-2 border border-gray-300 rounded text-sm"
+                  />
+                </div>
+              </div>
+              <div id="advancedFilters" class="hidden">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1"
+                      >Tags</label
+                    >
+                    <select
+                      class="w-full px-3 py-2 border border-gray-300 rounded text-sm custom-select pr-8"
+                    >
+                      <option value="">Select Tags</option>
+                      <option value="blog">Blog</option>
+                      <option value="portfolio">Portfolio</option>
+                      <option value="business">Business</option>
+                      <option value="personal">Personal</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1"
+                      >Language</label
+                    >
+                    <select
+                      class="w-full px-3 py-2 border border-gray-300 rounded text-sm custom-select pr-8"
+                    >
+                      <option value="">All Languages</option>
+                      <option value="en">English</option>
+                      <option value="es">Spanish</option>
+                      <option value="fr">French</option>
+                      <option value="de">German</option>
+                      <option value="zh">Chinese</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1"
+                      >Country</label
+                    >
+                    <select
+                      class="w-full px-3 py-2 border border-gray-300 rounded text-sm custom-select pr-8"
+                    >
+                      <option value="">All Countries</option>
+                      <option value="us">United States</option>
+                      <option value="uk">United Kingdom</option>
+                      <option value="ca">Canada</option>
+                      <option value="au">Australia</option>
+                      <option value="de">Germany</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1"
+                      >Pages</label
+                    >
+                    <select
+                      class="w-full px-3 py-2 border border-gray-300 rounded text-sm custom-select pr-8"
+                    >
+                      <option value="">Any</option>
+                      <option value="1-10">1-10</option>
+                      <option value="11-50">11-50</option>
+                      <option value="51-100">51-100</option>
+                      <option value="101+">101+</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1"
+                      >Top Level Domain</label
+                    >
+                    <select
+                      class="w-full px-3 py-2 border border-gray-300 rounded text-sm custom-select pr-8"
+                    >
+                      <option value="">All TLDs</option>
+                      <option value=".com">.com</option>
+                      <option value=".org">.org</option>
+                      <option value=".net">.net</option>
+                      <option value=".io">.io</option>
+                      <option value=".co">.co</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1"
+                      >Technologies</label
+                    >
+                    <select
+                      class="w-full px-3 py-2 border border-gray-300 rounded text-sm custom-select pr-8"
+                    >
+                      <option value="">All Technologies</option>
+                      <option value="react">React</option>
+                      <option value="vue">Vue.js</option>
+                      <option value="angular">Angular</option>
+                      <option value="jquery">jQuery</option>
+                      <option value="bootstrap">Bootstrap</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1"
+                      >Domain Reg Year</label
+                    >
+                    <select
+                      class="w-full px-3 py-2 border border-gray-300 rounded text-sm custom-select pr-8"
+                    >
+                      <option value="">Any Year</option>
+                      <option value="2023-2025">2023-2025</option>
+                      <option value="2020-2022">2020-2022</option>
+                      <option value="2015-2019">2015-2019</option>
+                      <option value="2010-2014">2010-2014</option>
+                      <option value="before-2010">Before 2010</option>
+                    </select>
+                  </div>
+                  <!-- Removed: Product Count, Collections Count, Product Avg Price, Currency, Installed Apps -->
+                </div>
+              </div>
+              <div class="flex mt-6">
+                <button
+                  class="bg-primary text-white px-6 py-2 rounded-button flex items-center whitespace-nowrap mr-3"
+                >
+                  <div class="w-5 h-5 flex items-center justify-center mr-2">
+                    <i class="ri-search-line"></i>
+                  </div>
+                  Search
+                </button>
+                <button
+                  class="bg-gray-100 text-gray-700 px-6 py-2 rounded-button whitespace-nowrap"
+                >
+                  Reset
+                </button>
+              </div>
+            </div>
+          </div>
+          <!-- Results Section -->
+          <div class="bg-white rounded shadow-sm">
+            <div
+              class="p-4 border-b border-gray-100 flex justify-between items-center"
+            >
+              <div class="text-sm text-gray-600">Found 317,455 Stores</div>
+              <div class="flex items-center">
+                <button
+                  class="bg-gray-100 text-gray-700 px-3 py-1.5 rounded-button text-sm whitespace-nowrap mr-3"
+                >
+                  <div class="flex items-center">
+                    <div class="w-4 h-4 flex items-center justify-center mr-1">
+                      <i class="ri-download-line"></i>
+                    </div>
+                    Export
+                  </div>
+                </button>
+
+                <button
+                  id="display-columns-btn"
+                  class="bg-gray-100 text-gray-700 px-3 py-1.5 rounded-button text-sm whitespace-nowrap relative focus:outline-none"
+                  type="button"
+                  aria-haspopup="true"
+                  aria-expanded="false"
+                >
+                  <div class="flex items-center">
+                    <div class="w-4 h-4 flex items-center justify-center mr-1">
+                      <i class="ri-list-check"></i>
+                    </div>
+                    Display
+                  </div>
+                </button>
+                <div
+                  id="columns-dropdown"
+                  class="hidden absolute right-0 mt-2 z-30 w-64 bg-white border border-gray-200 rounded-lg shadow-lg p-3 max-h-80 overflow-y-auto transition-all duration-200"
+                  tabindex="-1"
+                  aria-label="Column visibility menu"
+                >
+                  <form id="columns-dropdown-form" class="flex flex-col gap-2">
+                    <!-- Checkbox items will be injected here by JS -->
+                  </form>
+                </div>
+              </div>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                  <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Domain
+                    </th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Platform
+                    </th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Title
+                    </th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Description
+                    </th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Language
+                    </th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Country
+                    </th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Email
+                    </th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Phone
+                    </th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Tags
+                    </th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Domain Reg Date
+                    </th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Indexed Date
+                    </th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Facebook Link
+                    </th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Twitter Link
+                    </th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Instagram Link
+                    </th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Pinterest Link
+                    </th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Tiktok Link
+                    </th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      YouTube Link
+                    </th>
+                  </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                  <!-- Example row, repeat for each result row -->
+                  <tr class="hover:bg-gray-50 result-row cursor-pointer"
+                      data-domain="yamloveme.com"
+                      data-platform="Shopify"
+                      data-title="yamloveme"
+                      data-description="Trendy jewelry and accessories"
+                      data-language="EN"
+                      data-country="US"
+                      data-email="contact@yamloveme.com"
+                      data-phone="+1 555-5678"
+                      data-tags="Jewelry,Trendy,US"
+                      data-domainregdate="2019-04-12"
+                      data-indexeddate="2024-06-01"
+                  >
+                    <td class="px-6 py-4 whitespace-nowrap">
+                      <div class="flex items-center">
+                        <div class="w-8 h-8 flex items-center justify-center bg-red-100 rounded-full mr-3">
+                          <i class="ri-heart-fill text-red-500"></i>
+                        </div>
+                        <div class="text-sm font-medium text-gray-900">
+                          yamloveme.com
+                        </div>
+                      </div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      Shopify
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      yamloveme
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      Trendy jewelry and accessories
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      EN
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      US
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      contact@yamloveme.com
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      +1 555-5678
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <span class="bg-blue-100 text-blue-800 text-xs px-3 py-1 rounded-full mr-1">Jewelry</span>
+                      <span class="bg-blue-100 text-blue-800 text-xs px-3 py-1 rounded-full mr-1">Trendy</span>
+                      <span class="bg-blue-100 text-blue-800 text-xs px-3 py-1 rounded-full">US</span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      2019-04-12
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      2024-06-01
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <a href="#">facebook.com/yamloveme</a>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <a href="#">twitter.com/yamloveme</a>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <a href="#">instagram.com/yamloveme</a>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <a href="#">pinterest.com/yamloveme</a>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <a href="#">tiktok.com/@yamloveme</a>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <a href="#">youtube.com/yamloveme</a>
+                    </td>
+                  </tr>
+                  <tr class="hover:bg-gray-50 result-row cursor-pointer"
+                      data-domain="true-compress.com"
+                      data-platform="Shopify"
+                      data-title="True Compress"
+                      data-description="Compression wear for athletes"
+                      data-country="GB"
+                      data-language="EN"
+                      data-email="support@true-compress.com"
+                      data-phone="+44 20 1234 5678"
+                      data-tags="Athletic,Compression,GB"
+                      data-domainregdate="2021-08-22"
+                      data-indexeddate="2024-06-01"
+                  >
+                    <td class="px-6 py-4 whitespace-nowrap">
+                      <div class="flex items-center">
+                        <div
+                          class="w-8 h-8 flex items-center justify-center bg-blue-100 rounded-full mr-3"
+                        >
+                          <i class="ri-compress-line text-blue-500"></i>
+                        </div>
+                        <div class="text-sm font-medium text-gray-900">
+                          true-compress.com
+                        </div>
+                      </div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      Shopify
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      True Compress
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      Compression wear for athletes
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      EN
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      GB
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      support@true-compress.com
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      +44 20 1234 5678
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <span class="bg-blue-100 text-blue-800 text-xs px-3 py-1 rounded-full mr-1">Athletic</span>
+                      <span class="bg-blue-100 text-blue-800 text-xs px-3 py-1 rounded-full mr-1">Compression</span>
+                      <span class="bg-blue-100 text-blue-800 text-xs px-3 py-1 rounded-full">GB</span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      2021-08-22
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      2024-06-01
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <a href="#">facebook.com/truecompress</a>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <a href="#">twitter.com/truecompress</a>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <a href="#">instagram.com/truecompress</a>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <a href="#">pinterest.com/truecompress</a>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <a href="#">tiktok.com/@truecompress</a>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <a href="#">youtube.com/truecompress</a>
+                    </td>
+                  </tr>
+                  <tr class="hover:bg-gray-50 result-row cursor-pointer"
+                      data-domain="www.telenaarl.com"
+                      data-platform="Shopify"
+                      data-title="TeleNaarl – Timeless Jewellery for Every Occasion"
+                      data-description="Fine jewelry for all occasions"
+                      data-country="IN"
+                      data-language="EN"
+                      data-email="hello@telenaarl.com"
+                      data-phone="+91 22 1234 5678"
+                      data-tags="Jewelry,Timeless,IN"
+                      data-domainregdate="2018-11-10"
+                      data-indexeddate="2024-06-01"
+                  >
+                    <td class="px-6 py-4 whitespace-nowrap">
+                      <div class="flex items-center">
+                        <div
+                          class="w-8 h-8 flex items-center justify-center bg-purple-100 rounded-full mr-3"
+                        >
+                          <i class="ri-vip-diamond-fill text-purple-500"></i>
+                        </div>
+                        <div class="text-sm font-medium text-gray-900">
+                          www.telenaarl.com
+                        </div>
+                      </div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      Shopify
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      TeleNaarl – Timeless Jewellery for Every Occasion
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      Fine jewelry for all occasions
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      EN
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      IN
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      hello@telenaarl.com
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      +91 22 1234 5678
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <span class="bg-blue-100 text-blue-800 text-xs px-3 py-1 rounded-full mr-1">Jewelry</span>
+                      <span class="bg-blue-100 text-blue-800 text-xs px-3 py-1 rounded-full mr-1">Timeless</span>
+                      <span class="bg-blue-100 text-blue-800 text-xs px-3 py-1 rounded-full">IN</span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      2018-11-10
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      2024-06-01
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <a href="#">facebook.com/telenaarl</a>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <a href="#">twitter.com/telenaarl</a>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <a href="#">instagram.com/telenaarl</a>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <a href="#">pinterest.com/telenaarl</a>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <a href="#">tiktok.com/@telenaarl</a>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <a href="#">youtube.com/telenaarl</a>
+                    </td>
+                  </tr>
+                  <tr class="hover:bg-gray-50 result-row cursor-pointer"
+                      data-domain="dbfay.com"
+                      data-platform="Shopify"
+                      data-title="dbfay"
+                      data-description="Fashion and accessories"
+                      data-country="FR"
+                      data-language="FR"
+                      data-email="contact@dbfay.com"
+                      data-phone="+33 1 23 45 67 89"
+                      data-tags="Fashion,Accessories,FR"
+                      data-domainregdate="2020-02-18"
+                      data-indexeddate="2024-06-01"
+                  >
+                    <td class="px-6 py-4 whitespace-nowrap">
+                      <div class="flex items-center">
+                        <div
+                          class="w-8 h-8 flex items-center justify-center bg-green-100 rounded-full mr-3"
+                        >
+                          <i class="ri-store-fill text-green-500"></i>
+                        </div>
+                        <div class="text-sm font-medium text-gray-900">
+                          dbfay.com
+                        </div>
+                      </div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      Shopify
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      dbfay
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      Fashion and accessories
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      FR
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      FR
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      contact@dbfay.com
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      +33 1 23 45 67 89
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <span class="bg-blue-100 text-blue-800 text-xs px-3 py-1 rounded-full mr-1">Fashion</span>
+                      <span class="bg-blue-100 text-blue-800 text-xs px-3 py-1 rounded-full mr-1">Accessories</span>
+                      <span class="bg-blue-100 text-blue-800 text-xs px-3 py-1 rounded-full">FR</span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      2020-02-18
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      2024-06-01
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <a href="#">facebook.com/dbfay</a>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <a href="#">twitter.com/dbfay</a>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <a href="#">instagram.com/dbfay</a>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <a href="#">pinterest.com/dbfay</a>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <a href="#">tiktok.com/@dbfay</a>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <a href="#">youtube.com/dbfay</a>
+                    </td>
+                  </tr>
+                  <tr class="hover:bg-gray-50 result-row cursor-pointer"
+                      data-domain="epicfalls.legendary-laughs.shop"
+                      data-platform="Shopify"
+                      data-title="Epic Falls: Legendary Laughs!"
+                      data-description="Humor gifts and novelties"
+                      data-country="US"
+                      data-language="EN"
+                      data-email=""
+                      data-phone="+1 555-9876"
+                      data-tags="Humor,Gifts,US"
+                      data-domainregdate="2022-01-05"
+                      data-indexeddate="2024-06-01"
+                  >
+                    <td class="px-6 py-4 whitespace-nowrap">
+                      <div class="flex items-center">
+                        <div
+                          class="w-8 h-8 flex items-center justify-center bg-yellow-100 rounded-full mr-3"
+                        >
+                          <i class="ri-emotion-laugh-fill text-yellow-500"></i>
+                        </div>
+                        <div class="text-sm font-medium text-gray-900">
+                          epicfalls.legendary-laughs.shop
+                        </div>
+                      </div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      Shopify
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      Epic Falls: Legendary Laughs!
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      Humor gifts and novelties
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      EN
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      US
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                     
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      +1 555-9876
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <span class="bg-blue-100 text-blue-800 text-xs px-3 py-1 rounded-full mr-1">Humor</span>
+                      <span class="bg-blue-100 text-blue-800 text-xs px-3 py-1 rounded-full mr-1">Gifts</span>
+                      <span class="bg-blue-100 text-blue-800 text-xs px-3 py-1 rounded-full">US</span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      2022-01-05
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      2024-06-01
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <a href="#">facebook.com/epicfalls</a>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <a href="#">twitter.com/epicfalls</a>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <a href="#">instagram.com/epicfalls</a>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <a href="#">pinterest.com/epicfalls</a>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <a href="#">tiktok.com/@epicfalls</a>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <a href="#">youtube.com/epicfalls</a>
+                    </td>
+                  </tr>
+                  <tr class="hover:bg-gray-50 result-row cursor-pointer"
+                      data-domain="akitada.com"
+                      data-platform="Shopify"
+                      data-title="akitada"
+                      data-description="Japanese home goods"
+                      data-country="DE"
+                      data-language="DE"
+                      data-email="kontakt@akitada.com"
+                      data-phone="+49 30 123456"
+                      data-tags="Home Goods,Japanese,DE"
+                      data-domainregdate="2017-07-30"
+                      data-indexeddate="2024-06-01"
+                  >
+                    <td class="px-6 py-4 whitespace-nowrap">
+                      <div class="flex items-center">
+                        <div
+                          class="w-8 h-8 flex items-center justify-center bg-indigo-100 rounded-full mr-3"
+                        >
+                          <i class="ri-store-2-fill text-indigo-500"></i>
+                        </div>
+                        <div class="text-sm font-medium text-gray-900">
+                          akitada.com
+                        </div>
+                      </div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      Shopify
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      akitada
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      Japanese home goods
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      DE
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      DE
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      kontakt@akitada.com
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      +49 30 123456
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <span class="bg-blue-100 text-blue-800 text-xs px-3 py-1 rounded-full mr-1">Home Goods</span>
+                      <span class="bg-blue-100 text-blue-800 text-xs px-3 py-1 rounded-full mr-1">Japanese</span>
+                      <span class="bg-blue-100 text-blue-800 text-xs px-3 py-1 rounded-full">DE</span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      2017-07-30
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      2024-06-01
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <a href="#">facebook.com/akitada</a>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <a href="#">twitter.com/akitada</a>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <a href="#">instagram.com/akitada</a>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <a href="#">pinterest.com/akitada</a>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <a href="#">tiktok.com/@akitada</a>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      data-domainregdate="2016-03-14"
+                      data-indexeddate="2024-06-01"
+                  >
+                    <td class="px-6 py-4 whitespace-nowrap">
+                      <div class="flex items-center">
+                        <div
+                          class="w-8 h-8 flex items-center justify-center bg-pink-100 rounded-full mr-3"
+                        >
+                          <i class="ri-shopping-bag-fill text-pink-500"></i>
+                        </div>
+                        <div class="text-sm font-medium text-gray-900">
+                          avapros.com
+                        </div>
+                      </div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      Shopify
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      avapros
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      Professional beauty products
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      ID
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      ID
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      cs@avapros.com
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      +62 21 123456
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <span class="bg-blue-100 text-blue-800 text-xs px-3 py-1 rounded-full mr-1">Beauty</span>
+                      <span class="bg-blue-100 text-blue-800 text-xs px-3 py-1 rounded-full mr-1">Professional</span>
+                      <span class="bg-blue-100 text-blue-800 text-xs px-3 py-1 rounded-full">ID</span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      2016-03-14
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      2024-06-01
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <a href="#">facebook.com/avapros</a>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <a href="#">twitter.com/avapros</a>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <a href="#">instagram.com/avapros</a>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <a href="#">pinterest.com/avapros</a>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <a href="#">tiktok.com/@avapros</a>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <a href="#">youtube.com/avapros</a>
+                    </td>
+                  </tr>
+                  <tr class="hover:bg-gray-50 result-row cursor-pointer"
+                      data-domain="blackrow.com"
+                      data-platform="Shopify"
+                      data-title="blackrow"
+                      data-description="Streetwear and urban fashion"
+                      data-country="VN"
+                      data-language="VI"
+                      data-email="hello@blackrow.com"
+                      data-phone="+84 28 1234 5678"
+                      data-tags="Streetwear,Urban,VN"
+                      data-domainregdate="2015-12-01"
+                      data-indexeddate="2024-06-01"
+                  >
+                    <td class="px-6 py-4 whitespace-nowrap">
+                      <div class="flex items-center">
+                        <div
+                          class="w-8 h-8 flex items-center justify-center bg-indigo-100 rounded-full mr-3"
+                        >
+                          <i class="ri-store-2-fill text-indigo-500"></i>
+                        </div>
+                        <div class="text-sm font-medium text-gray-900">
+                          blackrow.com
+                        </div>
+                      </div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      Shopify
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      blackrow
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      Streetwear and urban fashion
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      VI
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      VN
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      hello@blackrow.com
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      +84 28 1234 5678
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <span class="bg-blue-100 text-blue-800 text-xs px-3 py-1 rounded-full mr-1">Streetwear</span>
+                      <span class="bg-blue-100 text-blue-800 text-xs px-3 py-1 rounded-full mr-1">Urban</span>
+                      <span class="bg-blue-100 text-blue-800 text-xs px-3 py-1 rounded-full">VN</span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      2015-12-01
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      2024-06-01
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <a href="#">facebook.com/blackrow</a>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <a href="#">twitter.com/blackrow</a>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <a href="#">instagram.com/blackrow</a>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <a href="#">pinterest.com/blackrow</a>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <a href="#">tiktok.com/@blackrow</a>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <a href="#">youtube.com/blackrow</a>
+                    </td>
+                  </tr>
+                  <tr class="hover:bg-gray-50 result-row cursor-pointer"
+                      data-domain="foxness.com"
+                      data-platform="Shopify"
+                      data-title="foxness"
+                      data-description="Pet accessories and toys"
+                      data-country="NL"
+                      data-language="NL"
+                      data-email="info@foxness.com"
+                      data-phone="+31 20 1234567"
+                      data-tags="Pets,Accessories,NL"
+                      data-domainregdate="2023-02-14"
+                      data-indexeddate="2024-06-01"
+                  >
+                    <td class="px-6 py-4 whitespace-nowrap">
+                      <div class="flex items-center">
+                        <div
+                          class="w-8 h-8 flex items-center justify-center bg-orange-100 rounded-full mr-3"
+                        >
+                          <i class="ri-fox-fill text-orange-500"></i>
+                        </div>
+                        <div class="text-sm font-medium text-gray-900">
+                          foxness.com
+                        </div>
+                      </div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      Shopify
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      foxness
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      Pet accessories and toys
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      NL
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      NL
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      info@foxness.com
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      +31 20 1234567
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <span class="bg-blue-100 text-blue-800 text-xs px-3 py-1 rounded-full mr-1">Pets</span>
+                      <span class="bg-blue-100 text-blue-800 text-xs px-3 py-1 rounded-full mr-1">Accessories</span>
+                      <span class="bg-blue-100 text-blue-800 text-xs px-3 py-1 rounded-full">NL</span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      2023-02-14
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      2024-06-01
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <a href="#">facebook.com/foxness</a>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <a href="#">twitter.com/foxness</a>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <a href="#">instagram.com/foxness</a>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <a href="#">pinterest.com/foxness</a>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <a href="#">tiktok.com/@foxness</a>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <a href="#">youtube.com/foxness</a>
+                    </td>
+                  </tr>
+                  <tr class="hover:bg-gray-50 result-row cursor-pointer"
+                      data-domain="cofuze.com"
+                      data-platform="Shopify"
+                      data-title="cofuze.com - CoFuze™"
+                      data-description="Coffee accessories and mugs"
+                      data-country="IN"
+                      data-language="EN"
+                      data-email="support@cofuze.com"
+                      data-phone="+91 44 1234 5678"
+                      data-tags="Coffee,Accessories,IN"
+                      data-domainregdate="2022-10-10"
+                      data-indexeddate="2024-06-01"
+                  >
+                    <td class="px-6 py-4 whitespace-nowrap">
+                      <div class="flex items-center">
+                        <div
+                          class="w-8 h-8 flex items-center justify-center bg-teal-100 rounded-full mr-3"
+                        >
+                          <i class="ri-building-2-fill text-teal-500"></i>
+                        </div>
+                        <div class="text-sm font-medium text-gray-900">
+                          cofuze.com
+                        </div>
+                      </div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      Shopify
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      cofuze.com - CoFuze™
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      Coffee accessories and mugs
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      EN
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      IN
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      support@cofuze.com
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      +91 44 1234 5678
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <span class="bg-blue-100 text-blue-800 text-xs px-3 py-1 rounded-full mr-1">Coffee</span>
+                      <span class="bg-blue-100 text-blue-800 text-xs px-3 py-1 rounded-full mr-1">Accessories</span>
+                      <span class="bg-blue-100 text-blue-800 text-xs px-3 py-1 rounded-full">IN</span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      2022-10-10
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      2024-06-01
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div
+              class="px-6 py-4 flex items-center justify-between border-t border-gray-200"
+            >
+              <div class="flex items-center">
+                <p class="text-sm text-gray-700">
+                  Showing <span class="font-medium">1</span> to
+                  <span class="font-medium">10</span> of
+                  <span class="font-medium">317,455</span> results
+                </p>
+              </div>
+              <div class="flex items-center space-x-2">
+                <button
+                  class="bg-primary text-white w-8 h-8 rounded flex items-center justify-center"
+                >
+                  <span>1</span>
+                </button>
+                <button
+                  class="text-gray-500 hover:bg-gray-100 w-8 h-8 rounded flex items-center justify-center"
+                >
+                  <span>2</span>
+                </button>
+                <button
+                  class="text-gray-500 hover:bg-gray-100 w-8 h-8 rounded flex items-center justify-center"
+                >
+                  <span>3</span>
+                </button>
+                <span class="text-gray-500">...</span>
+                <button
+                  class="text-gray-500 hover:bg-gray-100 w-8 h-8 rounded flex items-center justify-center"
+                >
+                  <span>233</span>
+                </button>
+                <button
+                  class="text-gray-500 hover:bg-gray-100 w-8 h-8 rounded flex items-center justify-center"
+                >
+                  <span>234</span>
+                </button>
+                <button
+                  class="text-gray-500 hover:bg-gray-100 w-8 h-8 rounded flex items-center justify-center"
+                >
+                  <div class="w-4 h-4 flex items-center justify-center">
+                    <i class="ri-arrow-right-s-line"></i>
+                  </div>
+                </button>
+              </div>
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+
+    <!-- Keep only the relevant scripts for your dashboard, charts, advanced filters, and column visibility dropdown. Remove duplicate or unused scripts. Place this at the end of your <body> -->
+
+    <script>
+      // Sidebar toggle and responsive behavior
+      document.addEventListener("DOMContentLoaded", function () {
+        const sidebar = document.getElementById("sidebar");
+        const mainContent = document.getElementById("main-content");
+        const sidebarToggle = document.getElementById("sidebar-toggle");
+        const sidebarTexts = document.querySelectorAll(".sidebar-text");
+        const sidebarMobileClose = document.getElementById("sidebar-mobile-close");
+
+        function isMobile() {
+          return window.innerWidth < 768;
+        }
+
+        function openSidebar() {
+          sidebar.classList.add("sidebar-expanded");
+          sidebar.classList.remove("sidebar-collapsed");
+          mainContent.classList.add("main-content-expanded");
+          mainContent.classList.remove("main-content-collapsed");
+          sidebarTexts.forEach((text) => (text.style.display = ""));
+          if (isMobile()) {
+            sidebar.style.transform = "translateX(0)";
+            if (sidebarMobileClose) sidebarMobileClose.style.display = "";
+          }
+        }
+
+        function closeSidebar() {
+          sidebar.classList.remove("sidebar-expanded");
+          sidebar.classList.add("sidebar-collapsed");
+          mainContent.classList.remove("main-content-expanded");
+          mainContent.classList.add("main-content-collapsed");
+          sidebarTexts.forEach((text) => (text.style.display = "none"));
+          if (isMobile()) {
+            sidebar.style.transform = "translateX(-100%)";
+            if (sidebarMobileClose) sidebarMobileClose.style.display = "none";
+          }
+        }
+
+        function handleResize() {
+          if (isMobile()) {
+            closeSidebar();
+            if (sidebarMobileClose) sidebarMobileClose.style.display = "";
+          } else {
+            openSidebar();
+            if (sidebarMobileClose) sidebarMobileClose.style.display = "none";
+          }
+        }
+
+        window.addEventListener("DOMContentLoaded", handleResize);
+        window.addEventListener("resize", handleResize);
+
+        sidebarToggle.addEventListener("click", function () {
+          if (sidebar.classList.contains("sidebar-expanded")) {
+            closeSidebar();
+          } else {
+            openSidebar();
+          }
+        });
+
+        if (sidebarMobileClose) {
+          sidebarMobileClose.addEventListener("click", closeSidebar);
+        }
+      });
+    </script>
+    <script>
+      // Toggle Advanced Filters functionality
+      document.addEventListener("DOMContentLoaded", function () {
+        const toggle = document.getElementById("toggleAdvancedFilters");
+        const advancedFilters = document.getElementById("advancedFilters");
+        if (toggle && advancedFilters) {
+          toggle.addEventListener("change", function () {
+            if (toggle.checked) {
+              advancedFilters.classList.remove("hidden");
+            } else {
+              advancedFilters.classList.add("hidden");
+            }
+          });
+        }
+      });
+    </script>
+
+    <script>
+      // Column visibility toggle functionality (Display dropdown)
+      document.addEventListener("DOMContentLoaded", function () {
+        const displayBtn = document.getElementById("display-columns-btn");
+        const dropdown = document.getElementById("columns-dropdown");
+        const dropdownForm = document.getElementById("columns-dropdown-form");
+        const table = document.querySelector("table");
+        if (!displayBtn || !dropdown || !dropdownForm || !table) return;
+
+        // Only website-related columns for the Display dropdown
+        const columns = [
+          { key: "domain", label: "Domain", checked: true },
+          { key: "platform", label: "Platform", checked: true },
+          { key: "title", label: "Title", checked: true },
+          { key: "description", label: "Description", checked: false },
+          { key: "language", label: "Language", checked: false },
+          { key: "country", label: "Country", checked: true },
+          { key: "email", label: "Email", checked: false },
+          { key: "phone", label: "Phone", checked: false },
+          { key: "domain-reg-date", label: "Domain Reg Date", checked: false },
+          { key: "indexed-date", label: "Indexed Date", checked: false },
+          { key: "facebook-link", label: "Facebook Link", checked: false },
+          { key: "twitter-link", label: "Twitter Link", checked: false },
+          { key: "instagram-link", label: "Instagram Link", checked: false },
+          { key: "pinterest-link", label: "Pinterest Link", checked: false },
+          { key: "tiktok-link", label: "Tiktok Link", checked: false },
+          { key: "youtube-link", label: "YouTube Link", checked: false }
+        ];
+
+        // Render checkboxes
+        dropdownForm.innerHTML = "";
+        columns.forEach((col) => {
+          const id = `col-toggle-${col.key}`;
+          const label = document.createElement("label");
+          label.setAttribute("for", id);
+          label.className =
+            "flex items-center gap-2 cursor-pointer px-1 py-1 rounded hover:bg-gray-50";
+
+          const checkbox = document.createElement("input");
+          checkbox.type = "checkbox";
+          checkbox.id = id;
+          checkbox.className =
+            "column-toggle form-checkbox h-4 w-4 text-primary";
+          checkbox.dataset.columnKey = col.key;
+          checkbox.checked = col.checked;
+
+          const span = document.createElement("span");
+          span.textContent = col.label;
+          span.className = "text-sm text-gray-700";
+
+          label.appendChild(checkbox);
+          label.appendChild(span);
+          dropdownForm.appendChild(label);
+        });
+
+        // Map table columns by header text (case-insensitive)
+        function mapTableColumns() {
+          const ths = table.querySelectorAll("thead th");
+          ths.forEach((th, idx) => {
+            const thText = th.textContent.trim().toLowerCase();
+            const col = columns.find((c) => c.label.toLowerCase() === thText);
+            if (col) th.setAttribute("data-column-key", col.key);
+          });
+          // For each row, set data-column-key on each td
+          table.querySelectorAll("tbody tr").forEach((tr) => {
+            tr.querySelectorAll("td").forEach((td, idx) => {
+              const th = table.querySelectorAll("thead th")[idx];
+              if (th && th.hasAttribute("data-column-key")) {
+                td.setAttribute(
+                  "data-column-key",
+                  th.getAttribute("data-column-key")
+                );
+              }
+            });
+          });
+        }
+        mapTableColumns();
+
+        // Set initial visibility based on checked state
+        columns.forEach((col) => {
+          setColumnVisibility(col.key, col.checked);
+        });
+
+        // Toggle column visibility
+        function setColumnVisibility(key, visible) {
+          table
+            .querySelectorAll(`th[data-column-key="${key}"]`)
+            .forEach((th) => {
+              th.style.display = visible ? "" : "none";
+            });
+          table
+            .querySelectorAll(`td[data-column-key="${key}"]`)
+            .forEach((td) => {
+              td.style.display = visible ? "" : "none";
+            });
+        }
+
+        // Checkbox change handler
+        dropdownForm.addEventListener("change", function (e) {
+          if (e.target.classList.contains("column-toggle")) {
+            const key = e.target.dataset.columnKey;
+            setColumnVisibility(key, e.target.checked);
+          }
+        });
+
+        // Dropdown toggle
+        function openDropdown() {
+          dropdown.classList.remove("hidden");
+          displayBtn.setAttribute("aria-expanded", "true");
+          setTimeout(() => dropdown.focus(), 0);
+        }
+        function closeDropdown() {
+          dropdown.classList.add("hidden");
+          displayBtn.setAttribute("aria-expanded", "false");
+        }
+        displayBtn.addEventListener("click", function (e) {
+          e.stopPropagation();
+          if (dropdown.classList.contains("hidden")) {
+            openDropdown();
+          } else {
+            closeDropdown();
+          }
+        });
+
+        // Click-away to close
+        document.addEventListener("mousedown", function (e) {
+          if (!dropdown.contains(e.target) && !displayBtn.contains(e.target)) {
+            closeDropdown();
+          }
+        });
+        // Keyboard navigation: ESC to close
+        dropdown.addEventListener("keydown", function (e) {
+          if (e.key === "Escape") {
+            closeDropdown();
+            displayBtn.focus();
+          }
+        });
+      });
+    </script>
+
+    <!-- Details Panel (slide in from right, custom content) -->
+    <div id="detailsPanel"
+       class="fixed top-0 right-0 z-50 h-full w-[750px] max-w-full bg-white shadow-lg transform translate-x-full transition-transform duration-300 overflow-y-auto"
+    >
+      <!-- Close button at top left -->
+      <button id="detailsPanelCloseBtn"
+          class="absolute top-4 left-4 z-10 p-2 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-500 hover:text-gray-700 focus:outline-none"
+          title="Close panel"
+          type="button"
+      >
+      <i class="ri-close-line text-xl"></i>
+      </button>
+      <div id="detailsContent" class="p-0">
+      <!-- Panel content will be injected here -->
+      </div>
+    </div>
+    <script>
+      // Add close button logic for details panel
+      document.addEventListener("DOMContentLoaded", function () {
+        const detailsPanel = document.getElementById('detailsPanel');
+        const closeBtn = document.getElementById('detailsPanelCloseBtn');
+        if (detailsPanel && closeBtn) {
+          closeBtn.onclick = function () {
+            detailsPanel.classList.remove('translate-x-0');
+            detailsPanel.classList.add('translate-x-full');
+            document.getElementById('detailsContent').innerHTML = '';
+          };
+        }
+      });
+    </script>
+
+    <script>
+      // --- MOCK DATA SECTION ---
+      // In production, replace this with backend/API data fetching.
+      // Each domain key maps to a full data object for the detail panel.
+      const websiteFullData = {
+        "yamloveme.com": {
+          domain: "yamloveme.com",
+          name: "yamloveme",
+          owner: "Jane Smith",
+          traffic: "12,500/mo",
+          dateAdded: "2023-11-20",
+          hosting: "Shopify",
+          tags: ["Jewelry", "Trendy", "US"],
+          description: "Trendy jewelry and accessories",
+          email: "contact@yamloveme.com",
+          phone: "+1 555-5678",
+          whatsapp: "+1 555-1234",
+          regDate: "2019-04-12",
+          indexedDate: "2024-06-01",
+          country: "US",
+          language: "EN",
+          facebook: "facebook.com/yamloveme",
+          instagram: "instagram.com/yamloveme",
+          youtube: "youtube.com/yamloveme",
+          pinterest: "pinterest.com/yamloveme",
+          tiktok: "tiktok.com/@yamloveme",
+          twitter: "twitter.com/yamloveme"
+        },
+        "true-compress.com": {
+          domain: "true-compress.com",
+          name: "True Compress",
+          owner: "John Doe",
+          traffic: "4,200/mo",
+          dateAdded: "2022-08-15",
+          hosting: "Shopify",
+          tags: ["Athletic", "Compression", "GB"],
+          description: "Compression wear for athletes",
+          email: "support@true-compress.com",
+          phone: "+44 20 1234 5678",
+          whatsapp: "+44 7700 900123",
+          regDate: "2021-08-22",
+          indexedDate: "2024-06-01",
+          country: "GB",
+          language: "EN",
+          facebook: "facebook.com/truecompress",
+          instagram: "instagram.com/truecompress",
+          youtube: "youtube.com/truecompress",
+          pinterest: "pinterest.com/truecompress",
+          tiktok: "tiktok.com/@truecompress",
+          twitter: "twitter.com/truecompress"
+        },
+        "dbfay.com": {
+          domain: "dbfay.com",
+          name: "dbfay",
+          owner: "Marie Dubois",
+          traffic: "7,800/mo",
+          dateAdded: "2021-03-10",
+          hosting: "Shopify",
+          tags: ["Fashion", "Accessories", "FR"],
+          description: "Fashion and accessories",
+          email: "contact@dbfay.com",
+          phone: "+33 1 23 45 67 89",
+          whatsapp: "+33 6 12 34 56 78",
+          regDate: "2020-02-18",
+          indexedDate: "2024-06-01",
+          country: "FR",
+          language: "FR",
+          facebook: "facebook.com/dbfay",
+          instagram: "instagram.com/dbfay",
+          youtube: "youtube.com/dbfay",
+          pinterest: "pinterest.com/dbfay",
+          tiktok: "tiktok.com/@dbfay",
+          twitter: "twitter.com/dbfay"
+        },
+        "epicfalls.legendary-laughs.shop": {
+          domain: "epicfalls.legendary-laughs.shop",
+          name: "Epic Falls: Legendary Laughs!",
+          owner: "Mike Johnson",
+          traffic: "2,200/mo",
+          dateAdded: "2022-03-01",
+          hosting: "Shopify",
+          tags: ["Humor", "Gifts", "US"],
+          description: "Humor gifts and novelties",
+          email: "",
+          phone: "+1 555-9876",
+          whatsapp: "+1 555-4321",
+          regDate: "2022-01-05",
+          indexedDate: "2024-06-01",
+          country: "US",
+          language: "EN",
+          facebook: "facebook.com/epicfalls",
+          instagram: "instagram.com/epicfalls",
+          youtube: "youtube.com/epicfalls",
+          pinterest: "pinterest.com/epicfalls",
+          tiktok: "tiktok.com/@epicfalls",
+          twitter: "twitter.com/epicfalls"
+        },
+        "akitada.com": {
+          domain: "akitada.com",
+          name: "akitada",
+          owner: "Hans Müller",
+          traffic: "3,500/mo",
+          dateAdded: "2018-09-15",
+          hosting: "Shopify",
+          tags: ["Home Goods", "Japanese", "DE"],
+          description: "Japanese home goods",
+          email: "kontakt@akitada.com",
+          phone: "+49 30 123456",
+          whatsapp: "+49 170 1234567",
+          regDate: "2017-07-30",
+          indexedDate: "2024-06-01",
+          country: "DE",
+          language: "DE",
+          facebook: "facebook.com/akitada",
+          instagram: "instagram.com/akitada",
+          youtube: "youtube.com/akitada",
+          pinterest: "pinterest.com/akitada",
+          tiktok: "tiktok.com/@akitada",
+          twitter: "twitter.com/akitada"
+        },
+        "avapros.com": {
+          domain: "avapros.com",
+          name: "avapros",
+          owner: "Dewi Lestari",
+          traffic: "6,200/mo",
+          dateAdded: "2017-05-22",
+          hosting: "Shopify",
+          tags: ["Beauty", "Professional", "ID"],
+          description: "Professional beauty products",
+          email: "cs@avapros.com",
+          phone: "+62 21 123456",
+          whatsapp: "+62 812 3456 7890",
+          regDate: "2016-03-14",
+          indexedDate: "2024-06-01",
+          country: "ID",
+          language: "ID",
+          facebook: "facebook.com/avapros",
+          instagram: "instagram.com/avapros",
+          youtube: "youtube.com/avapros",
+          pinterest: "pinterest.com/avapros",
+          tiktok: "tiktok.com/@avapros",
+          twitter: "twitter.com/avapros"
+        },
+        "blackrow.com": {
+          domain: "blackrow.com",
+          name: "blackrow",
+          owner: "Nguyen Van A",
+          traffic: "9,100/mo",
+          dateAdded: "2016-08-10",
+          hosting: "Shopify",
+          tags: ["Streetwear", "Urban", "VN"],
+          description: "Streetwear and urban fashion",
+          email: "hello@blackrow.com",
+          phone: "+84 28 1234 5678",
+          whatsapp: "+84 912 345 678",
+          regDate: "2015-12-01",
+          indexedDate: "2024-06-01",
+          country: "VN",
+          language: "VI",
+          facebook: "facebook.com/blackrow",
+          instagram: "instagram.com/blackrow",
+          youtube: "youtube.com/blackrow",
+          pinterest: "pinterest.com/blackrow",
+          tiktok: "tiktok.com/@blackrow",
+          twitter: "twitter.com/blackrow"
+        },
+        "foxness.com": {
+          domain: "foxness.com",
+          name: "foxness",
+          owner: "Sophie Janssen",
+          traffic: "2,900/mo",
+          dateAdded: "2023-03-01",
+          hosting: "Shopify",
+          tags: ["Pets", "Accessories", "NL"],
+          description: "Pet accessories and toys",
+          email: "info@foxness.com",
+          phone: "+31 20 1234567",
+          whatsapp: "+31 6 12345678",
+          regDate: "2023-02-14",
+          indexedDate: "2024-06-01",
+          country: "NL",
+          language: "NL",
+          facebook: "facebook.com/foxness",
+          instagram: "instagram.com/foxness",
+          youtube: "youtube.com/foxness",
+          pinterest: "pinterest.com/foxness",
+          tiktok: "tiktok.com/@foxness",
+          twitter: "twitter.com/foxness"
+        },
+        "cofuze.com": {
+          domain: "cofuze.com",
+          name: "cofuze.com - CoFuze™",
+          owner: "Arjun Patel",
+          traffic: "1,200/mo",
+          dateAdded: "2022-12-01",
+          hosting: "Shopify",
+          tags: ["Coffee", "Accessories", "IN"],
+          description: "Coffee accessories and mugs",
+          email: "support@cofuze.com",
+          phone: "+91 44 1234 5678",
+          whatsapp: "+91 90000 56789",
+          regDate: "2022-10-10",
+          indexedDate: "2024-06-01",
+          country: "IN",
+          language: "EN",
+          facebook: "facebook.com/cofuze",
+          instagram: "instagram.com/cofuze",
+          youtube: "youtube.com/cofuze",
+          pinterest: "pinterest.com/cofuze",
+          tiktok: "tiktok.com/@cofuze",
+          twitter: "twitter.com/cofuze"
+        }
+        // ...existing code...
+      };
+
+      // --- END MOCK DATA SECTION ---
+
+      // Details panel logic, always show full data for clicked row
+      document.addEventListener("DOMContentLoaded", function () {
+        const detailsPanel = document.getElementById('detailsPanel');
+        const detailsContent = document.getElementById('detailsContent');
+        const resultsTable = document.querySelector('table');
+
+        // Helper: render only website-related fields from the full data object
+        function renderFullDetails(data) {
+          // Responsive grid for details
+          return `
+<div class="p-4 md:p-8">
+  <div class="bg-white rounded-lg shadow-md p-4 md:p-6 mb-6">
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-6 gap-4">
+      <div class="flex items-center">
+        <div class="w-8 h-8 bg-gray-700 rounded-full flex items-center justify-center mr-3">
+          <i class="ri-global-line text-white text-lg"></i>
+        </div>
+        <h2 class="text-xl font-semibold break-words">${data.domain || data.name || ''}</h2>
+      </div>
+      <div class="flex flex-wrap gap-2 mt-2 md:mt-0">
+        ${(data.tags||[]).map(tag=>`<span class="bg-blue-100 text-blue-800 text-xs px-3 py-1 rounded-full">${tag}</span>`).join('')}
+      </div>
+    </div>
+    <div class="space-y-6">
+      <h3 class="text-lg font-semibold mb-4">Website Details</h3>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-6">
+        <div>
+          <p class="text-sm text-gray-500 mb-1">Site Name</p>
+          <div class="font-medium break-words">${data.name||''}</div>
+        </div>
+        <div>
+          <p class="text-sm text-gray-500 mb-1">Owner</p>
+          <div class="font-medium break-words">${data.owner||''}</div>
+        </div>
+        <div>
+          <p class="text-sm text-gray-500 mb-1">Domain</p>
+          <div class="font-medium break-words">${data.domain||''}</div>
+        </div>
+        <div>
+          <p class="text-sm text-gray-500 mb-1">Traffic</p>
+          <div class="font-medium break-words">${data.traffic||''}</div>
+        </div>
+        <div>
+          <p class="text-sm text-gray-500 mb-1">Date Added</p>
+          <div class="font-medium break-words">${data.dateAdded||''}</div>
+        </div>
+        <div>
+          <p class="text-sm text-gray-500 mb-1">Hosting Type</p>
+          <div class="font-medium break-words">${data.hosting||''}</div>
+        </div>
+        <div>
+          <p class="text-sm text-gray-500 mb-1">Country</p>
+          <div class="font-medium break-words">${data.country||''}</div>
+        </div>
+        <div>
+          <p class="text-sm text-gray-500 mb-1">Language</p>
+          <div class="font-medium break-words">${data.language||''}</div>
+        </div>
+        <div>
+          <p class="text-sm text-gray-500 mb-1">Description</p>
+          <div class="font-medium break-words">${data.description||''}</div>
+        </div>
+        <div>
+          <p class="text-sm text-gray-500 mb-1">Email</p>
+          <div class="font-medium break-words">${data.email||''}</div>
+        </div>
+        <div>
+          <p class="text-sm text-gray-500 mb-1">Phone</p>
+          <div class="font-medium break-words">${data.phone||''}</div>
+        </div>
+        <div>
+          <p class="text-sm text-gray-500 mb-1">WhatsApp</p>
+          <div class="font-medium break-words">${data.whatsapp||''}</div>
+        </div>
+        <div>
+          <p class="text-sm text-gray-500 mb-1">Domain Reg Date</p>
+          <div class="font-medium break-words">${data.regDate||''}</div>
+        </div>
+        <div>
+          <p class="text-sm text-gray-500 mb-1">Indexed Date</p>
+          <div class="font-medium break-words">${data.indexedDate||''}</div>
+        </div>
+        <div>
+          <p class="text-sm text-gray-500 mb-1">Facebook</p>
+          <div class="font-medium break-words"><a href="https://${data.facebook||'#'}" target="_blank">${data.facebook||''}</a></div>
+        </div>
+        <div>
+          <p class="text-sm text-gray-500 mb-1">Instagram</p>
+          <div class="font-medium break-words"><a href="https://${data.instagram||'#'}" target="_blank">${data.instagram||''}</a></div>
+        </div>
+        <div>
+          <p class="text-sm text-gray-500 mb-1">YouTube</p>
+          <div class="font-medium break-words"><a href="https://${data.youtube||'#'}" target="_blank">${data.youtube||''}</a></div>
+        </div>
+        <div>
+          <p class="text-sm text-gray-500 mb-1">Pinterest</p>
+          <div class="font-medium break-words"><a href="https://${data.pinterest||'#'}" target="_blank">${data.pinterest||''}</a></div>
+        </div>
+        <div>
+          <p class="text-sm text-gray-500 mb-1">TikTok</p>
+          <div class="font-medium break-words"><a href="https://${data.tiktok||'#'}" target="_blank">${data.tiktok||''}</a></div>
+        </div>
+        <div>
+          <p class="text-sm text-gray-500 mb-1">Twitter</p>
+          <div class="font-medium break-words"><a href="https://${data.twitter||'#'}" target="_blank">${data.twitter||''}</a></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+          `;
+        }
+
+        // Show panel and populate content on row click
+        resultsTable.addEventListener('click', function (e) {
+          const row = e.target.closest('.result-row');
+          if (!row) return;
+          // Use domain as key for demo/mock data
+          const domain = row.getAttribute('data-domain');
+          // In production, fetch full data from backend/API here
+          const data = websiteFullData[domain];
+          if (!data) {
+            detailsContent.innerHTML = `<div class="p-8 text-gray-400 text-center">No details available for this website.</div>`;
+          } else {
+            detailsContent.innerHTML = renderFullDetails(data);
+          }
+          detailsPanel.classList.remove('translate-x-full');
+          detailsPanel.classList.add('translate-x-0');
+        });
+
+        // Clear details panel on filter reset (button with text "Reset")
+        document.querySelectorAll('button').forEach(btn => {
+          if (btn.textContent.trim().toLowerCase() === 'reset') {
+            btn.addEventListener('click', function () {
+              detailsPanel.classList.remove('translate-x-0');
+              detailsPanel.classList.add('translate-x-full');
+              detailsContent.innerHTML = '';
+            });
+          }
+        });
+
+        // Optional: close on click outside
+        document.addEventListener('mousedown', function (e) {
+          if (!detailsPanel.contains(e.target) && !e.target.closest('.result-row')) {
+            detailsPanel.classList.remove('translate-x-0');
+            detailsPanel.classList.add('translate-x-full');
+            detailsContent.innerHTML = '';
+          }
+        });
+      });
+    </script>
+  </body>
+</html>
