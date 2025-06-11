@@ -180,7 +180,7 @@
         <div class="toggle-forms">
           <div class="forms-wrapper" id="formsWrapper">
             <!-- Sign In Form -->
-            <form action="login.php" method="post" class="signin-form visible-form px-1" id="signinForm">
+            <form action="auth/login/" method="post" class="signin-form visible-form px-1" id="signinForm">
               <div class="space-y-4">
                 <div class="input-group">
                   <input type="email" id="signin-email" name="email" placeholder=" " class="border-none">
@@ -206,7 +206,7 @@
               </div>
             </form>
             <!-- Sign Up Form -->
-            <form action="signup.php" method="post" class="signup-form hidden-form px-1" id="signupForm">
+            <form action="auth/signup/" method="post" class="signup-form hidden-form px-1" id="signupForm">
               <div class="space-y-4">
                 <div class="input-group">
                   <input type="text" id="fullname" name="fullname" placeholder=" " class="border-none">
@@ -483,7 +483,7 @@
   }
 
   // Send the email to backend
-  fetch('send_reset.php', {
+  fetch('auth/reset/send_reset.php', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded'

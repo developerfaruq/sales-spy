@@ -1,0 +1,1854 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Settings - Admin Dashboard</title>
+<script src="https://cdn.tailwindcss.com/3.4.16"></script>
+<script>tailwind.config={theme:{extend:{colors:{primary:'#1E3A8A',secondary:'#5BC0EB'},borderRadius:{'none':'0px','sm':'4px',DEFAULT:'8px','md':'12px','lg':'16px','xl':'20px','2xl':'24px','3xl':'32px','full':'9999px','button':'8px'}}}}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" rel="stylesheet">
+<style>
+:where([class^="ri-"])::before { content: "\f3c2"; }
+body {
+font-family: 'Inter', sans-serif;
+background-color: #f8f9fa;
+}
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+-webkit-appearance: none;
+margin: 0;
+}
+.custom-checkbox {
+position: relative;
+display: inline-block;
+width: 20px;
+height: 20px;
+background-color: white;
+border: 2px solid #e2e8f0;
+border-radius: 4px;
+cursor: pointer;
+transition: all 0.2s;
+}
+.custom-checkbox.checked {
+background-color: #3b82f6;
+border-color: #3b82f6;
+}
+.custom-checkbox.checked::after {
+content: '';
+position: absolute;
+left: 6px;
+top: 2px;
+width: 6px;
+height: 10px;
+border: solid white;
+border-width: 0 2px 2px 0;
+transform: rotate(45deg);
+}
+.custom-switch {
+position: relative;
+display: inline-block;
+width: 44px;
+height: 24px;
+}
+.custom-switch input {
+opacity: 0;
+width: 0;
+height: 0;
+}
+.switch-slider {
+position: absolute;
+cursor: pointer;
+top: 0;
+left: 0;
+right: 0;
+bottom: 0;
+background-color: #e2e8f0;
+transition: .4s;
+border-radius: 24px;
+}
+.switch-slider:before {
+position: absolute;
+content: "";
+height: 18px;
+width: 18px;
+left: 3px;
+bottom: 3px;
+background-color: white;
+transition: .4s;
+border-radius: 50%;
+}
+input:checked + .switch-slider {
+background-color: #3b82f6;
+}
+input:checked + .switch-slider:before {
+transform: translateX(20px);
+}
+.dropdown {
+position: relative;
+display: inline-block;
+}
+.dropdown-content {
+display: none;
+position: absolute;
+background-color: white;
+min-width: 160px;
+box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+z-index: 1;
+border-radius: 8px;
+right: 0;
+}
+.dropdown-content a {
+color: black;
+padding: 12px 16px;
+text-decoration: none;
+display: block;
+}
+.dropdown-content a:hover {
+background-color: #f8f9fa;
+}
+.dropdown:hover .dropdown-content {
+display: block;
+}
+
+/* Sidebar transition for smooth expand/collapse (match Dashboard-home.html) */
+#sidebar {
+  width: 240px;
+  min-width: 240px;
+  max-width: 240px;
+  transition: width 0.6s cubic-bezier(0.4,0,0.2,1), min-width 0.6s cubic-bezier(0.4,0,0.2,1), max-width 0.6s cubic-bezier(0.4,0,0.2,1);
+  overflow-x: hidden;
+}
+#sidebar.sidebar-collapsed {
+  width: 80px;
+  min-width: 80px;
+  max-width: 80px;
+}
+#sidebar .sidebar-logo-text {
+  transition: opacity 0.3s;
+}
+#sidebar.sidebar-collapsed .sidebar-logo-text {
+  opacity: 0;
+  pointer-events: none;
+}
+#sidebar .sidebar-logo-img {
+  display: none;
+}
+#sidebar.sidebar-collapsed .sidebar-logo-img {
+  display: block !important;
+}
+#sidebar .sidebar-logo-img {
+  transition: opacity 0.3s;
+}
+#sidebar.sidebar-collapsed .sidebar-logo-img {
+  opacity: 1;
+}
+#sidebar .sidebar-logo-img:not(.sidebar-collapsed) {
+  opacity: 0;
+}
+.sidebar-collapsed .sidebar-text {
+  display: none !important;
+}
+.sidebar-collapsed .mr-3,
+.sidebar-collapsed .sidebar-icon {
+  margin-right: 0 !important;
+}
+.sidebar-collapsed nav ul li a {
+  justify-content: center;
+  padding-left: 0.5rem !important;
+  padding-right: 0.5rem !important;
+}
+.sidebar-collapsed .rounded-r-lg {
+  border-radius: 8px !important;
+}
+.sidebar-collapsed .border-l-4 {
+  border-left-width: 0 !important;
+}
+.sidebar-collapsed .sidebar-logo {
+  justify-content: center !important;
+}
+.sidebar-collapsed .sidebar-logo-text {
+  display: none !important;
+}
+.sidebar-collapsed .sidebar-logo-img {
+  display: block !important;
+}
+.sidebar-logo-img {
+  display: none;
+}
+.sidebar-logo-text {
+  display: block;
+}
+@media (max-width: 1024px) {
+  #sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 40;
+    height: 100vh;
+    transform: translateX(-100%);
+    transition: transform 0.6s cubic-bezier(0.4,0,0.2,1), width 0.6s cubic-bezier(0.4,0,0.2,1), min-width 0.6s cubic-bezier(0.4,0,0.2,1), max-width 0.6s cubic-bezier(0.4,0,0.2,1);
+  }
+  #sidebar.open {
+    transform: translateX(0);
+  }
+  .sidebar-backdrop {
+    display: block;
+  }
+}
+@media (min-width: 1025px) {
+  .sidebar-backdrop {
+    display: none !important;
+  }
+}
+.sidebar-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.3);
+  z-index: 30;
+  display: none;
+}
+</style>
+</head>
+<body class="flex h-screen bg-gray-50">
+<!-- Sidebar Backdrop for mobile -->
+<div class="sidebar-backdrop hidden" id="sidebar-backdrop"></div>
+<!-- Sidebar -->
+<div id="sidebar" class="sidebar-collapsed bg-white shadow-lg z-20 flex flex-col transition-all duration-700 ease-in-out">
+  <div class="p-4 border-b flex items-center justify-center sidebar-logo">
+    <img src="logo-icon.png" alt="Logo" id="sidebar-logo-img" class="sidebar-logo-img w-8 h-8 mr-0">
+    <h1 id="sidebar-logo-text" class="sidebar-logo-text font-['Pacifico'] text-2xl text-primary ml-2 transition-opacity duration-300">Sales-Spy</h1>
+  </div>
+  <nav class="flex-1 overflow-y-auto py-4">
+    <ul>
+      <li class="mb-2">
+        <a href="Dashboard-home.html" class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-r-lg hover:text-primary transition-colors">
+          <div class="w-6 h-6 flex items-center justify-center mr-3 sidebar-icon">
+            <i class="ri-dashboard-line"></i>
+          </div>
+          <span class="sidebar-text">Dashboard</span>
+        </a>
+      </li>
+      <li class="mb-2">
+        <a href="Dashboard-web.html" class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-r-lg hover:text-primary transition-colors">
+          <div class="w-6 h-6 flex items-center justify-center mr-3 sidebar-icon">
+            <i class="ri-global-line"></i>
+          </div>
+          <span class="sidebar-text">Websites</span>
+        </a>
+      </li> 
+      <li class="mb-2">
+        <a href="#" class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-r-lg hover:text-primary transition-colors">
+          <div class="w-6 h-6 flex items-center justify-center mr-3 sidebar-icon">
+            <i class="ri-shopping-cart-line"></i>
+          </div>
+          <span class="sidebar-text">E-commerce</span>
+        </a>
+      </li>
+      <li class="mb-2">
+        <a href="#" class="flex items-center px-4 py-3 text-primary bg-blue-50 rounded-r-lg border-l-4 border-primary">
+          <div class="w-6 h-6 flex items-center justify-center mr-3 sidebar-icon">
+            <i class="ri-settings-line"></i>
+          </div>
+          <span class="sidebar-text">Settings</span>
+        </a>
+      </li>
+    </ul>
+  </nav>
+  <!-- Upgrade section (unchanged) -->
+  <div id="upgrade-section" class="p-4 border-t">
+                    <div id="upgrade-expanded" class="bg-gray-50 rounded-lg p-4 mb-3">
+                        <p class="text-sm text-gray-600 mb-2">Credits remaining</p>
+                        <div class="flex items-center justify-between">
+                            <span class="font-semibold text-lg">1,250</span>
+                            <span class="text-xs text-gray-500">of 2,000</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2 mt-2">
+                            <div class="bg-primary rounded-full h-2" style="width: 62.5%"></div>
+                        </div>
+                    </div>
+                    <button id="upgrade-btn-expanded" class="w-full bg-primary text-white py-2 px-4 rounded-button flex items-center justify-center whitespace-nowrap hover:bg-blue-600 transition-colors">
+                        <div class="w-5 h-5 flex items-center justify-center mr-2">
+                            <i class="ri-arrow-up-line"></i>
+                        </div>
+                        <span>Upgrade Plan</span>
+                    </button>
+                    <button id="upgrade-btn-collapsed" class="hidden bg-primary text-white w-10 h-10 rounded-full flex items-center justify-center mx-auto mt-2 hover:bg-blue-600 transition-colors" title="Upgrade">
+                        <i class="ri-arrow-up-line"></i>
+                    </button>
+                </div>
+                <script>
+                    document.addEventListener('DOMContentLoaded', function() {
+                        const sidebar = document.getElementById('sidebar');
+                        const upgradeExpanded = document.getElementById('upgrade-expanded');
+                        const upgradeBtnExpanded = document.getElementById('upgrade-btn-expanded');
+                        const upgradeBtnCollapsed = document.getElementById('upgrade-btn-collapsed');
+                        const logoImg = document.getElementById('sidebar-logo-img');
+                        const logoText = document.getElementById('sidebar-logo-text');
+
+                        function updateUpgradeSection() {
+                            if (sidebar.classList.contains('sidebar-collapsed')) {
+                                upgradeExpanded.style.display = 'none';
+                                upgradeBtnExpanded.style.display = 'none';
+                                upgradeBtnCollapsed.classList.remove('hidden'); 
+                            } else {
+                                upgradeExpanded.style.display = '';
+                                upgradeBtnExpanded.style.display = '';
+                                upgradeBtnCollapsed.classList.add('hidden');
+                            }
+                        }
+
+                        function updateLogo() {
+                            if (sidebar.classList.contains('sidebar-collapsed')) {
+                                logoImg.classList.remove('hidden');
+                                logoText.classList.add('hidden');
+                            } else {
+                                logoImg.classList.add('hidden');
+                                logoText.classList.remove('hidden');
+                            }
+                        }
+
+                        // Initial state
+                        updateUpgradeSection();
+                        updateLogo();
+
+                        // Listen for sidebar toggle
+                        const sidebarToggle = document.getElementById('sidebar-toggle');
+                        sidebarToggle.addEventListener('click', function() {
+                            setTimeout(() => {
+                                updateUpgradeSection();
+                                updateLogo();
+                            }, 310); // Wait for transition
+                        });
+
+                        // Also update on resize (for responsive)
+                        window.addEventListener('resize', function() {
+                            setTimeout(() => {
+                                updateUpgradeSection();
+                                updateLogo();
+                            }, 310);
+                        });
+                    });
+                </script>
+</div>
+<!-- Main content -->
+<div class="flex-1 flex flex-col min-h-screen">
+  <!-- Header -->
+  <header class="bg-white shadow-sm sticky top-0 z-10">
+    <div class="flex items-center justify-between px-6 py-4">
+      <div class="flex items-center">
+        <!-- Hamburger menu for mobile/desktop collapse (move here, match Dashboard-home.html) -->
+        <button id="sidebar-toggle" class="p-2 rounded-full hover:bg-gray-100 mr-4">
+          <i class="ri-menu-line"></i>
+        </button>
+        <script>
+          document.addEventListener('DOMContentLoaded', function() {
+            const sidebar = document.getElementById('sidebar');
+            const sidebarToggle = document.getElementById('sidebar-toggle');
+            const sidebarBackdrop = document.getElementById('sidebar-backdrop');
+            const mq = window.matchMedia('(max-width: 1024px)');
+            function updateSidebarText() {
+              const sidebarTexts = sidebar.querySelectorAll('.sidebar-text');
+              if (sidebar.classList.contains('sidebar-collapsed')) {
+          sidebarTexts.forEach(el => el.style.display = 'none');
+              } else {
+          sidebarTexts.forEach(el => el.style.display = '');
+              }
+            }
+            function openSidebarMobile() {
+              sidebar.classList.add('open');
+              sidebarBackdrop.classList.remove('hidden');
+              sidebar.classList.remove('sidebar-collapsed');
+              updateSidebarText();
+            }
+            function closeSidebarMobile() {
+              sidebar.classList.remove('open');
+              sidebarBackdrop.classList.add('hidden');
+              sidebar.classList.add('sidebar-collapsed');
+              updateSidebarText();
+            }
+            function toggleSidebarDesktop() {
+              sidebar.classList.toggle('sidebar-collapsed');
+              updateSidebarText();
+            }
+            function handleSidebarToggle() {
+              if (mq.matches) {
+          if (!sidebar.classList.contains('open')) {
+            openSidebarMobile();
+          } else {
+            closeSidebarMobile();
+          }
+              } else {
+          toggleSidebarDesktop();
+              }
+            }
+            if (sidebarToggle) {
+              sidebarToggle.addEventListener('click', handleSidebarToggle);
+            }
+            if (sidebarBackdrop) {
+              sidebarBackdrop.addEventListener('click', closeSidebarMobile);
+            }
+            function handleResize() {
+              if (mq.matches) {
+          sidebar.classList.add('sidebar-collapsed');
+          sidebar.classList.remove('open');
+          sidebarBackdrop.classList.add('hidden');
+          updateSidebarText();
+              } else {
+          sidebar.classList.remove('open');
+          sidebarBackdrop.classList.add('hidden');
+          updateSidebarText();
+              }
+            }
+            window.addEventListener('resize', handleResize);
+            handleResize();
+            updateSidebarText();
+          });
+        </script>
+        <span class="hidden lg:block font-semibold text-xl text-primary">Settings</span>
+      </div>
+      <div class="flex items-center space-x-4">
+        <div class="flex items-center bg-gray-100 rounded-full px-3 py-1">
+          <div class="w-5 h-5 flex items-center justify-center mr-2 text-primary">
+            <i class="ri-coin-line"></i>
+          </div>
+          <span class="text-sm font-medium">1,250 credits</span>
+        </div>
+        <button class="bg-primary text-white py-2 px-4 rounded-button whitespace-nowrap hover:bg-blue-600 transition-colors">
+          <span>Upgrade</span>
+        </button>
+        <div class="dropdown">
+          <button class="flex items-center space-x-2 focus:outline-none">
+            <div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
+              <img src="https://readdy.ai/api/search-image?query=professional%20headshot%20of%20a%20young%20business%20person%2C%20neutral%20expression%2C%20high%20quality%20portrait%2C%20business%20attire&width=200&height=200&seq=1&orientation=squarish" alt="User avatar" class="w-full h-full object-cover">
+            </div>
+            <i class="ri-arrow-down-s-line text-gray-500"></i>
+          </button>
+          <div class="dropdown-content right-0 mt-2">
+            <a href="#">Profile</a>
+            <a href="#">Settings</a>
+            <a href="#">Logout</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+  <!-- Main content scrollable area -->
+<main class="flex-1 overflow-y-auto p-6">
+<div class="max-w-5xl mx-auto">
+<h1 class="text-2xl font-bold text-gray-900 mb-6">Settings</h1>
+<!-- Profile Image Section -->
+<section class="bg-white rounded-lg shadow-sm mb-6 overflow-hidden">
+<div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center">
+<h2 class="text-lg font-medium text-gray-900">Profile Image</h2>
+<button class="flex items-center text-gray-500" id="toggle-profile">
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Profile Image Section collapse/expand
+  const toggleProfile = document.getElementById('toggle-profile');
+  const profileContent = document.getElementById('profile-content');
+  const profileIcon = document.getElementById('profile-icon');
+  if (toggleProfile && profileContent && profileIcon) {
+    toggleProfile.addEventListener('click', function() {
+      if (profileContent.classList.contains('hidden')) {
+        profileContent.classList.remove('hidden');
+        profileIcon.classList.remove('ri-arrow-down-s-line');
+        profileIcon.classList.add('ri-arrow-up-s-line');
+      } else {
+        profileContent.classList.add('hidden');
+        profileIcon.classList.remove('ri-arrow-up-s-line');
+        profileIcon.classList.add('ri-arrow-down-s-line');
+      }
+    });
+  }
+});
+</script>
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-arrow-up-s-line" id="profile-icon"></i>
+</div>
+</button>
+</div>
+<div class="p-6" id="profile-content">
+<div class="flex flex-col md:flex-row items-center gap-8">
+<div class="w-40 h-40 rounded-full bg-gray-100 overflow-hidden flex items-center justify-center relative">
+<img src="https://readdy.ai/api/search-image?query=professional%20headshot%20of%20a%20young%20business%20person%20with%20neutral%20expression%2C%20high%20quality%20portrait%20photo%2C%20professional%20lighting%2C%20office%20background&width=400&height=400&seq=2&orientation=squarish" alt="Current profile" class="w-full h-full object-cover" id="profile-preview">
+</div>
+<div class="flex-1">
+<div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-primary transition-colors cursor-pointer" id="dropzone">
+<div class="w-12 h-12 mx-auto mb-4 flex items-center justify-center text-gray-400">
+<i class="ri-upload-cloud-line ri-2x"></i>
+</div>
+<p class="text-sm text-gray-600 mb-2">Drag and drop your image here, or</p>
+<button class="px-4 py-2 bg-primary text-white rounded-button text-sm font-medium hover:bg-blue-600 transition-colors whitespace-nowrap">Choose File</button>
+<input type="file" id="profile-upload" class="hidden" accept=".jpg,.jpeg,.png,.webp">
+<p class="text-xs text-gray-500 mt-3">Accepted formats: JPG, PNG, WEBP (max 5MB)</p>
+</div>
+<div class="mt-4 flex justify-end">
+<button class="px-4 py-2 bg-primary text-white rounded-button text-sm font-medium hover:bg-blue-600 transition-colors whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed" id="save-profile" disabled>Save Changes</button>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Account Information Section -->
+<section class="bg-white rounded-lg shadow-sm mb-6 overflow-hidden">
+<div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center">
+<h2 class="text-lg font-medium text-gray-900">Account Information</h2>
+<button class="flex items-center text-gray-500" id="toggle-account">
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Account Information Section collapse/expand
+  const toggleAccount = document.getElementById('toggle-account');
+  const accountContent = document.getElementById('account-content');
+  const accountIcon = document.getElementById('account-icon');
+  if (toggleAccount && accountContent && accountIcon) {
+    toggleAccount.addEventListener('click', function() {
+      if (accountContent.classList.contains('hidden')) {
+        accountContent.classList.remove('hidden');
+        accountIcon.classList.remove('ri-arrow-down-s-line');
+        accountIcon.classList.add('ri-arrow-up-s-line');
+      } else {
+        accountContent.classList.add('hidden');
+        accountIcon.classList.remove('ri-arrow-up-s-line');
+        accountIcon.classList.add('ri-arrow-down-s-line');
+      }
+    });
+  }
+});
+</script>
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-arrow-up-s-line" id="account-icon"></i>
+</div>
+</button>
+</div>
+<div class="p-6" id="account-content">
+<form id="account-form">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+<div>
+<label for="full-name" class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+<input type="text" id="full-name" class="w-full px-4 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-primary focus:border-primary outline-none transition" value="Jonathan Wilson">
+</div>
+<div>
+<label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
+<input type="email" id="email" class="w-full px-4 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-primary focus:border-primary outline-none transition" value="jonathan.wilson@example.com">
+</div>
+<div>
+<label for="phone" class="block text-sm font-medium text-gray-700 mb-1">Phone Number (optional)</label>
+<input type="tel" id="phone" class="w-full px-4 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-primary focus:border-primary outline-none transition" value="+1 (555) 123-4567">
+</div>
+</div>
+<div class="border-t border-gray-100 pt-6 mt-6">
+<h3 class="text-md font-medium text-gray-900 mb-4">Change Password</h3>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<div>
+<label for="current-password" class="block text-sm font-medium text-gray-700 mb-1">Current Password</label>
+<input type="password" id="current-password" class="w-full px-4 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-primary focus:border-primary outline-none transition">
+</div>
+<div></div>
+<div>
+<label for="new-password" class="block text-sm font-medium text-gray-700 mb-1">New Password</label>
+<input type="password" id="new-password" class="w-full px-4 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-primary focus:border-primary outline-none transition">
+<div class="mt-1 h-1 w-full bg-gray-200 rounded-full overflow-hidden">
+<div class="h-full bg-gray-400 rounded-full" style="width: 0%" id="password-strength"></div>
+</div>
+</div>
+<div>
+<label for="confirm-password" class="block text-sm font-medium text-gray-700 mb-1">Confirm New Password</label>
+<input type="password" id="confirm-password" class="w-full px-4 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-primary focus:border-primary outline-none transition">
+</div>
+</div>
+</div>
+<div class="border-t border-gray-100 pt-6 mt-6">
+<h3 class="text-md font-medium text-gray-900 mb-4">Notifications</h3>
+<div class="flex items-center justify-between py-2">
+<div>
+<p class="text-sm font-medium text-gray-700">Email Notifications</p>
+<p class="text-xs text-gray-500">Receive emails about your account activity</p>
+</div>
+<label class="custom-switch">
+<input type="checkbox" checked>
+<span class="switch-slider"></span>
+</label>
+</div>
+<div class="flex items-center justify-between py-2">
+<div>
+<p class="text-sm font-medium text-gray-700">Marketing Emails</p>
+<p class="text-xs text-gray-500">Receive emails about new features and offers</p>
+</div>
+<label class="custom-switch">
+<input type="checkbox">
+<span class="switch-slider"></span>
+</label>
+</div>
+</div>
+<div class="flex justify-end space-x-3 mt-6">
+<button type="button" class="px-4 py-2 border border-gray-300 text-gray-700 rounded-button text-sm font-medium hover:bg-gray-50 transition-colors whitespace-nowrap">Cancel</button>
+<button type="submit" class="px-4 py-2 bg-primary text-white rounded-button text-sm font-medium hover:bg-blue-600 transition-colors whitespace-nowrap">Save Changes</button>
+</div>
+</form>
+</div>
+</section>
+<!-- Subscription & Billing Section -->
+<section class="bg-white rounded-lg shadow-sm mb-6 overflow-hidden">
+<div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center">
+<h2 class="text-lg font-medium text-gray-900">Subscription & Billing</h2>
+<button class="flex items-center text-gray-500" id="toggle-subscription">
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Subscription & Billing Section collapse/expand
+  const toggleSubscription = document.getElementById('toggle-subscription');
+  const subscriptionContent = document.getElementById('subscription-content');
+  const subscriptionIcon = document.getElementById('subscription-icon');
+  if (toggleSubscription && subscriptionContent && subscriptionIcon) {
+    toggleSubscription.addEventListener('click', function() {
+      if (subscriptionContent.classList.contains('hidden')) {
+        subscriptionContent.classList.remove('hidden');
+        subscriptionIcon.classList.remove('ri-arrow-down-s-line');
+        subscriptionIcon.classList.add('ri-arrow-up-s-line');
+      } else {
+        subscriptionContent.classList.add('hidden');
+        subscriptionIcon.classList.remove('ri-arrow-up-s-line');
+        subscriptionIcon.classList.add('ri-arrow-down-s-line');
+      }
+    });
+  }
+});
+</script>
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-arrow-up-s-line" id="subscription-icon"></i>
+</div>
+</button>
+</div>
+<div class="p-6" id="subscription-content">
+<div class="mb-6">
+<div class="border border-gray-200 rounded-lg p-6">
+<div class="flex flex-col md:flex-row md:items-center md:justify-between mb-4">
+<div>
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 mb-2">Current Plan</span>
+<h3 class="text-xl font-bold text-gray-900">Professional Plan</h3>
+</div>
+<div class="mt-2 md:mt-0">
+<span class="text-2xl font-bold text-gray-900">$49</span>
+<span class="text-gray-500">/month</span>
+</div>
+</div>
+<div class="flex flex-wrap gap-2 mb-4">
+<div class="flex items-center text-sm text-gray-600">
+<div class="w-4 h-4 flex items-center justify-center mr-1 text-green-500">
+<i class="ri-check-line"></i>
+</div>
+<span>Unlimited Projects</span>
+</div>
+<div class="flex items-center text-sm text-gray-600">
+<div class="w-4 h-4 flex items-center justify-center mr-1 text-green-500">
+<i class="ri-check-line"></i>
+</div>
+<span>Advanced Analytics</span>
+</div>
+<div class="flex items-center text-sm text-gray-600">
+<div class="w-4 h-4 flex items-center justify-center mr-1 text-green-500">
+<i class="ri-check-line"></i>
+</div>
+<span>24/7 Support</span>
+</div>
+</div>
+<div class="text-sm text-gray-600 mb-4">
+Your subscription will renew on <span class="font-medium">June 21, 2025</span>
+</div>
+<div class="flex flex-wrap gap-3">
+<button class="px-4 py-2 bg-primary text-white rounded-button text-sm font-medium hover:bg-blue-600 transition-colors whitespace-nowrap">Upgrade Plan</button>
+<button class="px-4 py-2 border border-gray-300 text-gray-700 rounded-button text-sm font-medium hover:bg-gray-50 transition-colors whitespace-nowrap">Change Plan</button>
+<button class="px-4 py-2 border border-red-300 text-red-600 rounded-button text-sm font-medium hover:bg-red-50 transition-colors whitespace-nowrap">Cancel Subscription</button>
+</div>
+</div>
+</div>
+<div class="mb-6">
+<h3 class="text-md font-medium text-gray-900 mb-4">Payment Methods</h3>
+<div class="space-y-4 mb-4">
+<div class="border border-gray-200 rounded-lg p-4 flex flex-col md:flex-row md:items-center md:justify-between">
+<div class="flex items-center">
+<div class="w-10 h-10 flex items-center justify-center mr-3 text-blue-500">
+<i class="ri-visa-fill ri-lg"></i>
+</div>
+<div>
+<p class="text-sm font-medium text-gray-900">Visa ending in 4242</p>
+<p class="text-xs text-gray-500">Expires 05/2026</p>
+</div>
+</div>
+<div class="flex items-center mt-3 md:mt-0">
+<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 mr-3">Default</span>
+<button class="text-gray-500 hover:text-gray-700">
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-delete-bin-line"></i>
+</div>
+</button>
+</div>
+</div>
+<div class="border border-gray-200 rounded-lg p-4 flex flex-col md:flex-row md:items-center md:justify-between">
+<div class="flex items-center">
+<div class="w-10 h-10 flex items-center justify-center mr-3 text-orange-500">
+<i class="ri-mastercard-fill ri-lg"></i>
+</div>
+<div>
+<p class="text-sm font-medium text-gray-900">Mastercard ending in 8888</p>
+<p class="text-xs text-gray-500">Expires 11/2025</p>
+</div>
+</div>
+<div class="flex items-center mt-3 md:mt-0">
+<button class="text-sm text-primary hover:text-blue-700 mr-3">Set as default</button>
+<button class="text-gray-500 hover:text-gray-700">
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-delete-bin-line"></i>
+</div>
+</button>
+</div>
+</div>
+</div>
+<div class="flex justify-end space-x-3">
+<button class="px-4 py-2 border border-gray-300 text-gray-700 rounded-button text-sm font-medium hover:bg-gray-50 transition-colors whitespace-nowrap">Cancel</button>
+<button class="px-4 py-2 bg-primary text-white rounded-button text-sm font-medium hover:bg-blue-600 transition-colors whitespace-nowrap">Save Changes</button>
+</div>
+<!-- Add Payment Button (text only, left bottom, always visible) -->
+<div class="flex mt-4">
+<button id="add-payment-btn" type="button" class="text-primary text-sm font-medium hover:underline focus:outline-none pl-0 pr-4 py-1 bg-transparent border-0 shadow-none">Add a payment</button>
+</div>
+</section>
+<!-- Security Section -->
+<section class="bg-white rounded-lg shadow-sm mb-6 overflow-hidden">
+<div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center">
+<h2 class="text-lg font-medium text-gray-900">Security & Access</h2>
+<button class="flex items-center text-gray-500" id="toggle-security">
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Security & Access Section collapse/expand
+  const toggleSecurity = document.getElementById('toggle-security');
+  const securityContent = document.getElementById('security-content');
+  const securityIcon = document.getElementById('security-icon');
+  if (toggleSecurity && securityContent && securityIcon) {
+    toggleSecurity.addEventListener('click', function() {
+      if (securityContent.classList.contains('hidden')) {
+        securityContent.classList.remove('hidden');
+        securityIcon.classList.remove('ri-arrow-down-s-line');
+        securityIcon.classList.add('ri-arrow-up-s-line');
+      } else {
+        securityContent.classList.add('hidden');
+        securityIcon.classList.remove('ri-arrow-up-s-line');
+        securityIcon.classList.add('ri-arrow-down-s-line');
+      }
+    });
+  }
+});
+</script>
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-arrow-down-s-line" id="security-icon"></i>
+</div>
+</button>
+</div>
+<div class="p-6 hidden" id="security-content">
+  <!-- 2FA SECTION -->
+<div class="mb-6">
+<h3 class="text-md font-medium text-gray-900 mb-4">Two-Factor Authentication</h3>
+<div class="flex items-center justify-between py-2 border-b border-gray-100">
+<div>
+<p class="text-sm font-medium text-gray-700">Two-Factor Authentication</p>
+<p class="text-xs text-gray-500">Add an extra layer of security to your account</p>
+</div>
+<label class="custom-switch">
+<input type="checkbox" id="2fa-toggle">
+<span class="switch-slider"></span>
+</label>
+</div>
+<div class="py-4 hidden" id="2fa-setup">
+<div class="bg-gray-50 p-4 rounded-lg mb-4">
+<h4 class="text-sm font-medium text-gray-900 mb-2">Setup Instructions</h4>
+<ol class="text-xs text-gray-600 space-y-2 pl-4 list-decimal">
+<li>Download an authenticator app like Google Authenticator or Authy</li>
+<li>Scan the QR code below with the app</li>
+<li>Enter the 6-digit code from the app to verify</li>
+</ol>
+</div>
+<div class="flex flex-col md:flex-row md:items-center gap-6 mb-4">
+<div class="w-40 h-40 bg-white border border-gray-200 rounded-lg flex items-center justify-center p-2">
+<img src="https://readdy.ai/api/search-image?query=QR%20code%20on%20white%20background%2C%20simple%20black%20and%20white%20QR%20code%20pattern%2C%20clear%20and%20scannable&width=150&height=150&seq=3&orientation=squarish" alt="2FA QR Code" class="w-full h-full object-contain">
+</div>
+<div class="flex-1">
+<p class="text-sm text-gray-600 mb-4">After scanning the QR code, enter the 6-digit verification code from your authenticator app:</p>
+<div class="flex space-x-2 mb-4">
+<input type="text" maxlength="6" class="w-full px-4 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-primary focus:border-primary outline-none transition" placeholder="000000">
+</div>
+<button class="px-4 py-2 bg-primary text-white rounded-button text-sm font-medium hover:bg-blue-600 transition-colors whitespace-nowrap">Verify & Enable</button>
+</div>
+</div>
+<div class="border-t border-gray-100 pt-4">
+<h4 class="text-sm font-medium text-gray-900 mb-2">Backup Codes</h4>
+<p class="text-xs text-gray-600 mb-3">Save these backup codes in a secure place. You can use them to sign in if you lose access to your authenticator app.</p>
+<div class="grid grid-cols-2 md:grid-cols-5 gap-2 mb-3">
+<div class="bg-gray-50 p-2 rounded text-xs font-mono text-center">ABCD-1234</div>
+<div class="bg-gray-50 p-2 rounded text-xs font-mono text-center">EFGH-5678</div>
+<div class="bg-gray-50 p-2 rounded text-xs font-mono text-center">IJKL-9012</div>
+<div class="bg-gray-50 p-2 rounded text-xs font-mono text-center">MNOP-3456</div>
+<div class="bg-gray-50 p-2 rounded text-xs font-mono text-center">QRST-7890</div>
+</div>
+<button class="text-sm text-primary hover:text-blue-700 font-medium">Download Codes</button>
+</div>
+</div>
+</div>
+<div>
+<h3 class="text-md font-medium text-gray-900 mb-4">Active Sessions</h3>
+<div class="space-y-4">
+<div class="border border-gray-200 rounded-lg p-4 flex flex-col md:flex-row md:items-center md:justify-between bg-blue-50 border-blue-200">
+<div class="flex items-center">
+<div class="w-10 h-10 flex items-center justify-center mr-3 text-blue-500 bg-blue-100 rounded-full">
+<i class="ri-computer-line"></i>
+</div>
+<div>
+<p class="text-sm font-medium text-gray-900">Current Session</p>
+<p class="text-xs text-gray-500">Windows 11 • Chrome • New York, USA</p>
+<p class="text-xs text-gray-500">IP: 192.168.1.1 • Last active: Just now</p>
+</div>
+</div>
+<div class="mt-3 md:mt-0">
+<button class="px-4 py-2 border border-gray-300 text-gray-700 rounded-button text-xs font-medium hover:bg-gray-50 transition-colors whitespace-nowrap">Sign Out</button>
+</div>
+</div>
+<div class="border border-gray-200 rounded-lg p-4 flex flex-col md:flex-row md:items-center md:justify-between">
+<div class="flex items-center">
+<div class="w-10 h-10 flex items-center justify-center mr-3 text-gray-500 bg-gray-100 rounded-full">
+<i class="ri-smartphone-line"></i>
+</div>
+<div>
+<p class="text-sm font-medium text-gray-900">iPhone 15 Pro</p>
+<p class="text-xs text-gray-500">iOS 18 • Safari • San Francisco, USA</p>
+<p class="text-xs text-gray-500">IP: 192.168.1.2 • Last active: 2 hours ago</p>
+</div>
+</div>
+<div class="mt-3 md:mt-0">
+<button class="px-4 py-2 border border-gray-300 text-gray-700 rounded-button text-xs font-medium hover:bg-gray-50 transition-colors whitespace-nowrap">Sign Out</button>
+</div>
+</div>
+<div class="border border-gray-200 rounded-lg p-4 flex flex-col md:flex-row md:items-center md:justify-between">
+<div class="flex items-center">
+<div class="w-10 h-10 flex items-center justify-center mr-3 text-gray-500 bg-gray-100 rounded-full">
+<i class="ri-tablet-line"></i>
+</div>
+<div>
+<p class="text-sm font-medium text-gray-900">iPad Air</p>
+<p class="text-xs text-gray-500">iPadOS 18 • Safari • Boston, USA</p>
+<p class="text-xs text-gray-500">IP: 192.168.1.3 • Last active: Yesterday</p>
+</div>
+</div>
+<div class="mt-3 md:mt-0">
+<button class="px-4 py-2 border border-gray-300 text-gray-700 rounded-button text-xs font-medium hover:bg-gray-50 transition-colors whitespace-nowrap">Sign Out</button>
+</div>
+</div>
+</div>
+<div class="mt-4">
+<button class="px-4 py-2 border border-gray-300 text-gray-700 rounded-button text-sm font-medium hover:bg-gray-50 transition-colors whitespace-nowrap">Sign Out From All Devices</button>
+</div>
+</div>
+</div>
+</section>
+<!-- Danger Zone Section -->
+<section class="bg-white rounded-lg shadow-sm mb-6 overflow-hidden">
+<div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center">
+<h2 class="text-lg font-medium text-gray-900">Danger Zone</h2>
+<button class="flex items-center text-gray-500" id="toggle-danger">
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Danger Zone Section collapse/expand
+  const toggleDanger = document.getElementById('toggle-danger');
+  const dangerContent = document.getElementById('danger-content');
+  const dangerIcon = document.getElementById('danger-icon');
+  if (toggleDanger && dangerContent && dangerIcon) {
+    toggleDanger.addEventListener('click', function() {
+      if (dangerContent.classList.contains('hidden')) {
+        dangerContent.classList.remove('hidden');
+        dangerIcon.classList.remove('ri-arrow-down-s-line');
+        dangerIcon.classList.add('ri-arrow-up-s-line');
+      } else {
+        dangerContent.classList.add('hidden');
+        dangerIcon.classList.remove('ri-arrow-up-s-line');
+        dangerIcon.classList.add('ri-arrow-down-s-line');
+      }
+    });
+  }
+});
+</script>
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-arrow-down-s-line" id="danger-icon"></i>
+</div>
+</button>
+</div>
+<div class="p-6 hidden" id="danger-content">
+<div class="border border-red-200 rounded-lg p-6 bg-red-50">
+<div class="flex items-start mb-4">
+<div class="w-10 h-10 flex items-center justify-center mr-3 text-red-500">
+<i class="ri-alert-line ri-lg"></i>
+</div>
+<div>
+<h3 class="text-lg font-medium text-gray-900 mb-1">Delete Account</h3>
+<p class="text-sm text-gray-600">Once you delete your account, there is no going back. This action is permanent and cannot be undone.</p>
+</div>
+</div>
+<button class="px-4 py-2 bg-red-600 text-white rounded-button text-sm font-medium hover:bg-red-700 transition-colors whitespace-nowrap" id="delete-account-btn">Delete Account</button>
+</div>
+</div>
+</section>
+
+
+<!-- Delete Account Modal -->
+<div class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center" id="delete-modal">
+<div class="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
+<div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+<h3 class="text-lg font-medium text-gray-900">Delete Account</h3>
+<button class="text-gray-500 hover:text-gray-700" id="close-delete-modal">
+<div class="w-5 h-5 flex items-center justify-center">
+<i class="ri-close-line"></i>
+</div>
+</button>
+</div>
+<div class="p-6">
+<div class="mb-4">
+<div class="w-12 h-12 mx-auto mb-4 flex items-center justify-center text-red-500 bg-red-100 rounded-full">
+<i class="ri-delete-bin-line ri-xl"></i>
+</div>
+<h4 class="text-lg font-medium text-center mb-2">Are you absolutely sure?</h4>
+<p class="text-sm text-gray-600 text-center">This action cannot be undone. This will permanently delete your account and remove all your data from our servers.</p>
+</div>
+<div class="mb-4">
+<label for="delete-confirm" class="block text-sm font-medium text-gray-700 mb-1">Please type "delete my account" to confirm</label>
+<input type="text" id="delete-confirm" class="w-full px-4 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-primary focus:border-primary outline-none transition" placeholder="delete my account">
+</div>
+<div class="mb-4">
+<label for="delete-password" class="block text-sm font-medium text-gray-700 mb-1">Enter your password</label>
+<input type="password" id="delete-password" class="w-full px-4 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-primary focus:border-primary outline-none transition">
+</div>
+<div class="flex justify-end space-x-3">
+<button class="px-4 py-2 border border-gray-300 text-gray-700 rounded-button text-sm font-medium hover:bg-gray-50 transition-colors whitespace-nowrap" id="cancel-delete-modal">Cancel</button>
+<button class="px-4 py-2 bg-red-600 text-white rounded-button text-sm font-medium hover:bg-red-700 transition-colors whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed" id="confirm-delete-btn" disabled>Delete Account</button>
+</div>
+</div>
+</div>
+</div>
+
+
+<!-- Add Payment Modal (hidden by default) -->
+<div class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center" id="payment-modal">
+  <div class="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
+    <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+      <h3 class="text-lg font-medium text-gray-900">Add Payment Method</h3>
+      <button class="text-gray-500 hover:text-gray-700" id="close-payment-modal">
+        <div class="w-5 h-5 flex items-center justify-center">
+          <i class="ri-close-line"></i>
+        </div>
+      </button>
+    </div>
+    <div class="p-6">
+      <form id="payment-form">
+        <div class="mb-4">
+          <label for="card-name" class="block text-sm font-medium text-gray-700 mb-1">Cardholder Name</label>
+          <input type="text" id="card-name" class="w-full px-4 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-primary focus:border-primary outline-none transition" placeholder="John Doe">
+        </div>
+        <div class="mb-4">
+          <label for="card-number" class="block text-sm font-medium text-gray-700 mb-1">Card Number</label>
+          <div class="relative">
+            <input type="text" id="card-number" class="w-full px-4 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-primary focus:border-primary outline-none transition" placeholder="1234 5678 9012 3456">
+            <div class="absolute right-3 top-1/2 transform -translate-y-1/2 flex space-x-1">
+              <div class="w-6 h-6 flex items-center justify-center text-blue-500">
+                <i class="ri-visa-line"></i>
+              </div>
+              <div class="w-6 h-6 flex items-center justify-center text-orange-500">
+                <i class="ri-mastercard-line"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-4 mb-4">
+          <div>
+            <label for="expiry-date" class="block text-sm font-medium text-gray-700 mb-1">Expiry Date</label>
+            <input type="text" id="expiry-date" class="w-full px-4 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-primary focus:border-primary outline-none transition" placeholder="MM/YY">
+          </div>
+          <div>
+            <label for="cvv" class="block text-sm font-medium text-gray-700 mb-1">CVV</label>
+            <input type="text" id="cvv" class="w-full px-4 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-primary focus:border-primary outline-none transition" placeholder="123">
+          </div>
+        </div>
+        <div class="mb-6">
+          <div class="flex items-center cursor-pointer" id="save-card-toggle">
+            <div class="custom-checkbox" id="save-card-checkbox"></div>
+            <label for="save-card-checkbox" class="ml-2 text-sm text-gray-700 select-none cursor-pointer">Set as default payment method</label>
+          </div>
+        </div>
+        <div class="flex justify-end space-x-3">
+          <button type="button" class="px-4 py-2 border border-gray-300 text-gray-700 rounded-button text-sm font-medium hover:bg-gray-50 transition-colors whitespace-nowrap" id="cancel-payment-modal">Cancel</button>
+          <button type="submit" class="px-4 py-2 bg-primary text-white rounded-button text-sm font-medium hover:bg-blue-600 transition-colors whitespace-nowrap">Add Card</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Sidebar collapse/expand for desktop and mobile
+  const sidebar = document.getElementById('sidebar');
+  const sidebarToggle = document.getElementById('sidebar-toggle');
+  const sidebarBackdrop = document.getElementById('sidebar-backdrop');
+  const mq = window.matchMedia('(max-width: 1024px)');
+  // Hide/show sidebar text for collapse/expand
+  function updateSidebarText() {
+    const sidebarTexts = sidebar.querySelectorAll('.sidebar-text');
+    if (sidebar.classList.contains('sidebar-collapsed')) {
+      sidebarTexts.forEach(el => el.style.display = 'none');
+    } else {
+      sidebarTexts.forEach(el => el.style.display = '');
+    }
+  }
+  function openSidebarMobile() {
+    sidebar.classList.add('open');
+    sidebarBackdrop.classList.remove('hidden');
+    sidebar.classList.remove('sidebar-collapsed');
+    updateSidebarText();
+  }
+  function closeSidebarMobile() {
+    sidebar.classList.remove('open');
+    sidebarBackdrop.classList.add('hidden');
+    sidebar.classList.add('sidebar-collapsed');
+    updateSidebarText();
+  }
+  function toggleSidebarDesktop() {
+    sidebar.classList.toggle('sidebar-collapsed');
+    updateSidebarText();
+  }
+  function handleSidebarToggle() {
+    if (mq.matches) {
+      if (!sidebar.classList.contains('open')) {
+        openSidebarMobile();
+      } else {
+        closeSidebarMobile();
+      }
+    } else {
+      toggleSidebarDesktop();
+    }
+  }
+  if (sidebarToggle) {
+    sidebarToggle.addEventListener('click', handleSidebarToggle);
+  }
+  if (sidebarBackdrop) {
+    sidebarBackdrop.addEventListener('click', closeSidebarMobile);
+  }
+  function handleResize() {
+    if (mq.matches) {
+      sidebar.classList.add('sidebar-collapsed');
+      sidebar.classList.remove('open');
+      sidebarBackdrop.classList.add('hidden');
+      updateSidebarText();
+    } else {
+      sidebar.classList.remove('open');
+      sidebarBackdrop.classList.add('hidden');
+      updateSidebarText();
+    }
+  }
+  window.addEventListener('resize', handleResize);
+  handleResize();
+  updateSidebarText();
+});
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Sidebar collapse/expand for desktop and mobile
+  const sidebar = document.getElementById('sidebar');
+  const sidebarToggle = document.getElementById('sidebar-toggle');
+  const sidebarBackdrop = document.getElementById('sidebar-backdrop');
+  const mq = window.matchMedia('(max-width: 1024px)');
+  // Hide/show sidebar text for collapse/expand
+  function updateSidebarText() {
+    const sidebarTexts = sidebar.querySelectorAll('.sidebar-text');
+    if (sidebar.classList.contains('sidebar-collapsed')) {
+      sidebarTexts.forEach(el => el.style.display = 'none');
+    } else {
+      sidebarTexts.forEach(el => el.style.display = '');
+    }
+  }
+  function openSidebarMobile() {
+    sidebar.classList.add('open');
+    sidebarBackdrop.classList.remove('hidden');
+    sidebar.classList.remove('sidebar-collapsed');
+    updateSidebarText();
+  }
+  function closeSidebarMobile() {
+    sidebar.classList.remove('open');
+    sidebarBackdrop.classList.add('hidden');
+    sidebar.classList.add('sidebar-collapsed');
+    updateSidebarText();
+  }
+  function toggleSidebarDesktop() {
+    sidebar.classList.toggle('sidebar-collapsed');
+    updateSidebarText();
+  }
+  function handleSidebarToggle() {
+    if (mq.matches) {
+      if (!sidebar.classList.contains('open')) {
+        openSidebarMobile();
+      } else {
+        closeSidebarMobile();
+      }
+    } else {
+      toggleSidebarDesktop();
+    }
+  }
+  if (sidebarToggle) {
+    sidebarToggle.addEventListener('click', handleSidebarToggle);
+  }
+  if (sidebarBackdrop) {
+    sidebarBackdrop.addEventListener('click', closeSidebarMobile);
+  }
+  function handleResize() {
+    if (mq.matches) {
+      sidebar.classList.add('sidebar-collapsed');
+      sidebar.classList.remove('open');
+      sidebarBackdrop.classList.add('hidden');
+      updateSidebarText();
+    } else {
+      sidebar.classList.remove('open');
+      sidebarBackdrop.classList.add('hidden');
+      updateSidebarText();
+    }
+  }
+  window.addEventListener('resize', handleResize);
+  handleResize();
+  updateSidebarText();
+});
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Profile image upload functionality
+  const profileUpload = document.getElementById('profile-upload');
+  const dropzone = document.getElementById('dropzone');
+  const profilePreview = document.getElementById('profile-preview');
+  const saveProfileBtn = document.getElementById('save-profile');
+  let selectedProfileFile = null;
+
+  // Modal for profile image success
+  let profileModal = document.getElementById('profile-success-modal');
+  if (!profileModal) {
+    profileModal = document.createElement('div');
+    profileModal.id = 'profile-success-modal';
+    profileModal.className = 'fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40 hidden';
+    profileModal.innerHTML = `
+      <div class="bg-white rounded-lg shadow-xl max-w-xs w-full p-6 text-center">
+        <div class="w-12 h-12 mx-auto mb-4 flex items-center justify-center text-green-500 bg-green-100 rounded-full">
+          <i class="ri-checkbox-circle-line ri-2x"></i>
+        </div>
+        <h4 class="text-lg font-medium mb-2">Success</h4>
+        <p class="text-sm text-gray-600 mb-4">Profile image updated successfully!</p>
+        <button id="close-profile-success-modal" class="px-4 py-2 bg-primary text-white rounded-button text-sm font-medium hover:bg-blue-600 transition-colors">OK</button>
+      </div>
+    `;
+    document.body.appendChild(profileModal);
+  }
+  function showProfileModal() {
+    profileModal.classList.remove('hidden');
+  }
+  profileModal.addEventListener('click', function(e) {
+    if (e.target.id === 'close-profile-success-modal' || e.target === profileModal) {
+      profileModal.classList.add('hidden');
+    }
+  });
+
+  if (profileUpload && dropzone && profilePreview && saveProfileBtn) {
+    // Click on dropzone or button triggers file input
+    dropzone.addEventListener('click', function(e) {
+      if (e.target.tagName !== 'BUTTON') return;
+      profileUpload.click();
+    });
+
+    // Handle file selection
+    profileUpload.addEventListener('change', function() {
+      if (this.files && this.files[0]) {
+        handleProfileFile(this.files[0]);
+      }
+    });
+
+    // Drag and drop functionality
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+      dropzone.addEventListener(eventName, preventDefaults, false);
+    });
+    function preventDefaults(e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    ['dragenter', 'dragover'].forEach(eventName => {
+      dropzone.addEventListener(eventName, () => dropzone.classList.add('border-primary'), false);
+    });
+    ['dragleave', 'drop'].forEach(eventName => {
+      dropzone.addEventListener(eventName, () => dropzone.classList.remove('border-primary'), false);
+    });
+    dropzone.addEventListener('drop', function(e) {
+      const dt = e.dataTransfer;
+      if (dt && dt.files && dt.files[0]) {
+        handleProfileFile(dt.files[0]);
+      }
+    });
+
+    function handleProfileFile(file) {
+      const validTypes = ['image/jpeg', 'image/png', 'image/webp'];
+      if (!validTypes.includes(file.type)) {
+        showProfileModal('Please select a valid image file (JPG, PNG, or WEBP)');
+        return;
+      }
+      if (file.size > 5 * 1024 * 1024) {
+        showProfileModal('File size exceeds 5MB limit');
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        profilePreview.src = e.target.result;
+        saveProfileBtn.disabled = false;
+        selectedProfileFile = file;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    // Save profile button
+    saveProfileBtn.addEventListener('click', function() {
+      if (!selectedProfileFile) return;
+      saveProfileBtn.disabled = true;
+      const originalText = saveProfileBtn.innerHTML;
+      saveProfileBtn.innerHTML = '<div class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2 inline-block"></div> Saving...';
+      setTimeout(() => {
+        saveProfileBtn.innerHTML = originalText;
+        saveProfileBtn.disabled = true;
+        showProfileModal();
+        selectedProfileFile = null;
+      }, 1500);
+    });
+  }
+});
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Account Information Section functionality
+  const accountForm = document.getElementById('account-form');
+  const fullNameInput = document.getElementById('full-name');
+  const emailInput = document.getElementById('email');
+  const phoneInput = document.getElementById('phone');
+  const currentPasswordInput = document.getElementById('current-password');
+  const newPasswordInput = document.getElementById('new-password');
+  const confirmPasswordInput = document.getElementById('confirm-password');
+  const passwordStrengthBar = document.getElementById('password-strength');
+
+  // Password strength check
+  if (newPasswordInput && passwordStrengthBar) {
+    newPasswordInput.addEventListener('input', function() {
+      const val = newPasswordInput.value;
+      let strength = 0;
+      if (val.length >= 8) strength += 1;
+      if (/[A-Z]/.test(val)) strength += 1;
+      if (/[0-9]/.test(val)) strength += 1;
+      if (/[^A-Za-z0-9]/.test(val)) strength += 1;
+      let percent = [0, 25, 50, 75, 100][strength];
+      passwordStrengthBar.style.width = percent + '%';
+      passwordStrengthBar.className = 'h-full rounded-full ' +
+        (percent < 50 ? 'bg-gray-400' : percent < 75 ? 'bg-yellow-400' : 'bg-green-500');
+    });
+  }
+
+  // Form validation and submission
+  if (accountForm) {
+    accountForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      // Basic validation
+      let errors = [];
+      if (!fullNameInput.value.trim()) errors.push('Full Name is required.');
+      if (!emailInput.value.trim() || !/^[^@]+@[^@]+\.[^@]+$/.test(emailInput.value)) errors.push('Valid Email is required.');
+      if (newPasswordInput.value || confirmPasswordInput.value) {
+        if (newPasswordInput.value.length < 8) errors.push('New password must be at least 8 characters.');
+        if (newPasswordInput.value !== confirmPasswordInput.value) errors.push('Passwords do not match.');
+      }
+      if (errors.length > 0) {
+        showAccountModal(errors.join('\n'), false);
+        return;
+      }
+      // Simulate save
+      const submitBtn = accountForm.querySelector('button[type="submit"]');
+      const originalText = submitBtn.innerHTML;
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<div class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2 inline-block"></div> Saving...';
+      setTimeout(() => {
+        submitBtn.innerHTML = originalText;
+        submitBtn.disabled = false;
+        showAccountModal('Account information updated successfully!', true);
+        // Optionally reset password fields
+        currentPasswordInput.value = '';
+        newPasswordInput.value = '';
+        confirmPasswordInput.value = '';
+        passwordStrengthBar.style.width = '0%';
+      }, 1200);
+    });
+  }
+
+  // Modal for Account Info Section
+  // Reuse the profile modal if present, else create a new one
+  let accountModal = document.getElementById('account-success-modal');
+  if (!accountModal) {
+    accountModal = document.createElement('div');
+    accountModal.id = 'account-success-modal';
+    accountModal.className = 'fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40 hidden';
+    accountModal.innerHTML = `
+      <div class="bg-white rounded-lg shadow-xl max-w-xs w-full p-6 text-center">
+        <div class="w-12 h-12 mx-auto mb-4 flex items-center justify-center text-green-500 bg-green-100 rounded-full">
+          <i class="ri-checkbox-circle-line ri-2x"></i>
+        </div>
+        <h4 class="text-lg font-medium mb-2">Success</h4>
+        <p class="text-sm text-gray-600 mb-4"></p>
+        <button id="close-account-success-modal" class="px-4 py-2 bg-primary text-white rounded-button text-sm font-medium hover:bg-blue-600 transition-colors">OK</button>
+      </div>
+    `;
+    document.body.appendChild(accountModal);
+  }
+  function showAccountModal(message, success) {
+    const icon = accountModal.querySelector('i');
+    const title = accountModal.querySelector('h4');
+    const desc = accountModal.querySelector('p');
+    if (success) {
+      icon.className = 'ri-checkbox-circle-line ri-2x';
+      icon.parentElement.className = 'w-12 h-12 mx-auto mb-4 flex items-center justify-center text-green-500 bg-green-100 rounded-full';
+      title.textContent = 'Success';
+      desc.textContent = message;
+    } else {
+      icon.className = 'ri-close-circle-line ri-2x';
+      icon.parentElement.className = 'w-12 h-12 mx-auto mb-4 flex items-center justify-center text-red-500 bg-red-100 rounded-full';
+      title.textContent = 'Error';
+      desc.textContent = message;
+    }
+    accountModal.classList.remove('hidden');
+  }
+  accountModal.addEventListener('click', function(e) {
+    if (e.target.id === 'close-account-success-modal' || e.target === accountModal) {
+      accountModal.classList.add('hidden');
+    }
+  });
+});
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // --- Subscription & Billing Section Functionality ---
+  // Pricing section HTML (from index.html, only the inner pricing cards)
+  const pricingSectionHTML = `
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-full mx-auto">
+      <div class="bg-white rounded-lg shadow-md p-4 border border-gray-200 flex flex-col min-w-0 max-w-xl ">
+        <h3 class="text-lg font-bold mb-2">Basic</h3>
+        <div class="text-2xl font-bold mb-1">$115<span class="text-gray-500 text-base font-normal">/mo</span></div>
+        <p class="text-gray-600 mb-3 text-sm">Perfect for small businesses just getting started with lead generation</p>
+        <ul class="space-y-2 mb-4 flex-grow text-sm">
+          <li class="flex items-center"><div class="w-5 h-5 flex items-center justify-center mr-2"><i class="ri-check-line text-primary"></i></div><span>500 leads per month</span></li>
+          <li class="flex items-center"><div class="w-5 h-5 flex items-center justify-center mr-2"><i class="ri-check-line text-primary"></i></div><span>Basic filtering options</span></li>
+          <li class="flex items-center"><div class="w-5 h-5 flex items-center justify-center mr-2"><i class="ri-check-line text-primary"></i></div><span>Email and phone support</span></li>
+          <li class="flex items-center"><div class="w-5 h-5 flex items-center justify-center mr-2"><i class="ri-check-line text-primary"></i></div><span>Weekly database updates</span></li>
+        </ul>
+        <a href="#" class="bg-white border border-primary text-primary px-4 py-2 !rounded-button whitespace-nowrap font-medium hover:bg-primary hover:text-white transition-all text-center text-sm">Get started</a>
+      </div>
+      <div class="bg-white rounded-lg shadow-lg p-4 border-2 border-primary flex flex-col relative min-w-0 max-w-xs ">
+        <div class="absolute top-2 right-2 bg-primary text-white text-xs font-bold px-2 py-1 rounded-bl-lg rounded-tr-lg">POPULAR</div>
+        <h3 class="text-lg font-bold mb-2">Pro</h3>
+        <div class="text-2xl font-bold mb-1">$225<span class="text-gray-500 text-base font-normal">/mo</span></div>
+        <p class="text-gray-600 mb-3 text-sm">Ideal for growing businesses with serious lead generation needs</p>
+        <ul class="space-y-2 mb-4 flex-grow text-sm">
+          <li class="flex items-center"><div class="w-5 h-5 flex items-center justify-center mr-2"><i class="ri-check-line text-primary"></i></div><span>2,000 leads per month</span></li>
+          <li class="flex items-center"><div class="w-5 h-5 flex items-center justify-center mr-2"><i class="ri-check-line text-primary"></i></div><span>Advanced filtering options</span></li>
+          <li class="flex items-center"><div class="w-5 h-5 flex items-center justify-center mr-2"><i class="ri-check-line text-primary"></i></div><span>Priority support</span></li>
+          <li class="flex items-center"><div class="w-5 h-5 flex items-center justify-center mr-2"><i class="ri-check-line text-primary"></i></div><span>Daily database updates</span></li>
+          <li class="flex items-center"><div class="w-5 h-5 flex items-center justify-center mr-2"><i class="ri-check-line text-primary"></i></div><span>CRM integration</span></li>
+          <li class="flex items-center"><div class="w-5 h-5 flex items-center justify-center mr-2"><i class="ri-check-line text-primary"></i></div><span>Email sequence automation</span></li>
+        </ul>
+        <a href="#" class="bg-primary text-white px-4 py-2 !rounded-button whitespace-nowrap font-medium hover:bg-opacity-90 transition-all text-center text-sm">Get started</a>
+      </div>
+      <div class="bg-white rounded-lg shadow-md p-4 border border-gray-200 flex flex-col min-w-0 max-w- ">
+        <h3 class="text-lg font-bold mb-2">Enterprise</h3>
+        <div class="text-2xl font-bold mb-1">Custom<span class="text-gray-500 text-base font-normal"></span></div>
+        <p class="text-gray-600 mb-3 text-sm">For large organizations with custom lead generation requirements</p>
+        <ul class="space-y-2 mb-4 flex-grow text-sm">
+          <li class="flex items-center"><div class="w-5 h-5 flex items-center justify-center mr-2"><i class="ri-check-line text-primary"></i></div><span>Unlimited leads</span></li>
+          <li class="flex items-center"><div class="w-5 h-5 flex items-center justify-center mr-2"><i class="ri-check-line text-primary"></i></div><span>Custom filtering options</span></li>
+          <li class="flex items-center"><div class="w-5 h-5 flex items-center justify-center mr-2"><i class="ri-check-line text-primary"></i></div><span>Dedicated account manager</span></li>
+          <li class="flex items-center"><div class="w-5 h-5 flex items-center justify-center mr-2"><i class="ri-check-line text-primary"></i></div><span>Real-time database updates</span></li>
+          <li class="flex items-center"><div class="w-5 h-5 flex items-center justify-center mr-2"><i class="ri-check-line text-primary"></i></div><span>Advanced API access</span></li>
+          <li class="flex items-center"><div class="w-5 h-5 flex items-center justify-center mr-2"><i class="ri-check-line text-primary"></i></div><span>Custom integration development</span></li>
+        </ul>
+        <a href="#" class="bg-white border border-primary text-primary px-4 py-2 !rounded-button whitespace-nowrap font-medium hover:bg-primary hover:text-white transition-all text-center text-sm">Contact sales</a>
+      </div>
+    </div>
+  `;
+
+  // Helper: get next plan HTML (assume current is "Professional Plan" -> show "Enterprise")
+  function getNextPlanHTML(currentPlan) {
+    if (currentPlan === 'Professional Plan' || currentPlan === 'Pro') {
+      // Show Enterprise
+      return `
+        <div class="bg-white rounded-lg shadow-md p-4 border border-gray-200 flex flex-col min-w-0 max-w-xs mx-auto">
+          <h3 class="text-lg font-bold mb-2">Enterprise</h3>
+          <div class="text-2xl font-bold mb-1">Custom<span class="text-gray-500 text-base font-normal"></span></div>
+          <p class="text-gray-600 mb-3 text-sm">For large organizations with custom lead generation requirements</p>
+          <ul class="space-y-2 mb-4 flex-grow text-sm">
+            <li class="flex items-center"><div class="w-5 h-5 flex items-center justify-center mr-2"><i class="ri-check-line text-primary"></i></div><span>Unlimited leads</span></li>
+            <li class="flex items-center"><div class="w-5 h-5 flex items-center justify-center mr-2"><i class="ri-check-line text-primary"></i></div><span>Custom filtering options</span></li>
+            <li class="flex items-center"><div class="w-5 h-5 flex items-center justify-center mr-2"><i class="ri-check-line text-primary"></i></div><span>Dedicated account manager</span></li>
+            <li class="flex items-center"><div class="w-5 h-5 flex items-center justify-center mr-2"><i class="ri-check-line text-primary"></i></div><span>Real-time database updates</span></li>
+            <li class="flex items-center"><div class="w-5 h-5 flex items-center justify-center mr-2"><i class="ri-check-line text-primary"></i></div><span>Advanced API access</span></li>
+            <li class="flex items-center"><div class="w-5 h-5 flex items-center justify-center mr-2"><i class="ri-check-line text-primary"></i></div><span>Custom integration development</span></li>
+          </ul>
+          <a href="#" class="bg-white border border-primary text-primary px-4 py-2 !rounded-button whitespace-nowrap font-medium hover:bg-primary hover:text-white transition-all text-center text-sm">Contact sales</a>
+        </div>
+      `;
+    }
+    // Default: show Pro if current is Basic
+    return `
+      <div class="bg-white rounded-lg shadow-lg p-4 border-2 border-primary flex flex-col relative min-w-0 max-w-xs mx-auto">
+        <div class="absolute top-2 right-2 bg-primary text-white text-xs font-bold px-2 py-1 rounded-bl-lg rounded-tr-lg">POPULAR</div>
+        <h3 class="text-lg font-bold mb-2">Pro</h3>
+        <div class="text-2xl font-bold mb-1">$225<span class="text-gray-500 text-base font-normal">/mo</span></div>
+        <p class="text-gray-600 mb-3 text-sm">Ideal for growing businesses with serious lead generation needs</p>
+        <ul class="space-y-2 mb-4 flex-grow text-sm">
+          <li class="flex items-center"><div class="w-5 h-5 flex items-center justify-center mr-2"><i class="ri-check-line text-primary"></i></div><span>2,000 leads per month</span></li>
+          <li class="flex items-center"><div class="w-5 h-5 flex items-center justify-center mr-2"><i class="ri-check-line text-primary"></i></div><span>Advanced filtering options</span></li>
+          <li class="flex items-center"><div class="w-5 h-5 flex items-center justify-center mr-2"><i class="ri-check-line text-primary"></i></div><span>Priority support</span></li>
+          <li class="flex items-center"><div class="w-5 h-5 flex items-center justify-center mr-2"><i class="ri-check-line text-primary"></i></div><span>Daily database updates</span></li>
+          <li class="flex items-center"><div class="w-5 h-5 flex items-center justify-center mr-2"><i class="ri-check-line text-primary"></i></div><span>CRM integration</span></li>
+          <li class="flex items-center"><div class="w-5 h-5 flex items-center justify-center mr-2"><i class="ri-check-line text-primary"></i></div><span>Email sequence automation</span></li>
+        </ul>
+        <a href="#" class="bg-primary text-white px-4 py-2 !rounded-button whitespace-nowrap font-medium hover:bg-opacity-90 transition-all text-center text-sm">Get started</a>
+      </div>
+    `;
+  }
+
+  // Modal utility for HTML content
+  function showHtmlModal({title, html, widthClass = 'max-w-3xl', onClose}) {
+    let modal = document.getElementById('pricing-modal');
+    if (!modal) {
+      modal = document.createElement('div');
+      modal.id = 'pricing-modal';
+      modal.className = 'fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40 hidden';
+      modal.innerHTML = `
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-4xl h-auto max-h-[90vh] overflow-y-auto p-4 text-center relative">
+          <button id="close-pricing-modal" class="absolute top-2 right-2 text-gray-400 hover:text-primary text-2xl font-bold">&times;</button>
+          <h4 class="text-xl font-bold mb-4" id="pricing-modal-title"></h4>
+          <div id="pricing-modal-content"></div>
+        </div>
+      `;
+      document.body.appendChild(modal);
+    }
+    modal.querySelector('#pricing-modal-title').textContent = title;
+    modal.querySelector('#pricing-modal-content').innerHTML = html;
+    modal.classList.remove('hidden');
+    // Close logic
+    modal.querySelector('#close-pricing-modal').onclick = () => {
+      modal.classList.add('hidden');
+      if (onClose) onClose();
+    };
+    modal.onclick = (e) => { if (e.target === modal) { modal.classList.add('hidden'); if (onClose) onClose(); } };
+  }
+
+  // Modal utility for warning/confirmation
+  function showModal({title, message, iconClass, iconBg, confirmText, cancelText, onConfirm, onCancel}) {
+    let modal = document.getElementById('subscription-modal');
+    if (!modal) {
+      modal = document.createElement('div');
+      modal.id = 'subscription-modal';
+      modal.className = 'fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40 hidden';
+      modal.innerHTML = `
+        <div class="bg-white rounded-lg shadow-xl max-w-xs w-full p-6 text-center">
+          <div id="modal-icon" class="w-12 h-12 mx-auto mb-4 flex items-center justify-center rounded-full"></div>
+          <h4 id="modal-title" class="text-lg font-medium mb-2"></h4>
+          <p id="modal-message" class="text-sm text-gray-600 mb-4"></p>
+          <div class="flex justify-center gap-2" id="modal-actions"></div>
+        </div>
+      `;
+      document.body.appendChild(modal);
+    }
+    // Set content
+    const iconDiv = modal.querySelector('#modal-icon');
+    iconDiv.className = `w-12 h-12 mx-auto mb-4 flex items-center justify-center rounded-full ${iconBg}`;
+    iconDiv.innerHTML = `<i class="${iconClass} ri-2x"></i>`;
+    modal.querySelector('#modal-title').textContent = title;
+    modal.querySelector('#modal-message').textContent = message;
+    const actions = modal.querySelector('#modal-actions');
+    actions.innerHTML = '';
+    if (cancelText) {
+      const cancelBtn = document.createElement('button');
+      cancelBtn.className = 'px-4 py-2 border border-gray-300 text-gray-700 rounded-button text-sm font-medium hover:bg-gray-50 transition-colors';
+      cancelBtn.textContent = cancelText;
+      cancelBtn.onclick = () => {
+        modal.classList.add('hidden');
+        if (onCancel) onCancel();
+      };
+      actions.appendChild(cancelBtn);
+    }
+    if (confirmText) {
+      const confirmBtn = document.createElement('button');
+      confirmBtn.className = 'px-4 py-2 bg-primary text-white rounded-button text-sm font-medium hover:bg-blue-600 transition-colors';
+      confirmBtn.textContent = confirmText;
+      confirmBtn.onclick = () => {
+        modal.classList.add('hidden');
+        if (onConfirm) onConfirm();
+      };
+      actions.appendChild(confirmBtn);
+    }
+    modal.classList.remove('hidden');
+    // Dismiss on backdrop click
+    modal.onclick = (e) => { if (e.target === modal) modal.classList.add('hidden'); };
+  }
+
+  // Upgrade Plan
+  document.querySelectorAll('button').forEach(btn => {
+    if (btn.textContent.trim() === 'Upgrade Plan') {
+      btn.addEventListener('click', function(e) {
+        e.preventDefault();
+        showHtmlModal({
+          title: 'Upgrade Your Plan',
+          html: `<div class="mb-4"><p class="text-gray-600 mb-4 text-sm">Choose the plan that fits your business needs.</p>${pricingSectionHTML}</div>`,
+          widthClass: 'max-w-sm'
+        });
+      });
+    }
+    if (btn.textContent.trim() === 'Change Plan') {
+      btn.addEventListener('click', function(e) {
+        e.preventDefault();
+        let currentPlan = 'Professional Plan';
+        const planEl = document.querySelector('.text-xl.font-bold.text-gray-900');
+        if (planEl) currentPlan = planEl.textContent.trim();
+        showHtmlModal({
+          title: 'Change Your Plan',
+          html: `<div class="mb-4"><p class="text-gray-600 mb-4 text-sm">Upgrade to the next available plan.</p>${getNextPlanHTML(currentPlan)}</div>`,
+          widthClass: 'max-w-xs'
+        });
+      });
+    }
+    if (btn.textContent.trim() === 'Cancel Subscription') {
+      btn.addEventListener('click', function(e) {
+        e.preventDefault();
+        showModal({
+          title: 'Cancel Subscription',
+          message: 'Are you sure you want to cancel your subscription? This action cannot be undone.',
+          iconClass: 'ri-alert-line',
+          iconBg: 'bg-red-100 text-red-500',
+          confirmText: 'Yes, Cancel',
+          cancelText: 'No',
+          onConfirm: () => {
+            showModal({
+              title: 'Subscription Cancelled',
+              message: 'Your subscription has been cancelled.',
+              iconClass: 'ri-checkbox-circle-line',
+              iconBg: 'bg-green-100 text-green-500',
+              confirmText: 'OK'
+            });
+          }
+        });
+      });
+    }
+    if (btn.textContent.trim() === 'Save Changes') {
+      // Only for Subscription & Billing section
+      btn.addEventListener('click', function(e) {
+        // Check if inside Subscription & Billing section
+        if (btn.closest('section') && btn.closest('section').innerHTML.includes('Payment Methods')) {
+          e.preventDefault();
+          btn.disabled = true;
+          const orig = btn.innerHTML;
+          btn.innerHTML = '<div class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2 inline-block"></div> Saving...';
+          setTimeout(() => {
+            btn.innerHTML = orig;
+            btn.disabled = false;
+            showModal({
+              title: 'Saved',
+              message: 'Subscription & billing changes saved.',
+              iconClass: 'ri-checkbox-circle-line',
+              iconBg: 'bg-green-100 text-green-500',
+              confirmText: 'OK'
+            });
+          }, 1000);
+        }
+      });
+    }
+    if (btn.textContent.trim() === 'Cancel') {
+      // Only for Subscription & Billing section
+      btn.addEventListener('click', function(e) {
+        if (btn.closest('section') && btn.closest('section').innerHTML.includes('Payment Methods')) {
+          e.preventDefault();
+          showModal({
+            title: 'Cancelled',
+            message: 'No changes were saved.',
+            iconClass: 'ri-close-circle-line',
+            iconBg: 'bg-gray-100 text-gray-500',
+            confirmText: 'OK'
+          });
+        }
+      });
+    }
+  });
+
+  // Payment Methods: Set as default & Delete
+  document.querySelectorAll('.border.border-gray-200.rounded-lg.p-4').forEach(card => {
+    // Set as default
+    const setDefaultBtn = card.querySelector('button.text-primary');
+    if (setDefaultBtn) {
+      setDefaultBtn.addEventListener('click', function() {
+        // Remove "Default" badge from all cards
+        document.querySelectorAll('.border.border-gray-200.rounded-lg.p-4').forEach(c => {
+          const badge = c.querySelector('.bg-blue-100.text-blue-800');
+          if (badge) badge.remove();
+          const btn = c.querySelector('button.text-primary');
+          if (btn) btn.style.display = '';
+        });
+        // Add "Default" badge to this card
+        const badge = document.createElement('span');
+        badge.className = 'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 mr-3';
+        badge.textContent = 'Default';
+        setDefaultBtn.parentNode.insertBefore(badge, setDefaultBtn);
+        setDefaultBtn.style.display = 'none';
+      });
+    }
+    // Delete payment method
+    card.querySelectorAll('button').forEach(delBtn => {
+      if (delBtn.innerHTML.includes('ri-delete-bin-line')) {
+        delBtn.addEventListener('click', function() {
+          showModal({
+            title: 'Delete Payment Method',
+            message: 'Are you sure you want to delete this payment method?',
+            iconClass: 'ri-delete-bin-line',
+            iconBg: 'bg-red-100 text-red-500',
+            confirmText: 'Delete',
+            cancelText: 'Cancel',
+            onConfirm: () => {
+              card.remove();
+              showModal({
+                title: 'Deleted',
+                message: 'Payment method deleted.',
+                iconClass: 'ri-checkbox-circle-line',
+                iconBg: 'bg-green-100 text-green-500',
+                confirmText: 'OK'
+              });
+            }
+          });
+        });
+      }
+    });
+  });
+
+  // Payment Modal Functionality
+  const addPaymentBtn = document.getElementById('add-payment-btn');
+  const paymentModal = document.getElementById('payment-modal');
+  const closePaymentModal = document.getElementById('close-payment-modal');
+  const cancelPaymentModal = document.getElementById('cancel-payment-modal');
+  const paymentForm = document.getElementById('payment-form');
+  const saveCardCheckbox = document.getElementById('save-card-checkbox');
+  const saveCardToggle = document.getElementById('save-card-toggle');
+
+  // Custom checkbox state
+  let saveCardChecked = false;
+  function updateSaveCardCheckbox() {
+    if (saveCardChecked) {
+      saveCardCheckbox.classList.add('checked');
+    } else {
+      saveCardCheckbox.classList.remove('checked');
+    }
+  }
+  if (saveCardToggle) {
+    saveCardToggle.addEventListener('click', function(e) {
+      saveCardChecked = !saveCardChecked;
+      updateSaveCardCheckbox();
+    });
+  }
+
+  // Show/hide modal
+  if (addPaymentBtn) {
+    addPaymentBtn.addEventListener('click', function() {
+      paymentModal.classList.remove('hidden');
+    });
+  }
+  if (closePaymentModal) {
+    closePaymentModal.addEventListener('click', function() {
+      paymentModal.classList.add('hidden');
+    });
+  }
+  if (cancelPaymentModal) {
+    cancelPaymentModal.addEventListener('click', function() {
+      paymentModal.classList.add('hidden');
+    });
+  }
+  if (paymentModal) {
+    paymentModal.addEventListener('click', function(e) {
+      if (e.target === paymentModal) paymentModal.classList.add('hidden');
+    });
+  }
+
+  // Payment form submission
+  if (paymentForm) {
+    paymentForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      // (Basic validation could be added here)
+      paymentModal.classList.add('hidden');
+      // Show success modal
+      let modal = document.getElementById('payment-success-modal');
+      if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'payment-success-modal';
+        modal.className = 'fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40';
+        modal.innerHTML = `
+          <div class="bg-white rounded-lg shadow-xl max-w-xs w-full p-6 text-center">
+            <div class="w-12 h-12 mx-auto mb-4 flex items-center justify-center text-green-500 bg-green-100 rounded-full">
+              <i class="ri-checkbox-circle-line ri-2x"></i>
+            </div>
+            <h4 class="text-lg font-medium mb-2">Card Added</h4>
+            <p class="text-sm text-gray-600 mb-4">Your payment method has been added successfully.</p>
+            <button id="close-payment-success-modal" class="px-4 py-2 bg-primary text-white rounded-button text-sm font-medium hover:bg-blue-600 transition-colors">OK</button>
+          </div>
+        `;
+        document.body.appendChild(modal);
+      }
+      modal.classList.remove('hidden');
+      modal.onclick = function(ev) {
+        if (ev.target.id === 'close-payment-success-modal' || ev.target === modal) {
+          modal.classList.add('hidden');
+        }
+      };
+    });
+  }
+
+  // 2FA Toggle and Setup
+  const twoFAToggle = document.getElementById('2fa-toggle');
+  const twoFASetup = document.getElementById('2fa-setup');
+  const verifyBtn = twoFASetup ? twoFASetup.querySelector('button') : null;
+  const codeInput = twoFASetup ? twoFASetup.querySelector('input[type="text"][maxlength="6"]') : null;
+
+  // 2FA Success Modal
+  let twoFAModal = document.getElementById('twofa-success-modal');
+  if (!twoFAModal) {
+    twoFAModal = document.createElement('div');
+    twoFAModal.id = 'twofa-success-modal';
+    twoFAModal.className = 'fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40 hidden';
+    twoFAModal.innerHTML = `
+      <div class="bg-white rounded-lg shadow-xl max-w-xs w-full p-6 text-center">
+        <div class="w-12 h-12 mx-auto mb-4 flex items-center justify-center text-green-500 bg-green-100 rounded-full">
+          <i class="ri-checkbox-circle-line ri-2x"></i>
+        </div>
+        <h4 class="text-lg font-medium mb-2">Two-Factor Authentication Enabled</h4>
+        <p class="text-sm text-gray-600 mb-4">Two-Factor Authentication has been enabled successfully!</p>
+        <button id="close-twofa-success-modal" class="px-4 py-2 bg-primary text-white rounded-button text-sm font-medium hover:bg-blue-600 transition-colors">OK</button>
+      </div>
+    `;
+    document.body.appendChild(twoFAModal);
+  }
+  function showTwoFAModal() {
+    twoFAModal.classList.remove('hidden');
+  }
+  twoFAModal.addEventListener('click', function(e) {
+    if (e.target.id === 'close-twofa-success-modal' || e.target === twoFAModal) {
+      twoFAModal.classList.add('hidden');
+    }
+  });
+
+  if (twoFAToggle && twoFASetup) {
+    // Show/hide setup instructions
+    twoFAToggle.addEventListener('change', function() {
+      if (this.checked) {
+        twoFASetup.classList.remove('hidden');
+      } else {
+        twoFASetup.classList.add('hidden');
+      }
+    });
+  }
+
+  // Simulate verification
+  if (verifyBtn && codeInput) {
+    verifyBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      const code = codeInput.value.trim();
+      if (/^\d{6}$/.test(code)) {
+        verifyBtn.disabled = true;
+        verifyBtn.innerHTML = '<div class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2 inline-block"></div> Verifying...';
+        setTimeout(() => {
+          verifyBtn.innerHTML = 'Verified!';
+          verifyBtn.classList.add('bg-green-500');
+          verifyBtn.disabled = true;
+          codeInput.disabled = true;
+          setTimeout(() => {
+            verifyBtn.innerHTML = 'Verify & Enable';
+            verifyBtn.classList.remove('bg-green-500');
+            verifyBtn.disabled = false;
+            codeInput.disabled = false;
+            codeInput.value = '';
+            twoFASetup.classList.add('hidden');
+            showTwoFAModal();
+          }, 1200);
+        }, 1200);
+      } else {
+        codeInput.classList.add('border-red-500');
+        setTimeout(() => codeInput.classList.remove('border-red-500'), 1200);
+      }
+    });
+  }
+});
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Delete Account Modal functionality
+  const deleteBtn = document.getElementById('delete-account-btn');
+  const deleteModal = document.getElementById('delete-modal');
+  const closeDeleteModal = document.getElementById('close-delete-modal');
+  const cancelDeleteModal = document.getElementById('cancel-delete-modal');
+  const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
+  const deleteConfirmInput = document.getElementById('delete-confirm');
+  const deletePasswordInput = document.getElementById('delete-password');
+
+  // Show modal
+  if (deleteBtn && deleteModal) {
+    deleteBtn.addEventListener('click', function() {
+      deleteModal.classList.remove('hidden');
+      confirmDeleteBtn.disabled = true;
+      deleteConfirmInput.value = '';
+      deletePasswordInput.value = '';
+    });
+  }
+
+  // Hide modal
+  function closeModal() {
+    deleteModal.classList.add('hidden');
+  }
+  if (closeDeleteModal) closeDeleteModal.addEventListener('click', closeModal);
+  if (cancelDeleteModal) cancelDeleteModal.addEventListener('click', closeModal);
+  if (deleteModal) {
+    deleteModal.addEventListener('click', function(e) {
+      if (e.target === deleteModal) closeModal();
+    });
+  }
+
+  // Enable confirm button only if both fields are valid
+  function validateDeleteFields() {
+    const phraseOk = deleteConfirmInput.value.trim().toLowerCase() === 'delete my account';
+    const passOk = deletePasswordInput.value.length > 0;
+    confirmDeleteBtn.disabled = !(phraseOk && passOk);
+  }
+  if (deleteConfirmInput && deletePasswordInput) {
+    deleteConfirmInput.addEventListener('input', validateDeleteFields);
+    deletePasswordInput.addEventListener('input', validateDeleteFields);
+  }
+
+  // Handle delete confirmation
+  if (confirmDeleteBtn) {
+    confirmDeleteBtn.addEventListener('click', function() {
+      confirmDeleteBtn.disabled = true;
+      confirmDeleteBtn.innerHTML = '<div class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2 inline-block"></div> Deleting...';
+      setTimeout(() => {
+        closeModal();
+        // Show a success modal or alert
+        alert('Your account has been deleted. (Demo: No real deletion performed)');
+        // Optionally redirect or clear session here
+      }, 1500);
+    });
+  }
+});
+</script>
+</body>
+</html>

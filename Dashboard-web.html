@@ -1,0 +1,887 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BootLeads Dashboard</title>
+    <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+    <script>tailwind.config={theme:{extend:{colors:{primary:'#1E3A8A',secondary:'#5BC0EB'},borderRadius:{'none':'0px','sm':'4px',DEFAULT:'8px','md':'12px','lg':'16px','xl':'20px','2xl':'24px','3xl':'32px','full':'9999px','button':'8px'}}}}</script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.5.0/echarts.min.js"></script>
+    <style>
+        :where([class^="ri-"])::before { content: "\f3c2"; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f9fafb;
+        }
+        .glassmorphism {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        input:focus {
+            outline: none;
+        }
+        .sidebar-expanded {
+            width: 240px;
+            transition: all 0.6s cubic-bezier(0.4,0,0.2,1);
+        }
+        .sidebar-collapsed {
+            width: 80px;
+            transition: all 0.6s cubic-bezier(0.4,0,0.2,1);
+        }
+        .main-content-expanded {
+            margin-left: 240px;
+            transition: all 0.6s cubic-bezier(0.4,0,0.2,1);
+        }
+        .main-content-collapsed {
+            margin-left: 80px;
+            transition: all 0.6s cubic-bezier(0.4,0,0.2,1);
+        }
+        @media (max-width: 768px) {
+            .main-content-expanded, .main-content-collapsed {
+                margin-left: 0;
+            }
+        }
+        .custom-switch {
+            position: relative;
+            display: inline-block;
+            width: 44px;
+            height: 24px;
+        }
+        .custom-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #e2e8f0;
+            transition: .4s;
+            border-radius: 24px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        input:checked + .slider {
+            background-color: #3b82f6;
+        }
+        input:checked + .slider:before {
+            transform: translateX(20px);
+        }
+    </style>
+</head>
+<body>
+    <div class="flex h-screen bg-gray-50">
+        <!-- Sidebar -->
+        <div id="sidebar" class="sidebar-collapsed fixed h-full bg-white shadow-lg z-20 transition-all duration-700 ease-in-out">
+            <div class="flex flex-col h-full">
+                <!-- Logo -->
+                <div class="p-4 border-b flex items-center justify-center">
+                    <img src="logo-icon.png" alt="Logo" id="sidebar-logo-img" class="w-8 h-8 mr-0 hidden">
+                    <h1 id="sidebar-logo-text" class="font-['Pacifico'] text-2xl text-primary">Sales-Spy</h1>
+                </div>
+                
+                <!-- Navigation -->
+                <nav class="flex-1 overflow-y-auto py-4">
+                    <ul>
+                        <li class="mb-2">
+                            <a href="#" class="flex items-center px-4 py-3 text-primary bg-blue-50 rounded-r-lg border-l-4 border-primary">
+                                <div class="w-6 h-6 flex items-center justify-center mr-3">
+                                    <i class="ri-dashboard-line"></i>
+                                </div>
+                                <span class="sidebar-text">Dashboard</span>
+                            </a>
+                        </li>
+                        <li class="mb-2">
+                            <a href="Dashboard-web.html" class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-r-lg hover:text-primary transition-colors">
+                                <div class="w-6 h-6 flex items-center justify-center mr-3">
+                                    <i class="ri-global-line"></i>
+                                </div>
+                                <span class="sidebar-text">Websites</span>
+                            </a>
+                        </li>
+                        <li class="mb-2">
+                            <a href="#" class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-r-lg hover:text-primary transition-colors">
+                                <div class="w-6 h-6 flex items-center justify-center mr-3">
+                                    <i class="ri-shopping-cart-line"></i>
+                                </div>
+                                <span class="sidebar-text">E-commerce</span>
+                            </a>
+                        </li>
+                        <li class="mb-2">
+                            <a href="Dashboard-set.html" class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-r-lg hover:text-primary transition-colors">
+                                <div class="w-6 h-6 flex items-center justify-center mr-3">
+                                    <i class="ri-settings-line"></i>
+                                </div>
+                                <span class="sidebar-text">Settings</span>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+                
+                <!-- Upgrade section -->
+                <div id="upgrade-section" class="p-4 border-t">
+                    <div id="upgrade-expanded" class="bg-gray-50 rounded-lg p-4 mb-3">
+                        <p class="text-sm text-gray-600 mb-2">Credits remaining</p>
+                        <div class="flex items-center justify-between">
+                            <span class="font-semibold text-lg">1,250</span>
+                            <span class="text-xs text-gray-500">of 2,000</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2 mt-2">
+                            <div class="bg-primary rounded-full h-2" style="width: 62.5%"></div>
+                        </div>
+                    </div>
+                    <button id="upgrade-btn-expanded" class="w-full bg-primary text-white py-2 px-4 rounded-button flex items-center justify-center whitespace-nowrap hover:bg-blue-600 transition-colors">
+                        <div class="w-5 h-5 flex items-center justify-center mr-2">
+                            <i class="ri-arrow-up-line"></i>
+                        </div>
+                        <span>Upgrade Plan</span>
+                    </button>
+                    <button id="upgrade-btn-collapsed" class="hidden bg-primary text-white w-10 h-10 rounded-full flex items-center justify-center mx-auto mt-2 hover:bg-blue-600 transition-colors" title="Upgrade">
+                        <i class="ri-arrow-up-line"></i>
+                    </button>
+                </div>
+                <script>
+                    document.addEventListener('DOMContentLoaded', function() {
+                        const sidebar = document.getElementById('sidebar');
+                        const upgradeExpanded = document.getElementById('upgrade-expanded');
+                        const upgradeBtnExpanded = document.getElementById('upgrade-btn-expanded');
+                        const upgradeBtnCollapsed = document.getElementById('upgrade-btn-collapsed');
+                        const logoImg = document.getElementById('sidebar-logo-img');
+                        const logoText = document.getElementById('sidebar-logo-text');
+
+                        function updateUpgradeSection() {
+                            if (sidebar.classList.contains('sidebar-collapsed')) {
+                                upgradeExpanded.style.display = 'none';
+                                upgradeBtnExpanded.style.display = 'none';
+                                upgradeBtnCollapsed.classList.remove('hidden');
+                            } else {
+                                upgradeExpanded.style.display = '';
+                                upgradeBtnExpanded.style.display = '';
+                                upgradeBtnCollapsed.classList.add('hidden');
+                            }
+                        }
+
+                        function updateLogo() {
+                            if (sidebar.classList.contains('sidebar-collapsed')) {
+                                logoImg.classList.remove('hidden');
+                                logoText.classList.add('hidden');
+                            } else {
+                                logoImg.classList.add('hidden');
+                                logoText.classList.remove('hidden');
+                            }
+                        }
+
+                        // Initial state
+                        updateUpgradeSection();
+                        updateLogo();
+
+                        // Listen for sidebar toggle
+                        const sidebarToggle = document.getElementById('sidebar-toggle');
+                        sidebarToggle.addEventListener('click', function() {
+                            setTimeout(() => {
+                                updateUpgradeSection();
+                                updateLogo();
+                            }, 310); // Wait for transition
+                        });
+
+                        // Also update on resize (for responsive)
+                        window.addEventListener('resize', function() {
+                            setTimeout(() => {
+                                updateUpgradeSection();
+                                updateLogo();
+                            }, 310);
+                        });
+                    });
+                </script>
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div id="main-content" class="main-content-expanded flex-1 transition-all duration-700 ease-in-out overflow-x-auto">
+            <!-- Header -->
+            <header class="bg-white shadow-sm sticky top-0 z-10">
+                <div class="flex items-center justify-between px-6 py-4">
+                    <div class="flex items-center">
+                        <button id="sidebar-toggle" class="p-2 rounded-full hover:bg-gray-100 mr-4">
+                            <div class="w-5 h-5 flex items-center justify-center">
+                                <i class="ri-menu-line"></i>
+                            </div>
+                        </button>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <div class="flex items-center bg-gray-100 rounded-full px-3 py-1">
+                            <div class="w-5 h-5 flex items-center justify-center mr-2 text-primary">
+                                <i class="ri-coin-line"></i>
+                            </div>
+                            <span class="text-sm font-medium">1,250 credits</span>
+                        </div>
+                        <button class="bg-primary text-white py-2 px-4 rounded-button whitespace-nowrap hover:bg-blue-600 transition-colors">
+                            <span>Upgrade</span>
+                        </button>
+                        <div class="relative">
+                            <button class="flex items-center space-x-2">
+                                <div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
+                                    <img src="https://readdy.ai/api/search-image?query=professional%20headshot%20of%20a%20young%20business%20person%2C%20neutral%20expression%2C%20high%20quality%20portrait%2C%20business%20attire&width=200&height=200&seq=1&orientation=squarish" alt="User avatar" class="w-full h-full object-cover">
+                                </div>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </header>
+            
+            <!-- Content -->
+      <main class=" flex-1 p-6">
+<div class="mb-6">
+<h1 class="text-2xl font-bold text-gray-800 mb-2">Websites</h1>
+<p class="text-gray-600">Search, filter, and discover website leads for your business.</p>
+</div>
+<!-- Filters Section -->
+<div class="bg-white rounded shadow-sm mb-6">
+<div class="p-4 border-b border-gray-100 flex items-center justify-between">
+<h2 class="text-lg font-semibold text-gray-800">Filters</h2>
+<div class="flex items-center">
+<span class="text-sm text-gray-600 mr-2">More Filters</span>
+<div id="filterToggle" class="custom-checkbox"></div>
+</div>
+</div>
+<div class="p-4">
+<div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+<div>
+<label class="block text-sm font-medium text-gray-700 mb-1">Keyword</label>
+<input type="text" class="w-full px-3 py-2 border border-gray-300 rounded text-sm" placeholder="Enter keywords...">
+</div>
+<div>
+<label class="block text-sm font-medium text-gray-700 mb-1">Platform</label>
+<select class="w-full px-3 py-2 border border-gray-300 rounded text-sm custom-select pr-8">
+<option value="">All Platforms</option>
+<option value="shopify">Shopify</option>
+<option value="woocommerce">WooCommerce</option>
+<option value="magento">Magento</option>
+<option value="wordpress">WordPress</option>
+</select>
+</div>
+<div>
+<label class="block text-sm font-medium text-gray-700 mb-1">SNS & Email</label>
+<select class="w-full px-3 py-2 border border-gray-300 rounded text-sm custom-select pr-8">
+<option value="">All</option>
+<option value="facebook">Facebook</option>
+<option value="instagram">Instagram</option>
+<option value="twitter">Twitter</option>
+<option value="email">Email Available</option>
+</select>
+</div>
+<div>
+<label class="block text-sm font-medium text-gray-700 mb-1">Indexed Date</label>
+<input type="date" class="w-full px-3 py-2 border border-gray-300 rounded text-sm">
+</div>
+</div>
+<div id="advancedFilters" class="hidden">
+<div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+<div>
+<label class="block text-sm font-medium text-gray-700 mb-1">Tags</label>
+<select class="w-full px-3 py-2 border border-gray-300 rounded text-sm custom-select pr-8">
+<option value="">Select Tags</option>
+<option value="fashion">Fashion</option>
+<option value="electronics">Electronics</option>
+<option value="home">Home & Garden</option>
+<option value="beauty">Beauty</option>
+</select>
+</div>
+<div>
+<label class="block text-sm font-medium text-gray-700 mb-1">Language</label>
+<select class="w-full px-3 py-2 border border-gray-300 rounded text-sm custom-select pr-8">
+<option value="">All Languages</option>
+<option value="en">English</option>
+<option value="es">Spanish</option>
+<option value="fr">French</option>
+<option value="de">German</option>
+<option value="zh">Chinese</option>
+</select>
+</div>
+<div>
+<label class="block text-sm font-medium text-gray-700 mb-1">Country</label>
+<select class="w-full px-3 py-2 border border-gray-300 rounded text-sm custom-select pr-8">
+<option value="">All Countries</option>
+<option value="us">United States</option>
+<option value="uk">United Kingdom</option>
+<option value="ca">Canada</option>
+<option value="au">Australia</option>
+<option value="de">Germany</option>
+</select>
+</div>
+<div>
+<label class="block text-sm font-medium text-gray-700 mb-1">Product Count</label>
+<select class="w-full px-3 py-2 border border-gray-300 rounded text-sm custom-select pr-8">
+<option value="">Any</option>
+<option value="1-100">1-100</option>
+<option value="101-500">101-500</option>
+<option value="501-1000">501-1000</option>
+<option value="1001+">1001+</option>
+</select>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+<div>
+<label class="block text-sm font-medium text-gray-700 mb-1">Pages</label>
+<select class="w-full px-3 py-2 border border-gray-300 rounded text-sm custom-select pr-8">
+<option value="">Any</option>
+<option value="1-10">1-10</option>
+<option value="11-50">11-50</option>
+<option value="51-100">51-100</option>
+<option value="101+">101+</option>
+</select>
+</div>
+<div>
+<label class="block text-sm font-medium text-gray-700 mb-1">Top Level Domain</label>
+<select class="w-full px-3 py-2 border border-gray-300 rounded text-sm custom-select pr-8">
+<option value="">All TLDs</option>
+<option value=".com">.com</option>
+<option value=".org">.org</option>
+<option value=".net">.net</option>
+<option value=".io">.io</option>
+<option value=".co">.co</option>
+</select>
+</div>
+<div>
+<label class="block text-sm font-medium text-gray-700 mb-1">Technologies</label>
+<select class="w-full px-3 py-2 border border-gray-300 rounded text-sm custom-select pr-8">
+<option value="">All Technologies</option>
+<option value="react">React</option>
+<option value="vue">Vue.js</option>
+<option value="angular">Angular</option>
+<option value="jquery">jQuery</option>
+<option value="bootstrap">Bootstrap</option>
+</select>
+</div>
+<div>
+<label class="block text-sm font-medium text-gray-700 mb-1">Installed Apps</label>
+<select class="w-full px-3 py-2 border border-gray-300 rounded text-sm custom-select pr-8">
+<option value="">All Apps</option>
+<option value="analytics">Google Analytics</option>
+<option value="hotjar">Hotjar</option>
+<option value="intercom">Intercom</option>
+<option value="mailchimp">Mailchimp</option>
+<option value="zendesk">Zendesk</option>
+</select>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+<div>
+<label class="block text-sm font-medium text-gray-700 mb-1">Domain Reg Year</label>
+<select class="w-full px-3 py-2 border border-gray-300 rounded text-sm custom-select pr-8">
+<option value="">Any Year</option>
+<option value="2023-2025">2023-2025</option>
+<option value="2020-2022">2020-2022</option>
+<option value="2015-2019">2015-2019</option>
+<option value="2010-2014">2010-2014</option>
+<option value="before-2010">Before 2010</option>
+</select>
+</div>
+<div>
+<label class="block text-sm font-medium text-gray-700 mb-1">Product Avg Price</label>
+<div class="flex space-x-2">
+<input type="number" placeholder="Min" class="w-full px-3 py-2 border border-gray-300 rounded text-sm">
+<input type="number" placeholder="Max" class="w-full px-3 py-2 border border-gray-300 rounded text-sm">
+</div>
+</div>
+<div>
+<label class="block text-sm font-medium text-gray-700 mb-1">Currency</label>
+<select class="w-full px-3 py-2 border border-gray-300 rounded text-sm custom-select pr-8">
+<option value="">All Currencies</option>
+<option value="usd">USD</option>
+<option value="eur">EUR</option>
+<option value="gbp">GBP</option>
+<option value="cad">CAD</option>
+<option value="aud">AUD</option>
+</select>
+</div>
+<div>
+<label class="block text-sm font-medium text-gray-700 mb-1">Order Results By</label>
+<select class="w-full px-3 py-2 border border-gray-300 rounded text-sm custom-select pr-8">
+<option value="relevance">Relevance</option>
+<option value="date-desc">Date (Newest)</option>
+<option value="date-asc">Date (Oldest)</option>
+<option value="traffic-desc">Traffic (High to Low)</option>
+<option value="traffic-asc">Traffic (Low to High)</option>
+<option value="products-desc">Products (High to Low)</option>
+<option value="products-asc">Products (Low to High)</option>
+</select>
+</div>
+</div>
+</div>
+<div class="flex mt-6">
+<button class="bg-primary text-white px-6 py-2 rounded-button flex items-center whitespace-nowrap mr-3">
+<div class="w-5 h-5 flex items-center justify-center mr-2">
+<i class="ri-search-line"></i>
+</div>
+Search
+</button>
+<button class="bg-gray-100 text-gray-700 px-6 py-2 rounded-button whitespace-nowrap">
+Reset
+</button>
+</div>
+</div>
+</div>
+<!-- Results Section -->
+<div class="bg-white rounded shadow-sm">
+<div class="p-4 border-b border-gray-100 flex justify-between items-center">
+<div class="text-sm text-gray-600">Found 317,455 Stores</div>
+<div class="flex items-center">
+<button class="bg-gray-100 text-gray-700 px-3 py-1.5 rounded-button text-sm whitespace-nowrap mr-3">
+<div class="flex items-center">
+<div class="w-4 h-4 flex items-center justify-center mr-1">
+<i class="ri-download-line"></i>
+</div>
+Export
+</div>
+</button>
+<button class="bg-gray-100 text-gray-700 px-3 py-1.5 rounded-button text-sm whitespace-nowrap">
+<div class="flex items-center">
+<div class="w-4 h-4 flex items-center justify-center mr-1">
+<i class="ri-list-check"></i>
+</div>
+Display
+</div>
+</button>
+</div>
+</div>
+<div class="overflow-x-auto">
+<table class="min-w-full divide-y divide-gray-200">
+<thead class="bg-gray-50">
+<tr>
+<th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Store</th>
+<th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Platform</th>
+<th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Title</th>
+<th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Country</th>
+<th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product Count</th>
+<th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product avg price</th>
+</tr>
+</thead>
+<tbody class="bg-white divide-y divide-gray-200">
+<tr class="hover:bg-gray-50">
+<td class="px-6 py-4 whitespace-nowrap">
+<div class="flex items-center">
+<div class="w-8 h-8 flex items-center justify-center bg-red-100 rounded-full mr-3">
+<i class="ri-heart-fill text-red-500"></i>
+</div>
+<div class="text-sm font-medium text-gray-900">yamloveme.com</div>
+</div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Shopify</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">yamloveme</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">US</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">1900</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">37.69</td>
+</tr>
+<tr class="hover:bg-gray-50">
+<td class="px-6 py-4 whitespace-nowrap">
+<div class="flex items-center">
+<div class="w-8 h-8 flex items-center justify-center bg-blue-100 rounded-full mr-3">
+<i class="ri-compress-line text-blue-500"></i>
+</div>
+<div class="text-sm font-medium text-gray-900">true-compress.com</div>
+</div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Shopify</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">True Compress</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">GB</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">10</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">42.04</td>
+</tr>
+<tr class="hover:bg-gray-50">
+<td class="px-6 py-4 whitespace-nowrap">
+<div class="flex items-center">
+<div class="w-8 h-8 flex items-center justify-center bg-purple-100 rounded-full mr-3">
+<i class="ri-vip-diamond-fill text-purple-500"></i>
+</div>
+<div class="text-sm font-medium text-gray-900">www.telenaarl.com</div>
+</div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Shopify</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">TeleNaarl – Timeless Jewellery for Every Occasion</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">IN</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">1185</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">93.04</td>
+</tr>
+<tr class="hover:bg-gray-50">
+<td class="px-6 py-4 whitespace-nowrap">
+<div class="flex items-center">
+<div class="w-8 h-8 flex items-center justify-center bg-green-100 rounded-full mr-3">
+<i class="ri-store-fill text-green-500"></i>
+</div>
+<div class="text-sm font-medium text-gray-900">dbfay.com</div>
+</div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Shopify</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">dbfay</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">FR</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">840</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">35.56</td>
+</tr>
+<tr class="hover:bg-gray-50">
+<td class="px-6 py-4 whitespace-nowrap">
+<div class="flex items-center">
+<div class="w-8 h-8 flex items-center justify-center bg-yellow-100 rounded-full mr-3">
+<i class="ri-emotion-laugh-fill text-yellow-500"></i>
+</div>
+<div class="text-sm font-medium text-gray-900">epicfalls.legendary-laughs.shop</div>
+</div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Shopify</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Epic Falls: Legendary Laughs! – EpicFalls</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">US</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">3</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">1623.08</td>
+</tr>
+<tr class="hover:bg-gray-50">
+<td class="px-6 py-4 whitespace-nowrap">
+<div class="flex items-center">
+<div class="w-8 h-8 flex items-center justify-center bg-indigo-100 rounded-full mr-3">
+<i class="ri-store-2-fill text-indigo-500"></i>
+</div>
+<div class="text-sm font-medium text-gray-900">akitada.com</div>
+</div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Shopify</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">akitada</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">DE</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">165</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">29.96</td>
+</tr>
+<tr class="hover:bg-gray-50">
+<td class="px-6 py-4 whitespace-nowrap">
+<div class="flex items-center">
+<div class="w-8 h-8 flex items-center justify-center bg-pink-100 rounded-full mr-3">
+<i class="ri-shopping-bag-fill text-pink-500"></i>
+</div>
+<div class="text-sm font-medium text-gray-900">avapros.com</div>
+</div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Shopify</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">avapros</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">ID</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">1181</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">35.73</td>
+</tr>
+<tr class="hover:bg-gray-50">
+<td class="px-6 py-4 whitespace-nowrap">
+<div class="flex items-center">
+<div class="w-8 h-8 flex items-center justify-center bg-teal-100 rounded-full mr-3">
+<i class="ri-building-2-fill text-teal-500"></i>
+</div>
+<div class="text-sm font-medium text-gray-900">blackrow.com</div>
+</div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Shopify</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">blackrow</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">VN</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">1385</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">43.57</td>
+</tr>
+<tr class="hover:bg-gray-50">
+<td class="px-6 py-4 whitespace-nowrap">
+<div class="flex items-center">
+<div class="w-8 h-8 flex items-center justify-center bg-orange-100 rounded-full mr-3">
+<i class="ri-fox-fill text-orange-500"></i>
+</div>
+<div class="text-sm font-medium text-gray-900">foxness.com</div>
+</div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Shopify</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">foxness</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">NL</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">610</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">31.95</td>
+</tr>
+<tr class="hover:bg-gray-50">
+<td class="px-6 py-4 whitespace-nowrap">
+<div class="flex items-center">
+<div class="w-8 h-8 flex items-center justify-center bg-blue-100 rounded-full mr-3">
+<i class="ri-building-fill text-blue-500"></i>
+</div>
+<div class="text-sm font-medium text-gray-900">cofuze.com</div>
+</div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Shopify</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">cofuze.com - CoFuze™</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">IN</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">90</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">87.64</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="px-6 py-4 flex items-center justify-between border-t border-gray-200">
+<div class="flex items-center">
+<p class="text-sm text-gray-700">
+Showing <span class="font-medium">1</span> to <span class="font-medium">10</span> of <span class="font-medium">317,455</span> results
+</p>
+</div>
+<div class="flex items-center space-x-2">
+<button class="bg-primary text-white w-8 h-8 rounded flex items-center justify-center">
+<span>1</span>
+</button>
+<button class="text-gray-500 hover:bg-gray-100 w-8 h-8 rounded flex items-center justify-center">
+<span>2</span>
+</button>
+<button class="text-gray-500 hover:bg-gray-100 w-8 h-8 rounded flex items-center justify-center">
+<span>3</span>
+</button>
+<span class="text-gray-500">...</span>
+<button class="text-gray-500 hover:bg-gray-100 w-8 h-8 rounded flex items-center justify-center">
+<span>233</span>
+</button>
+<button class="text-gray-500 hover:bg-gray-100 w-8 h-8 rounded flex items-center justify-center">
+<span>234</span>
+</button>
+<button class="text-gray-500 hover:bg-gray-100 w-8 h-8 rounded flex items-center justify-center">
+<div class="w-4 h-4 flex items-center justify-center">
+<i class="ri-arrow-right-s-line"></i>
+</div>
+</button>
+</div>
+</div>
+</div>
+</main>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Sidebar toggle
+            const sidebar = document.getElementById('sidebar');
+            const mainContent = document.getElementById('main-content');
+            const sidebarToggle = document.getElementById('sidebar-toggle');
+            const sidebarTexts = document.querySelectorAll('.sidebar-text');
+            
+            function toggleSidebar() {
+                const isExpanded = sidebar.classList.contains('sidebar-expanded');
+                if (isExpanded) {
+                    sidebar.classList.remove('sidebar-expanded');
+                    sidebar.classList.add('sidebar-collapsed');
+                    mainContent.classList.remove('main-content-expanded');
+                    mainContent.classList.add('main-content-collapsed');
+                    sidebarTexts.forEach(text => text.style.display = 'none');
+                } else {
+                    sidebar.classList.remove('sidebar-collapsed');
+                    sidebar.classList.add('sidebar-expanded');
+                    mainContent.classList.remove('main-content-collapsed');
+                    mainContent.classList.add('main-content-expanded');
+                    sidebarTexts.forEach(text => text.style.display = '');
+                }
+            }
+            
+            sidebarToggle.addEventListener('click', toggleSidebar);
+            
+            // Responsive sidebar behavior
+            function handleResize() {
+                if (window.innerWidth < 768) {
+                    sidebar.classList.add('sidebar-collapsed');
+                    sidebar.classList.remove('sidebar-expanded');
+                    sidebarTexts.forEach(text => text.style.display = 'none');
+                    sidebar.style.transform = 'translateX(-100%)';
+                    mainContent.classList.remove('main-content-expanded', 'main-content-collapsed');
+                } else {
+                    sidebar.style.transform = 'translateX(0)';
+                    // Do NOT force expanded here, just update text visibility
+                    if (sidebar.classList.contains('sidebar-collapsed')) {
+                        sidebarTexts.forEach(text => text.style.display = 'none');
+                        mainContent.classList.remove('main-content-expanded');
+                        mainContent.classList.add('main-content-collapsed');
+                    } else {
+                        sidebarTexts.forEach(text => text.style.display = 'inline');
+                        mainContent.classList.add('main-content-expanded');
+                        mainContent.classList.remove('main-content-collapsed');
+                    }
+                }
+            }
+            
+            window.addEventListener('resize', handleResize);
+            handleResize(); // Initial call
+            
+            // Mobile sidebar toggle
+            sidebarToggle.addEventListener('click', function() {
+                if (window.innerWidth < 768) {
+                    if (sidebar.style.transform === 'translateX(0px)') {
+                        sidebar.style.transform = 'translateX(-100%)';
+                    } else {
+                        sidebar.style.transform = 'translateX(0px)';
+                    }
+                }
+            });
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize Leads Chart
+            const leadsChart = echarts.init(document.getElementById('leads-chart'));
+            
+            const leadsOption = {
+                animation: false,
+                tooltip: {
+                    trigger: 'axis',
+                    backgroundColor: 'rgba(255, 255, 255, 0.8)',
+                    textStyle: {
+                        color: '#1f2937'
+                    }
+                },
+                grid: {
+                    top: 10,
+                    right: 10,
+                    bottom: 20,
+                    left: 40
+                },
+                xAxis: {
+                    type: 'category',
+                    data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                    axisLine: {
+                        lineStyle: {
+                            color: '#e2e8f0'
+                        }
+                    },
+                    axisLabel: {
+                        color: '#64748b'
+                    }
+                },
+                yAxis: {
+                    type: 'value',
+                    axisLine: {
+                        show: false
+                    },
+                    axisLabel: {
+                        color: '#64748b'
+                    },
+                    splitLine: {
+                        lineStyle: {
+                            color: '#e2e8f0'
+                        }
+                    }
+                },
+                series: [
+                    {
+                        name: 'Leads',
+                        type: 'line',
+                        smooth: true,
+                        symbol: 'none',
+                        lineStyle: {
+                            width: 3,
+                            color: 'rgba(87, 181, 231, 1)'
+                        },
+                        areaStyle: {
+                            color: {
+                                type: 'linear',
+                                x: 0,
+                                y: 0,
+                                x2: 0,
+                                y2: 1,
+                                colorStops: [
+                                    {
+                                        offset: 0,
+                                        color: 'rgba(87, 181, 231, 0.2)'
+                                    },
+                                    {
+                                        offset: 1,
+                                        color: 'rgba(87, 181, 231, 0.01)'
+                                    }
+                                ]
+                            }
+                        },
+                        data: [320, 420, 380, 520, 450, 570, 630]
+                    }
+                ]
+            };
+            
+            leadsChart.setOption(leadsOption);
+            
+            // Initialize Filter Chart
+            const filterChart = echarts.init(document.getElementById('filter-chart'));
+            
+            const filterOption = {
+                animation: false,
+                tooltip: {
+                    trigger: 'item',
+                    backgroundColor: 'rgba(255, 255, 255, 0.8)',
+                    textStyle: {
+                        color: '#1f2937'
+                    }
+                },
+                legend: {
+                    orient: 'vertical',
+                    right: 10,
+                    top: 'center',
+                    textStyle: {
+                        color: '#64748b'
+                    }
+                },
+                series: [
+                    {
+                        name: 'Filter Usage',
+                        type: 'pie',
+                        radius: ['50%', '70%'],
+                        avoidLabelOverlap: false,
+                        itemStyle: {
+                            borderRadius: 8,
+                            borderColor: '#fff',
+                            borderWidth: 2
+                        },
+                        label: {
+                            show: false
+                        },
+                        emphasis: {
+                            label: {
+                                show: false
+                            }
+                        },
+                        labelLine: {
+                            show: false
+                        },
+                        data: [
+                            { value: 35, name: 'E-commerce', itemStyle: { color: 'rgba(87, 181, 231, 1)' } },
+                            { value: 25, name: 'Location', itemStyle: { color: 'rgba(141, 211, 199, 1)' } },
+                            { value: 20, name: 'Industry', itemStyle: { color: 'rgba(251, 191, 114, 1)' } },
+                            { value: 20, name: 'Technology', itemStyle: { color: 'rgba(252, 141, 98, 1)' } }
+                        ]
+                    }
+                ]
+            };
+            
+            filterChart.setOption(filterOption);
+            
+            // Handle window resize for charts
+            window.addEventListener('resize', function() {
+                leadsChart.resize();
+                filterChart.resize();
+            });
+        });
+    </script>
+    <script>
+  // Personalize dashboard greeting with name from localStorage
+  document.addEventListener('DOMContentLoaded', function() {
+    const greeting = document.getElementById('dashboard-greeting');
+    const name = localStorage.getItem('dashboardName');
+    if (name && greeting) {
+      greeting.textContent = `Welcome back, ${name}`;
+      // Optionally clear the name after use:
+      // localStorage.removeItem('dashboardName');
+    }
+  });
+</script>
+</body>
+</html>

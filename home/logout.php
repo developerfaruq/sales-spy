@@ -2,5 +2,5 @@
 session_start();
 session_unset();
 session_destroy();
-header("Location: signup.html");
+header('Location: http://localhost/sales/signup.html');
 exit;
