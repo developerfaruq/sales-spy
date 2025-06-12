@@ -1,5 +1,5 @@
 <?php
-// Rename this file to Dashboard-home.php and add the following code at the top
+
 require '../config/db.php';
 session_start();
 
