@@ -11,12 +11,12 @@ if (!isset($_SESSION['user_id'])) {
 // Initialize data variables
 $user = [];
 $stats = [
-    'total_leads' => 0,
-    'active_campaigns' => 0,
-    'credits_remaining' => 0,
+    'total_leads' => 14,
+    'active_campaigns' => 10,
+    'credits_remaining' => 10,
     'credits_total' => 2000,
-    'credits_percentage' => 0,
-    'recent_activity' => 0,
+    'credits_percentage' => 10,
+    'recent_activity' => 10,
     'plan_name' => 'Pro'
 ];
 
@@ -39,7 +39,7 @@ try {
 
     if (!$user) {
         session_destroy();
-        header("Location: signup.html?form=login&status=invalid_user");
+        header('Location:' .BASE_URL. 'signup.html?form=login&status=invalid_user');
         exit;
     }
 
@@ -94,54 +94,240 @@ try {
 $avatarUrl = "https://ui-avatars.com/api/?name=" . urlencode($user['full_name'] ?? 'User') . 
              "&background=1E3A8A&color=fff&length=1&size=128";
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <!-- Keep all head content exactly the same as in your original file -->
-    <!-- ... -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sales-Spy Dashboard</title>
+    <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+    <script>tailwind.config={theme:{extend:{colors:{primary:'#1E3A8A',secondary:'#5BC0EB'},borderRadius:{'none':'0px','sm':'4px',DEFAULT:'8px','md':'12px','lg':'16px','xl':'20px','2xl':'24px','3xl':'32px','full':'9999px','button':'8px'}}}}</script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.5.0/echarts.min.js"></script>
+    <style>
+        :where([class^="ri-"])::before { content: "\f3c2"; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f9fafb;
+        }
+        .glassmorphism {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        input:focus {
+            outline: none;
+        }
+        .sidebar-expanded {
+            width: 240px;
+            transition: all 0.6s cubic-bezier(0.4,0,0.2,1);
+        }
+        .sidebar-collapsed {
+            width: 80px;
+            transition: all 0.6s cubic-bezier(0.4,0,0.2,1);
+        }
+        .main-content-expanded {
+            margin-left: 240px;
+            transition: all 0.6s cubic-bezier(0.4,0,0.2,1);
+        }
+        .main-content-collapsed {
+            margin-left: 80px;
+            transition: all 0.6s cubic-bezier(0.4,0,0.2,1);
+        }
+        @media (max-width: 768px) {
+            .main-content-expanded, .main-content-collapsed {
+                margin-left: 0;
+            }
+        }
+        .custom-switch {
+            position: relative;
+            display: inline-block;
+            width: 44px;
+            height: 24px;
+        }
+        .custom-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #e2e8f0;
+            transition: .4s;
+            border-radius: 24px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        input:checked + .slider {
+            background-color: #3b82f6;
+        }
+        input:checked + .slider:before {
+            transform: translateX(20px);
+        }
+    </style>
 </head>
 <body>
     <div class="flex h-screen bg-gray-50">
-        <!-- Sidebar - Update dynamic content -->
-        <div id="sidebar" class="sidebar-collapsed fixed h-full bg-white shadow-lg z-20 transition-all duration-700 ease-in-out">
+        <!-- Sidebar -->
+        <div id="sidebar" class="sidebar-expanded fixed h-full bg-white shadow-lg z-20 transition-all duration-700 ease-in-out">
             <div class="flex flex-col h-full">
                 <!-- Logo -->
-                <div class="p-4 border-b flex items-center justify-center">
-                    <img src="logo-icon.png" alt="Logo" id="sidebar-logo-img" class="w-8 h-8 mr-0 hidden">
+                <div class="p-4 border-b flex items-center justify-center relative">
+                    <img src="https://res.cloudinary.com/dtrn8j0sz/image/upload/v1749075914/SS_s4jkfw.jpg" alt="Logo" id="sidebar-logo-img" class="w-8 h-8 mr-0 hidden">
                     <h1 id="sidebar-logo-text" class="font-['Pacifico'] text-2xl text-primary">Sales-Spy</h1>
+                    <!-- Mobile-only collapse button -->
+                    <button id="sidebar-mobile-close" class="absolute right-2 top-2 p-2 rounded-full hover:bg-gray-100 md:hidden" aria-label="Close sidebar">
+                        <i class="ri-close-line text-xl"></i>
+                    </button>
                 </div>
                 
-                <!-- Navigation (unchanged) -->
-                <!-- ... -->
+                <!-- Navigation -->
+                <nav class="flex-1 overflow-y-auto py-4">
+                    <ul>
+                        <li class="mb-2">
+                            <a href="#" class="flex items-center px-4 py-3 text-primary bg-blue-50 rounded-r-lg border-l-4 border-primary">
+                                <div class="w-6 h-6 flex items-center justify-center mr-3">
+                                    <i class="ri-dashboard-line"></i>
+                                </div>
+                                <span class="sidebar-text">Dashboard</span>
+                            </a>
+                        </li>
+                        <li class="mb-2">
+                            <a href="Dashboard-com.html" class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-r-lg hover:text-primary transition-colors">
+                                <div class="w-6 h-6 flex items-center justify-center mr-3">
+                                    <i class="ri-global-line"></i>
+                                </div>
+                                <span class="sidebar-text">Websites</span>
+                            </a>
+                        </li>
+                        <li class="mb-2">
+                            <a href="Dashboard-ecc.html" class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-r-lg hover:text-primary transition-colors">
+                                <div class="w-6 h-6 flex items-center justify-center mr-3">
+                                    <i class="ri-shopping-cart-line"></i>
+                                </div>
+                                <span class="sidebar-text">E-commerce</span>
+                            </a>
+                        </li>
+                         <li class="mb-2">
+                <a href="Dashboard-pay.html" class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-r-lg hover:text-primary transition-colors">
+                  <div class="w-6 h-6 flex items-center justify-center mr-3"> <i class="ri-bank-card-line"></i></div>
+                  <span class="sidebar-text">Payment</span>
+                </a>
+              </li>
+                        <li class="mb-2">
+                            <a href="Dashboard-set.html" class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-r-lg hover:text-primary transition-colors">
+                                <div class="w-6 h-6 flex items-center justify-center mr-3">
+                                    <i class="ri-settings-line"></i>
+                                </div>
+                                <span class="sidebar-text">Settings</span>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
                 
-                <!-- Upgrade section - Make dynamic -->
+                <!-- Upgrade section -->
                 <div id="upgrade-section" class="p-4 border-t">
                     <div id="upgrade-expanded" class="bg-gray-50 rounded-lg p-4 mb-3">
                         <p class="text-sm text-gray-600 mb-2">Credits remaining</p>
                         <div class="flex items-center justify-between">
                             <span class="font-semibold text-lg"><?= number_format($stats['credits_remaining']) ?></span>
-                            <span class="text-xs text-gray-500">of <?= number_format($stats['credits_total']) ?></span>
+                            <span class="text-xs text-gray-500"><?= number_format($stats['credits_total']) ?></span>
                         </div>
                         <div class="w-full bg-gray-200 rounded-full h-2 mt-2">
-                            <div class="bg-primary rounded-full h-2" style="width: <?= $stats['credits_percentage'] ?>%"></div>
+                            <div class="bg-primary rounded-full h-2" style="width: <?= number_format($stats['credits_percentage']) ?>%"></div>
                         </div>
                     </div>
+                    <a href="Dashboard-pay.html">
                     <button id="upgrade-btn-expanded" class="w-full bg-primary text-white py-2 px-4 rounded-button flex items-center justify-center whitespace-nowrap hover:bg-blue-600 transition-colors">
                         <div class="w-5 h-5 flex items-center justify-center mr-2">
                             <i class="ri-arrow-up-line"></i>
                         </div>
                         <span>Upgrade Plan</span>
                     </button>
+                    </a>
+                    <a href="Dashboard-pay.html">
                     <button id="upgrade-btn-collapsed" class="hidden bg-primary text-white w-10 h-10 rounded-full flex items-center justify-center mx-auto mt-2 hover:bg-blue-600 transition-colors" title="Upgrade">
                         <i class="ri-arrow-up-line"></i>
                     </button>
+                    </a>
                 </div>
+                <script>
+                    document.addEventListener('DOMContentLoaded', function() {
+                        const sidebar = document.getElementById('sidebar');
+                        const upgradeExpanded = document.getElementById('upgrade-expanded');
+                        const upgradeBtnExpanded = document.getElementById('upgrade-btn-expanded');
+                        const upgradeBtnCollapsed = document.getElementById('upgrade-btn-collapsed');
+                        const logoImg = document.getElementById('sidebar-logo-img');
+                        const logoText = document.getElementById('sidebar-logo-text');
+
+                        function updateUpgradeSection() {
+                            if (sidebar.classList.contains('sidebar-collapsed')) {
+                                upgradeExpanded.style.display = 'none';
+                                upgradeBtnExpanded.style.display = 'none';
+                                upgradeBtnCollapsed.classList.remove('hidden');
+                            } else {
+                                upgradeExpanded.style.display = '';
+                                upgradeBtnExpanded.style.display = '';
+                                upgradeBtnCollapsed.classList.add('hidden');
+                            }
+                        }
+
+                        function updateLogo() {
+                            if (sidebar.classList.contains('sidebar-collapsed')) {
+                                logoImg.classList.remove('hidden');
+                                logoText.classList.add('hidden');
+                            } else {
+                                logoImg.classList.add('hidden');
+                                logoText.classList.remove('hidden');
+                            }
+                        }
+
+                        // Initial state
+                        updateUpgradeSection();
+                        updateLogo();
+
+                        // Listen for sidebar toggle
+                        const sidebarToggle = document.getElementById('sidebar-toggle');
+                        sidebarToggle.addEventListener('click', function() {
+                            setTimeout(() => {
+                                updateUpgradeSection();
+                                updateLogo();
+                            }, 310); // Wait for transition
+                        });
+
+                        // Also update on resize (for responsive)
+                        window.addEventListener('resize', function() {
+                            setTimeout(() => {
+                                updateUpgradeSection();
+                                updateLogo();
+                            }, 310);
+                        });
+                    });
+                </script>
             </div>
         </div>
         
         <!-- Main Content -->
         <div id="main-content" class="main-content-expanded flex-1 transition-all duration-700 ease-in-out">
-            <!-- Header - Update dynamic content -->
+            <!-- Header -->
             <header class="bg-white shadow-sm sticky top-0 z-10">
                 <div class="flex items-center justify-between px-6 py-4">
                     <div class="flex items-center">
@@ -156,15 +342,17 @@ $avatarUrl = "https://ui-avatars.com/api/?name=" . urlencode($user['full_name'] 
                             <div class="w-5 h-5 flex items-center justify-center mr-2 text-primary">
                                 <i class="ri-coin-line"></i>
                             </div>
-                            <span class="text-sm font-medium"><?= number_format($stats['credits_remaining']) ?> credits</span>
+                            <span class="text-sm font-medium"><?= number_format($stats['credits_remaining']) ?></span>
                         </div>
+                        <a href="Dashboard-pay.html">
                         <button class="bg-primary text-white py-2 px-4 rounded-button whitespace-nowrap hover:bg-blue-600 transition-colors">
                             <span>Upgrade</span>
                         </button>
+                        </a>
                         <div class="relative">
                             <button class="flex items-center space-x-2">
                                 <div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
-                                    <img src="<?= $avatarUrl ?>" alt="User avatar" class="w-full h-full object-cover">
+                                    <img src="<?= $avatarUrl ?>" alt="User avatar" class="w-full h-full object-cover" id="header-profile-img">
                                 </div>
                             </button>
                         </div>
@@ -172,7 +360,7 @@ $avatarUrl = "https://ui-avatars.com/api/?name=" . urlencode($user['full_name'] 
                 </div>
             </header>
             
-            <!-- Content - Update dynamic content -->
+            <!-- Content -->
             <div class="p-6">
                 <!-- Welcome Section -->
                 <div class="mb-8">
@@ -180,7 +368,7 @@ $avatarUrl = "https://ui-avatars.com/api/?name=" . urlencode($user['full_name'] 
                     <p class="text-gray-600">Here's what's been happening recently.</p>
                 </div>
                 
-                <!-- Stats Grid - Make dynamic -->
+                <!-- Stats Grid -->
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                     <!-- Total Leads -->
                     <div class="glassmorphism rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow">
@@ -242,9 +430,9 @@ $avatarUrl = "https://ui-avatars.com/api/?name=" . urlencode($user['full_name'] 
                             <div>
                                 <p class="text-3xl font-bold text-gray-800"><?= number_format($stats['credits_remaining']) ?></p>
                                 <div class="w-full bg-gray-200 rounded-full h-2 mt-3">
-                                    <div class="bg-primary rounded-full h-2" style="width: <?= $stats['credits_percentage'] ?>%"></div>
+                                    <div class="bg-primary rounded-full h-2" style="width: 62.5%"></div>
                                 </div>
-                                <p class="text-xs text-gray-500 mt-1"><?= round($stats['credits_percentage'], 1) ?>% remaining</p>
+                                <p class="text-xs text-gray-500 mt-1"><?= $stats['credits_percentage'] ?>% remaining</p>
                             </div>
                         </div>
                     </div>
@@ -266,7 +454,7 @@ $avatarUrl = "https://ui-avatars.com/api/?name=" . urlencode($user['full_name'] 
                                     <div class="w-4 h-4 flex items-center justify-center mr-1">
                                         <i class="ri-arrow-up-line"></i>
                                     </div>
-                                    <span>18% from yesterday</span>
+                                    <span><?= number_format($stats['recent_activity']) ?>% from yesterday</span>
                                 </p>
                             </div>
                         </div>
@@ -275,7 +463,7 @@ $avatarUrl = "https://ui-avatars.com/api/?name=" . urlencode($user['full_name'] 
                 
                 <!-- Recent Activity Feed & Analytics -->
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <!-- Recent Activity Feed - Make dynamic -->
+                    <!-- Recent Activity Feed -->
                     <div class="lg:col-span-1 glassmorphism rounded-lg shadow-sm p-6">
                         <div class="flex items-center justify-between mb-6">
                             <h2 class="text-lg font-semibold text-gray-800">Recent Activity</h2>
@@ -329,7 +517,7 @@ $avatarUrl = "https://ui-avatars.com/api/?name=" . urlencode($user['full_name'] 
                         </div>
                     </div>
                     
-                    <!-- Analytics Charts - Make dynamic -->
+                    <!-- Analytics Charts -->
                     <div class="lg:col-span-2 glassmorphism rounded-lg shadow-sm p-6">
                         <div class="flex items-center justify-between mb-6">
                             <h2 class="text-lg font-semibold text-gray-800">Analytics Overview</h2>
@@ -358,15 +546,75 @@ $avatarUrl = "https://ui-avatars.com/api/?name=" . urlencode($user['full_name'] 
             </div>
         </div>
     </div>
-
-    <!-- JavaScript - Update chart data to use PHP variables -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Sidebar toggle (unchanged)
-            // ...
-            
-            // Initialize Leads Chart with dynamic data
+            // Sidebar toggle
+            const sidebar = document.getElementById('sidebar');
+            const mainContent = document.getElementById('main-content');
+            const sidebarToggle = document.getElementById('sidebar-toggle');
+            const sidebarTexts = document.querySelectorAll('.sidebar-text');
+            const sidebarMobileClose = document.getElementById('sidebar-mobile-close');
+
+            // Helper: is mobile viewport
+            function isMobile() {
+                return window.innerWidth < 768;
+            }
+
+            // Sidebar open/close for mobile and desktop
+            function openSidebar() {
+                sidebar.classList.add('sidebar-expanded');
+                sidebar.classList.remove('sidebar-collapsed');
+                mainContent.classList.add('main-content-expanded');
+                mainContent.classList.remove('main-content-collapsed');
+                sidebarTexts.forEach(text => text.style.display = '');
+                if (isMobile()) {
+                    sidebar.style.transform = 'translateX(0)';
+                    if (sidebarMobileClose) sidebarMobileClose.style.display = '';
+                }
+            }
+
+            function closeSidebar() {
+                sidebar.classList.remove('sidebar-expanded');
+                sidebar.classList.add('sidebar-collapsed');
+                mainContent.classList.remove('main-content-expanded');
+                mainContent.classList.add('main-content-collapsed');
+                sidebarTexts.forEach(text => text.style.display = 'none');
+                if (isMobile()) {
+                    sidebar.style.transform = 'translateX(-100%)';
+                    if (sidebarMobileClose) sidebarMobileClose.style.display = 'none';
+                }
+            }
+
+            function handleResize() {
+                if (isMobile()) {
+                    closeSidebar();
+                    if (sidebarMobileClose) sidebarMobileClose.style.display = '';
+                } else {
+                    openSidebar();
+                    if (sidebarMobileClose) sidebarMobileClose.style.display = 'none';
+                }
+            }
+
+            window.addEventListener('DOMContentLoaded', handleResize);
+            window.addEventListener('resize', handleResize);
+
+            sidebarToggle.addEventListener('click', function() {
+                if (sidebar.classList.contains('sidebar-expanded')) {
+                    closeSidebar();
+                } else {
+                    openSidebar();
+                }
+            });
+
+            if (sidebarMobileClose) {
+                sidebarMobileClose.addEventListener('click', closeSidebar);
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize Leads Chart
             const leadsChart = echarts.init(document.getElementById('leads-chart'));
+            
             const leadsOption = {
                 animation: false,
                 tooltip: {
@@ -441,10 +689,12 @@ $avatarUrl = "https://ui-avatars.com/api/?name=" . urlencode($user['full_name'] 
                     }
                 ]
             };
+            
             leadsChart.setOption(leadsOption);
             
-            // Initialize Filter Chart with dynamic data
+            // Initialize Filter Chart
             const filterChart = echarts.init(document.getElementById('filter-chart'));
+            
             const filterOption = {
                 animation: false,
                 tooltip: {
@@ -488,6 +738,7 @@ $avatarUrl = "https://ui-avatars.com/api/?name=" . urlencode($user['full_name'] 
                     }
                 ]
             };
+            
             filterChart.setOption(filterOption);
             
             // Handle window resize for charts
@@ -497,5 +748,48 @@ $avatarUrl = "https://ui-avatars.com/api/?name=" . urlencode($user['full_name'] 
             });
         });
     </script>
+    <script>
+  // Personalize dashboard greeting with name from localStorage
+  document.addEventListener('DOMContentLoaded', function() {
+    const greeting = document.getElementById('dashboard-greeting');
+    const name = localStorage.getItem('dashboardName');
+    if (name && greeting) {
+      greeting.textContent = `Welcome back, ${name}`;
+      // Optionally clear the name after use:
+      // localStorage.removeItem('dashboardName');
+    }
+  });
+</script>
+<script>
+// Profile image sync logic for all dashboards (localStorage-based)
+// This will be replaced by backend API calls in the future.
+document.addEventListener('DOMContentLoaded', function() {
+  const headerImg = document.getElementById('header-profile-img');
+  const localProfileImg = localStorage.getItem('profileImageBase64');
+  if (headerImg && localProfileImg) {
+    headerImg.src = localProfileImg;
+  }
+  // --- BACKEND INTEGRATION POINT ---
+  // On page load, replace localStorage fetch with API call to get user profile image.
+});
+</script>
 </body>
 </html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
