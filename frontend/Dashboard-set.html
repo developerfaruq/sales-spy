@@ -435,7 +435,7 @@ document.addEventListener('DOMContentLoaded', function() {
         <div class="dropdown">
           <button class="flex items-center space-x-2 focus:outline-none">
             <div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
-              <img src="https://readdy.ai/api/search-image?query=professional%20headshot%20of%20a%20young%20business%20person%2C%20neutral%20expression%2C%20high%20quality%20portrait%2C%20business%20attire&width=200&height=200&seq=1&orientation=squarish" alt="User avatar" class="w-full h-full object-cover">
+              <img src="" alt="User avatar" class="w-full h-full object-cover">
             </div>
             <i class="ri-arrow-down-s-line text-gray-500"></i>
           </button>
@@ -486,7 +486,7 @@ document.addEventListener('DOMContentLoaded', function() {
 <div class="p-6" id="profile-content">
 <div class="flex flex-col md:flex-row items-center gap-8">
 <div class="w-40 h-40 rounded-full bg-gray-100 overflow-hidden flex items-center justify-center relative">
-<img src="https://readdy.ai/api/search-image?query=professional%20headshot%20of%20a%20young%20business%20person%20with%20neutral%20expression%2C%20high%20quality%20portrait%20photo%2C%20professional%20lighting%2C%20office%20background&width=400&height=400&seq=2&orientation=squarish" alt="Current profile" class="w-full h-full object-cover" id="profile-preview">
+  <img src="" alt="Current profile" class="w-full h-full object-cover" id="profile-preview">
 </div>
 <div class="flex-1">
 <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-primary transition-colors cursor-pointer" id="dropzone">
@@ -494,9 +494,8 @@ document.addEventListener('DOMContentLoaded', function() {
 <i class="ri-upload-cloud-line ri-2x"></i>
 </div>
 <p class="text-sm text-gray-600 mb-2">Drag and drop your image here, or</p>
-<button class="px-4 py-2 bg-primary text-white rounded-button text-sm font-medium hover:bg-blue-600 transition-colors whitespace-nowrap">Choose File</button>
+<button type="button" class="px-4 py-2 bg-primary text-white rounded-button text-sm font-medium hover:bg-blue-600 transition-colors whitespace-nowrap" id="choose-file-btn">Choose File</button>
 <input type="file" id="profile-upload" class="hidden" accept=".jpg,.jpeg,.png,.webp">
-<p class="text-xs text-gray-500 mt-3">Accepted formats: JPG, PNG, WEBP (max 5MB)</p>
 </div>
 <div class="mt-4 flex justify-end">
 <button class="px-4 py-2 bg-primary text-white rounded-button text-sm font-medium hover:bg-blue-600 transition-colors whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed" id="save-profile" disabled>Save Changes</button>
@@ -902,44 +901,108 @@ document.addEventListener('DOMContentLoaded', function() {
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-  // Profile image upload functionality
+  // Fetch user settings data
+  fetch('../home/update_settings.php')
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        const userData = data.data.user;
+        
+        // Update both profile images
+        const profilePreview = document.getElementById('profile-preview');
+        const navbarProfile = document.querySelector('.dropdown img');
+        
+        function updateProfileImage(element) {
+          if (element) {
+            if (userData.profile_picture) {
+              // Add error handling for the image
+              element.onerror = function() {
+                // If image fails to load, use the fallback avatar with initials
+                this.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(userData.full_name)}&background=1E3A8A&color=fff&length=1&size=400`;
+              };
+              element.src = userData.profile_picture;
+            } else {
+              // Use initials avatar if no profile picture
+              element.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(userData.full_name)}&background=1E3A8A&color=fff&length=1&size=400`;
+            }
+          }
+        }
+
+        // Update both profile images
+        updateProfileImage(profilePreview);
+        updateProfileImage(navbarProfile);
+
+        // Update account information form
+        const fullNameInput = document.getElementById('full-name');
+        const emailInput = document.getElementById('email');
+        const phoneInput = document.getElementById('phone');
+
+        if (fullNameInput) fullNameInput.value = userData.full_name || '';
+        if (emailInput) emailInput.value = userData.email || '';
+        if (phoneInput) phoneInput.value = userData.phone || '';
+
+        // Update credits display
+        const creditsDisplay = document.querySelector('.text-sm.font-medium');
+        if (creditsDisplay) {
+          creditsDisplay.textContent = `${data.data.credits} credits`;
+        }
+
+        // Update active sessions
+        const sessionsContainer = document.querySelector('.space-y-4');
+        if (sessionsContainer && data.data.sessions) {
+          const currentSession = data.data.sessions[0]; // Most recent session
+          if (currentSession) {
+            const sessionElement = sessionsContainer.querySelector('.bg-blue-50');
+            if (sessionElement) {
+              const deviceInfo = sessionElement.querySelector('.text-xs.text-gray-500');
+              if (deviceInfo) {
+                deviceInfo.textContent = `${currentSession.device} • ${currentSession.browser} • ${currentSession.location}`;
+              }
+              const ipInfo = deviceInfo.nextElementSibling;
+              if (ipInfo) {
+                ipInfo.textContent = `IP: ${currentSession.ip_address} • Last active: ${formatLastActive(currentSession.last_activity)}`;
+              }
+            }
+          }
+        }
+
+        // Update subscription info if available
+        if (data.data.subscription) {
+          const subscription = data.data.subscription;
+          const planName = document.querySelector('.text-xs.text-gray-500');
+          if (planName) {
+            planName.textContent = `of ${subscription.plan_name}`;
+          }
+        }
+      } else {
+        console.error('Failed to fetch user data:', data.message);
+      }
+    })
+    .catch(error => {
+      console.error('Error fetching user data:', error);
+    });
+
+  // Helper function to format last active time
+  function formatLastActive(timestamp) {
+    const date = new Date(timestamp);
+    const now = new Date();
+    const diff = now - date;
+    
+    if (diff < 60000) return 'Just now';
+    if (diff < 3600000) return `${Math.floor(diff/60000)} minutes ago`;
+    if (diff < 86400000) return `${Math.floor(diff/3600000)} hours ago`;
+    return `${Math.floor(diff/86400000)} days ago`;
+  }
+
+  // Profile image upload handling
   const profileUpload = document.getElementById('profile-upload');
+  const chooseFileBtn = document.getElementById('choose-file-btn');
   const dropzone = document.getElementById('dropzone');
-  const profilePreview = document.getElementById('profile-preview');
   const saveProfileBtn = document.getElementById('save-profile');
-  let selectedProfileFile = null;
 
-  // Modal for profile image success
-  let profileModal = document.getElementById('profile-success-modal');
-  if (!profileModal) {
-    profileModal = document.createElement('div');
-    profileModal.id = 'profile-success-modal';
-    profileModal.className = 'fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40 hidden';
-    profileModal.innerHTML = `
-      <div class="bg-white rounded-lg shadow-xl max-w-xs w-full p-6 text-center">
-        <div class="w-12 h-12 mx-auto mb-4 flex items-center justify-center text-green-500 bg-green-100 rounded-full">
-          <i class="ri-checkbox-circle-line ri-2x"></i>
-        </div>
-        <h4 class="text-lg font-medium mb-2">Success</h4>
-        <p class="text-sm text-gray-600 mb-4">Profile image updated successfully!</p>
-        <button id="close-profile-success-modal" class="px-4 py-2 bg-primary text-white rounded-button text-sm font-medium hover:bg-blue-600 transition-colors">OK</button>
-      </div>
-    `;
-    document.body.appendChild(profileModal);
-  }
-  function showProfileModal() {
-    profileModal.classList.remove('hidden');
-  }
-  profileModal.addEventListener('click', function(e) {
-    if (e.target.id === 'close-profile-success-modal' || e.target === profileModal) {
-      profileModal.classList.add('hidden');
-    }
-  });
-
-  if (profileUpload && dropzone && profilePreview && saveProfileBtn) {
-    // Click on dropzone or button triggers file input
-    dropzone.addEventListener('click', function(e) {
-      if (e.target.tagName !== 'BUTTON') return;
+  if (profileUpload && chooseFileBtn && dropzone && saveProfileBtn) {
+    // Handle choose file button click
+    chooseFileBtn.addEventListener('click', function() {
       profileUpload.click();
     });
 
@@ -950,20 +1013,24 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     });
 
-    // Drag and drop functionality
+    // Handle drag and drop
     ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
       dropzone.addEventListener(eventName, preventDefaults, false);
     });
+
     function preventDefaults(e) {
       e.preventDefault();
       e.stopPropagation();
     }
+
     ['dragenter', 'dragover'].forEach(eventName => {
       dropzone.addEventListener(eventName, () => dropzone.classList.add('border-primary'), false);
     });
+
     ['dragleave', 'drop'].forEach(eventName => {
       dropzone.addEventListener(eventName, () => dropzone.classList.remove('border-primary'), false);
     });
+
     dropzone.addEventListener('drop', function(e) {
       const dt = e.dataTransfer;
       if (dt && dt.files && dt.files[0]) {
@@ -974,35 +1041,90 @@ document.addEventListener('DOMContentLoaded', function() {
     function handleProfileFile(file) {
       const validTypes = ['image/jpeg', 'image/png', 'image/webp'];
       if (!validTypes.includes(file.type)) {
-        showProfileModal('Please select a valid image file (JPG, PNG, or WEBP)');
+        showToast('Please select a valid image file (JPG, PNG, or WEBP)', 'error');
         return;
       }
       if (file.size > 5 * 1024 * 1024) {
-        showProfileModal('File size exceeds 5MB limit');
+        showToast('File size exceeds 5MB limit', 'error');
         return;
       }
+
       const reader = new FileReader();
       reader.onload = function(e) {
+        const profilePreview = document.getElementById('profile-preview');
+        if (profilePreview) {
         profilePreview.src = e.target.result;
+        }
         saveProfileBtn.disabled = false;
-        selectedProfileFile = file;
       };
       reader.readAsDataURL(file);
     }
 
     // Save profile button
     saveProfileBtn.addEventListener('click', function() {
-      if (!selectedProfileFile) return;
+      const profilePreview = document.getElementById('profile-preview');
+      const navbarProfile = document.querySelector('.dropdown img');
+      if (!profilePreview) return;
+
       saveProfileBtn.disabled = true;
       const originalText = saveProfileBtn.innerHTML;
       saveProfileBtn.innerHTML = '<div class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2 inline-block"></div> Saving...';
-      setTimeout(() => {
+
+      // Create form data
+      const formData = new FormData();
+      formData.append('profile_picture', profilePreview.src);
+
+      // Send to server
+      fetch('../home/update_profile.php', {
+        method: 'POST',
+        body: formData
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          showToast('Profile picture updated successfully', 'success');
+          // Update navbar profile picture as well
+          if (navbarProfile) {
+            navbarProfile.src = profilePreview.src;
+          }
+        } else {
+          showToast(data.message || 'Failed to update profile picture', 'error');
+          // If update fails, revert to initials
+          const initialsUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(userData.full_name)}&background=1E3A8A&color=fff&length=1&size=400`;
+          profilePreview.src = initialsUrl;
+          if (navbarProfile) {
+            navbarProfile.src = initialsUrl;
+          }
+        }
+      })
+      .catch(error => {
+        showToast('Error updating profile picture', 'error');
+        console.error('Error:', error);
+        // If error occurs, revert to initials
+        const initialsUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(userData.full_name)}&background=1E3A8A&color=fff&length=1&size=400`;
+        profilePreview.src = initialsUrl;
+        if (navbarProfile) {
+          navbarProfile.src = initialsUrl;
+        }
+      })
+      .finally(() => {
         saveProfileBtn.innerHTML = originalText;
         saveProfileBtn.disabled = true;
-        showProfileModal();
-        selectedProfileFile = null;
-      }, 1500);
+      });
     });
+  }
+
+  // Toast notification function
+  function showToast(message, type = 'success') {
+    const toast = document.createElement('div');
+    toast.className = `fixed bottom-4 right-4 px-6 py-3 rounded-lg text-white ${
+      type === 'success' ? 'bg-green-500' : 'bg-red-500'
+    } shadow-lg z-50`;
+    toast.textContent = message;
+    document.body.appendChild(toast);
+    setTimeout(() => {
+      toast.remove();
+    }, 3000);
   }
 });
 </script>
@@ -1038,33 +1160,75 @@ document.addEventListener('DOMContentLoaded', function() {
   if (accountForm) {
     accountForm.addEventListener('submit', function(e) {
       e.preventDefault();
+      
       // Basic validation
       let errors = [];
       if (!fullNameInput.value.trim()) errors.push('Full Name is required.');
       if (!emailInput.value.trim() || !/^[^@]+@[^@]+\.[^@]+$/.test(emailInput.value)) errors.push('Valid Email is required.');
+      
       if (newPasswordInput.value || confirmPasswordInput.value) {
         if (newPasswordInput.value.length < 8) errors.push('New password must be at least 8 characters.');
         if (newPasswordInput.value !== confirmPasswordInput.value) errors.push('Passwords do not match.');
       }
+
       if (errors.length > 0) {
-        showAccountModal(errors.join('\n'), false);
+        showToast(errors.join('\n'), 'error');
         return;
       }
-      // Simulate save
+
+      // Create form data
+      const formData = new FormData();
+      formData.append('full_name', fullNameInput.value.trim());
+      formData.append('email', emailInput.value.trim());
+      formData.append('phone', phoneInput.value.trim());
+      
+      if (currentPasswordInput.value) {
+        formData.append('current_password', currentPasswordInput.value);
+      }
+      if (newPasswordInput.value) {
+        formData.append('new_password', newPasswordInput.value);
+      }
+
+      // Show loading state
       const submitBtn = accountForm.querySelector('button[type="submit"]');
       const originalText = submitBtn.innerHTML;
       submitBtn.disabled = true;
       submitBtn.innerHTML = '<div class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2 inline-block"></div> Saving...';
-      setTimeout(() => {
+
+      // Send update request
+      fetch('../home/update_user_details.php', {
+        method: 'POST',
+        body: formData
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          showToast('Account information updated successfully!', 'success');
+          // Reset password fields
+          currentPasswordInput.value = '';
+          newPasswordInput.value = '';
+          confirmPasswordInput.value = '';
+          passwordStrengthBar.style.width = '0%';
+          
+          // Update profile picture if it was changed
+          if (data.data.profile_picture) {
+            const profilePreview = document.getElementById('profile-preview');
+            if (profilePreview) {
+              profilePreview.src = data.data.profile_picture;
+            }
+          }
+        } else {
+          showToast(data.message || 'Failed to update account information', 'error');
+        }
+      })
+      .catch(error => {
+        showToast('Error updating account information', 'error');
+        console.error('Error:', error);
+      })
+      .finally(() => {
         submitBtn.innerHTML = originalText;
         submitBtn.disabled = false;
-        showAccountModal('Account information updated successfully!', true);
-        // Optionally reset password fields
-        currentPasswordInput.value = '';
-        newPasswordInput.value = '';
-        confirmPasswordInput.value = '';
-        passwordStrengthBar.style.width = '0%';
-      }, 1200);
+      });
     });
   }
 
@@ -1109,24 +1273,6 @@ document.addEventListener('DOMContentLoaded', function() {
       accountModal.classList.add('hidden');
     }
   });
-});
-</script>
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-  // --- Autofill Account Information from localStorage (from signup.html) ---
-  const fullNameInput = document.getElementById('full-name');
-  const emailInput = document.getElementById('email');
-  const phoneInput = document.getElementById('phone');
-  // Only set if present in localStorage
-  if (fullNameInput && localStorage.getItem('dashboardName')) {
-    fullNameInput.value = localStorage.getItem('dashboardName');
-  }
-  if (emailInput && localStorage.getItem('dashboardEmail')) {
-    emailInput.value = localStorage.getItem('dashboardEmail');
-  }
-  if (phoneInput && localStorage.getItem('dashboardPhone')) {
-    phoneInput.value = localStorage.getItem('dashboardPhone');
-  }
 });
 </script>
 </body>
