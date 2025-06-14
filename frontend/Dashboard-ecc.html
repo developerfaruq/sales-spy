@@ -3190,5 +3190,173 @@
         });
       });
     </script>
+
+    <div class="p-4">
+      <h2 class="text-xl font-bold mb-4">Filter Stores</h2>
+      <div class="mb-4">
+        <label for="platform">Platform:</label>
+        <select id="platform" class="border rounded p-2">
+          <option value="">All</option>
+          <option value="shopify">Shopify</option>
+          <option value="woocommerce">WooCommerce</option>
+          <option value="etsy">Etsy</option>
+          <option value="ebay">eBay</option>
+          <option value="square">Square</option>
+        </select>
+      </div>
+      <div class="mb-4">
+        <label for="created_after">Created After:</label>
+        <input type="date" id="created_after" class="border rounded p-2">
+      </div>
+      <div class="mb-4">
+        <label for="created_before">Created Before:</label>
+        <input type="date" id="created_before" class="border rounded p-2">
+      </div>
+      <div class="flex gap-2">
+        <button id="filterButton" class="bg-blue-500 text-white p-2 rounded">Filter</button>
+        <form id="exportForm" method="GET" action="../api/export_csv.php" target="_blank" class="inline">
+          <input type="hidden" name="platform" id="exportPlatform">
+          <input type="hidden" name="created_after" id="exportCreatedAfter">
+          <input type="hidden" name="created_before" id="exportCreatedBefore">
+          <button type="submit" id="exportButton" class="bg-green-500 text-white p-2 rounded">Export CSV</button>
+        </form>
+      </div>
+    </div>
+
+    <div id="results" class="p-4">
+      <!-- Results will be displayed here -->
+    </div>
+
+    <div id="pagination" class="p-4 flex justify-center gap-2">
+      <!-- Pagination will be displayed here -->
+    </div>
+
+    <div id="storeDetailsPanel" class="fixed right-0 top-0 h-full w-1/3 bg-white shadow-lg transform translate-x-full transition-transform duration-300 ease-in-out">
+      <div class="p-4">
+        <h3 id="storeName" class="text-xl font-bold"></h3>
+        <p id="storeUrl" class="text-blue-500"></p>
+        <p id="storePlatform"></p>
+        <p id="storeCountry"></p>
+        <p id="storeCategory"></p>
+        <p id="storeCreationDate"></p>
+        <p id="storeAddedOn"></p>
+        <button id="closePanel" class="mt-4 bg-red-500 text-white p-2 rounded">Close</button>
+      </div>
+    </div>
+
+    <script>
+    let currentPage = 1;
+    const itemsPerPage = 10;
+
+    function fetchStores(page = 1) {
+      const platform = document.getElementById('platform').value;
+      const createdAfter = document.getElementById('created_after').value;
+      const createdBefore = document.getElementById('created_before').value;
+
+      fetch(`../api/filter_stores.php?platform=${platform}&created_after=${createdAfter}&created_before=${createdBefore}&page=${page}&limit=${itemsPerPage}`)
+        .then(response => response.json())
+        .then(data => {
+          const resultsDiv = document.getElementById('results');
+          resultsDiv.innerHTML = '';
+          
+          if (data.stores.length === 0) {
+            resultsDiv.innerHTML = '<p>No stores found</p>';
+          } else {
+            data.stores.forEach(store => {
+              const storeElement = document.createElement('div');
+              storeElement.className = 'border p-4 mb-2 hover:bg-gray-50 cursor-pointer';
+              storeElement.innerHTML = `
+                <h3 class="font-bold">${store.title}</h3>
+                <p>Platform: ${store.tech_stack}</p>
+                <a href="${store.domain}" target="_blank" class="text-blue-500">${store.domain}</a>
+                <p>Creation Date: ${new Date(store.date_added).toLocaleDateString()}</p>
+              `;
+              storeElement.addEventListener('click', () => showStoreDetails(store));
+              resultsDiv.appendChild(storeElement);
+            });
+          }
+
+          // Update pagination
+          updatePagination(data.pagination);
+        })
+        .catch(error => console.error('Error fetching data:', error));
+    }
+
+    function updatePagination(pagination) {
+      const paginationDiv = document.getElementById('pagination');
+      paginationDiv.innerHTML = '';
+
+      if (pagination.total_pages <= 1) return;
+
+      // Previous button
+      if (pagination.page > 1) {
+        const prevButton = document.createElement('button');
+        prevButton.textContent = 'Previous';
+        prevButton.className = 'bg-gray-200 p-2 rounded';
+        prevButton.onclick = () => fetchStores(pagination.page - 1);
+        paginationDiv.appendChild(prevButton);
+      }
+
+      // Page numbers
+      for (let i = 1; i <= pagination.total_pages; i++) {
+        const pageButton = document.createElement('button');
+        pageButton.textContent = i;
+        pageButton.className = `p-2 rounded ${i === pagination.page ? 'bg-blue-500 text-white' : 'bg-gray-200'}`;
+        pageButton.onclick = () => fetchStores(i);
+        paginationDiv.appendChild(pageButton);
+      }
+
+      // Next button
+      if (pagination.page < pagination.total_pages) {
+        const nextButton = document.createElement('button');
+        nextButton.textContent = 'Next';
+        nextButton.className = 'bg-gray-200 p-2 rounded';
+        nextButton.onclick = () => fetchStores(pagination.page + 1);
+        paginationDiv.appendChild(nextButton);
+      }
+    }
+
+    function showStoreDetails(store) {
+      document.getElementById('storeName').textContent = store.title;
+      document.getElementById('storeUrl').innerHTML = `<a href="${store.domain}" target="_blank">${store.domain}</a>`;
+      document.getElementById('storePlatform').textContent = `Platform: ${store.tech_stack}`;
+      document.getElementById('storeCountry').textContent = `Country: ${store.country}`;
+      document.getElementById('storeCategory').textContent = `Category: ${store.categories}`;
+      document.getElementById('storeCreationDate').textContent = `Creation Date: ${new Date(store.date_added).toLocaleDateString()}`;
+      document.getElementById('storeAddedOn').textContent = `Added On: ${new Date(store.date_added).toLocaleDateString()}`;
+      document.getElementById('storeDetailsPanel').classList.remove('translate-x-full');
+    }
+
+    document.getElementById('filterButton').addEventListener('click', () => fetchStores(1));
+
+    document.getElementById('exportButton').addEventListener('click', function(e) {
+      e.preventDefault();
+      const platform = document.getElementById('platform').value;
+      const createdAfter = document.getElementById('created_after').value;
+      const createdBefore = document.getElementById('created_before').value;
+
+      // Update hidden form fields
+      document.getElementById('exportPlatform').value = platform;
+      document.getElementById('exportCreatedAfter').value = createdAfter;
+      document.getElementById('exportCreatedBefore').value = createdBefore;
+
+      // Submit the form
+      document.getElementById('exportForm').submit();
+    });
+
+    document.getElementById('closePanel').addEventListener('click', function() {
+      document.getElementById('storeDetailsPanel').classList.add('translate-x-full');
+    });
+
+    document.addEventListener('click', function(event) {
+      const panel = document.getElementById('storeDetailsPanel');
+      if (!panel.contains(event.target) && !event.target.closest('#results')) {
+        panel.classList.add('translate-x-full');
+      }
+    });
+
+    // Initial load
+    fetchStores(1);
+    </script>
   </body>
 </html>
