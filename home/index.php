@@ -203,7 +203,7 @@ $avatarUrl = "https://ui-avatars.com/api/?name=" . urlencode($user['full_name'] 
                 <nav class="flex-1 overflow-y-auto py-4">
                     <ul>
                         <li class="mb-2">
-                            <a href="#" class="flex items-center px-4 py-3 text-primary bg-blue-50 rounded-r-lg border-l-4 border-primary">
+                            <a href="index.php" class="flex items-center px-4 py-3 text-primary bg-blue-50 rounded-r-lg border-l-4 border-primary">
                                 <div class="w-6 h-6 flex items-center justify-center mr-3">
                                     <i class="ri-dashboard-line"></i>
                                 </div>
@@ -211,7 +211,7 @@ $avatarUrl = "https://ui-avatars.com/api/?name=" . urlencode($user['full_name'] 
                             </a>
                         </li>
                         <li class="mb-2">
-                            <a href="Dashboard-com.html" class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-r-lg hover:text-primary transition-colors">
+                            <a href="../frontend/Dashboard-com.html" class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-r-lg hover:text-primary transition-colors">
                                 <div class="w-6 h-6 flex items-center justify-center mr-3">
                                     <i class="ri-global-line"></i>
                                 </div>
@@ -219,7 +219,7 @@ $avatarUrl = "https://ui-avatars.com/api/?name=" . urlencode($user['full_name'] 
                             </a>
                         </li>
                         <li class="mb-2">
-                            <a href="Dashboard-ecc.html" class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-r-lg hover:text-primary transition-colors">
+                            <a href="../frontend/Dashboard-ecc.html" class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-r-lg hover:text-primary transition-colors">
                                 <div class="w-6 h-6 flex items-center justify-center mr-3">
                                     <i class="ri-shopping-cart-line"></i>
                                 </div>
@@ -227,13 +227,13 @@ $avatarUrl = "https://ui-avatars.com/api/?name=" . urlencode($user['full_name'] 
                             </a>
                         </li>
                          <li class="mb-2">
-                <a href="Dashboard-pay.html" class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-r-lg hover:text-primary transition-colors">
+                <a href="../frontend/Dashboard-pay.html" class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-r-lg hover:text-primary transition-colors">
                   <div class="w-6 h-6 flex items-center justify-center mr-3"> <i class="ri-bank-card-line"></i></div>
                   <span class="sidebar-text">Payment</span>
                 </a>
               </li>
                         <li class="mb-2">
-                            <a href="Dashboard-set.html" class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-r-lg hover:text-primary transition-colors">
+                            <a href="../frontend/Dashboard-set.html" class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-r-lg hover:text-primary transition-colors">
                                 <div class="w-6 h-6 flex items-center justify-center mr-3">
                                     <i class="ri-settings-line"></i>
                                 </div>
