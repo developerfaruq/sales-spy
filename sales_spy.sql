@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: May 22, 2025 at 01:10 PM
+-- Generation Time: Jun 14, 2025 at 09:42 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -35,6 +35,27 @@ CREATE TABLE `api_keys` (
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `api_keys`
+--
+
+INSERT INTO `api_keys` (`id`, `user_id`, `api_key`, `is_active`, `created_at`) VALUES
+(1, 10, 'ddae3ab5ccf1133e8e964f69d9f8e915cf773d216eeec2e5eb245e319b0ef507', 1, '2025-06-13 16:00:54');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `campaigns`
+--
+
+CREATE TABLE `campaigns` (
+  `id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `name` varchar(100) NOT NULL,
+  `status` enum('active','inactive','paused') DEFAULT 'active',
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
 -- --------------------------------------------------------
 
 --
@@ -47,6 +68,39 @@ CREATE TABLE `exports` (
   `store_count` int(11) DEFAULT NULL,
   `exported_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `leads`
+--
+
+CREATE TABLE `leads` (
+  `id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `store_id` int(11) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `password_reset_attempts`
+--
+
+CREATE TABLE `password_reset_attempts` (
+  `id` int(11) NOT NULL,
+  `email` varchar(100) NOT NULL,
+  `ip_address` varchar(45) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `password_reset_attempts`
+--
+
+INSERT INTO `password_reset_attempts` (`id`, `email`, `ip_address`, `created_at`) VALUES
+(1, 'timileyinfaruq9@gmail.com', '::1', '2025-05-24 18:16:45');
 
 -- --------------------------------------------------------
 
@@ -103,9 +157,11 @@ CREATE TABLE `stores` (
 CREATE TABLE `subscriptions` (
   `id` int(11) NOT NULL,
   `user_id` int(11) NOT NULL,
-  `plan_name` enum('free','pro','enterprise') NOT NULL,
-  `start_date` date NOT NULL,
-  `end_date` date NOT NULL,
+  `plan_name` enum('free','pro','enterprise') NOT NULL DEFAULT 'free',
+  `credits_remaining` int(11) NOT NULL DEFAULT 1250,
+  `credits_total` int(11) NOT NULL DEFAULT 2000,
+  `start_date` timestamp NOT NULL DEFAULT current_timestamp(),
+  `end_date` timestamp NULL DEFAULT NULL,
   `is_active` tinyint(1) DEFAULT 1
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -119,10 +175,40 @@ CREATE TABLE `users` (
   `id` int(11) NOT NULL,
   `full_name` varchar(100) NOT NULL,
   `email` varchar(100) NOT NULL,
+  `phone` varchar(20) DEFAULT NULL,
   `password` varchar(255) NOT NULL,
   `role` enum('user','admin','enterprise') DEFAULT 'user',
-  `profile_picture` varchar(255) DEFAULT NULL,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `reset_token` varchar(255) DEFAULT NULL,
+  `reset_token_expiry` datetime DEFAULT NULL,
+  `failed_attempts` int(11) DEFAULT 0,
+  `last_failed_attempt` datetime DEFAULT NULL,
+  `avatar_url` varchar(255) DEFAULT NULL,
+  `credits` int(11) DEFAULT 1250
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `users`
+--
+
+INSERT INTO `users` (`id`, `full_name`, `email`, `phone`, `password`, `role`, `created_at`, `reset_token`, `reset_token_expiry`, `failed_attempts`, `last_failed_attempt`, `avatar_url`, `credits`) VALUES
+(8, 'FARUQ ODEWUNMI', 'dev@gmail.com', '0816 127 1354', '$2y$10$QAJUhsYRwyHHOYXC5l5N0e94UUh7KQ8jsiDzqOMsi7nI1Ry8Uh5wG', 'user', '2025-06-11 21:20:16', NULL, NULL, 0, NULL, NULL, 1250),
+(9, 'faru', 'developerfaruq@gmail.com', '08116533380', '$2y$10$46jru8Jh04uDv8lcFtUsAuZT5l5tqSIC9RLHk9rBePenzgEH5L31.', 'user', '2025-06-13 15:54:03', NULL, NULL, 0, NULL, NULL, 1250),
+(10, 'faru', 'deve@gmail.com', '08161271350', '$2y$10$sujhFmBxzcqNfzG9tJsEJed4W3YkakeIlsIZKHyKPT.39ysNmEe0W', 'user', '2025-06-13 16:00:54', NULL, NULL, 0, NULL, NULL, 1250);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `user_stats`
+--
+
+CREATE TABLE `user_stats` (
+  `id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `leads_count` int(11) DEFAULT 0,
+  `campaigns_count` int(11) DEFAULT 0,
+  `credits_used` int(11) DEFAULT 0,
+  `last_activity` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -138,11 +224,32 @@ ALTER TABLE `api_keys`
   ADD KEY `user_id` (`user_id`);
 
 --
+-- Indexes for table `campaigns`
+--
+ALTER TABLE `campaigns`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `user_id` (`user_id`);
+
+--
 -- Indexes for table `exports`
 --
 ALTER TABLE `exports`
   ADD PRIMARY KEY (`id`),
   ADD KEY `user_id` (`user_id`);
+
+--
+-- Indexes for table `leads`
+--
+ALTER TABLE `leads`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `user_id` (`user_id`),
+  ADD KEY `store_id` (`store_id`);
+
+--
+-- Indexes for table `password_reset_attempts`
+--
+ALTER TABLE `password_reset_attempts`
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indexes for table `search_logs`
@@ -172,6 +279,13 @@ ALTER TABLE `users`
   ADD UNIQUE KEY `email` (`email`);
 
 --
+-- Indexes for table `user_stats`
+--
+ALTER TABLE `user_stats`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `user_id` (`user_id`);
+
+--
 -- AUTO_INCREMENT for dumped tables
 --
 
@@ -179,6 +293,12 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `api_keys`
 --
 ALTER TABLE `api_keys`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT for table `campaigns`
+--
+ALTER TABLE `campaigns`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
@@ -186,6 +306,18 @@ ALTER TABLE `api_keys`
 --
 ALTER TABLE `exports`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `leads`
+--
+ALTER TABLE `leads`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `password_reset_attempts`
+--
+ALTER TABLE `password_reset_attempts`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `search_logs`
@@ -203,12 +335,18 @@ ALTER TABLE `stores`
 -- AUTO_INCREMENT for table `subscriptions`
 --
 ALTER TABLE `subscriptions`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+
+--
+-- AUTO_INCREMENT for table `user_stats`
+--
+ALTER TABLE `user_stats`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
@@ -222,10 +360,23 @@ ALTER TABLE `api_keys`
   ADD CONSTRAINT `api_keys_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
 
 --
+-- Constraints for table `campaigns`
+--
+ALTER TABLE `campaigns`
+  ADD CONSTRAINT `campaigns_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
+
+--
 -- Constraints for table `exports`
 --
 ALTER TABLE `exports`
   ADD CONSTRAINT `exports_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
+
+--
+-- Constraints for table `leads`
+--
+ALTER TABLE `leads`
+  ADD CONSTRAINT `leads_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`),
+  ADD CONSTRAINT `leads_ibfk_2` FOREIGN KEY (`store_id`) REFERENCES `stores` (`id`);
 
 --
 -- Constraints for table `search_logs`
@@ -237,7 +388,13 @@ ALTER TABLE `search_logs`
 -- Constraints for table `subscriptions`
 --
 ALTER TABLE `subscriptions`
-  ADD CONSTRAINT `subscriptions_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
+  ADD CONSTRAINT `subscriptions_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `user_stats`
+--
+ALTER TABLE `user_stats`
+  ADD CONSTRAINT `user_stats_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

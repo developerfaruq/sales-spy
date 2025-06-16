@@ -1,180 +1,4 @@
-<?php
-// Dashboard-home.php
-require '../config/db.php';
-session_start();
-
-if (!isset($_SESSION['user_id'])) {
-    header("Location: signup.html?form=login&status=session_expired");
-    exit;
-}
-
-// Initialize data variables with defaults
-$user = [];
-$stats = [
-    'total_leads' => 0,
-    'active_campaigns' => 0,
-    'credits_remaining' => 1250,
-    'credits_total' => 2000,
-    'credits_percentage' => 0,
-    'recent_activity' => 0,
-    'plan_name' => 'Free',
-    'leads_change_percentage' => 0,
-    'campaigns_change_count' => 0,
-    'activity_change_percentage' => 0
-];
-
-$activities = [];
-$chartData = [
-    'leads' => array_fill(0, 7, 0),
-    'filters' => [
-        ['value' => 35, 'name' => 'E-commerce', 'color' => 'rgba(87, 181, 231, 1)'],
-        ['value' => 25, 'name' => 'Location', 'color' => 'rgba(141, 211, 199, 1)'],
-        ['value' => 20, 'name' => 'Industry', 'color' => 'rgba(251, 191, 114, 1)'],
-        ['value' => 20, 'name' => 'Technology', 'color' => 'rgba(252, 141, 98, 1)']
-    ]
-];
-
-try {
-    // Get user data
-    $stmt = $pdo->prepare("SELECT * FROM users WHERE id = ?");
-    $stmt->execute([$_SESSION['user_id']]);
-    $user = $stmt->fetch();
-
-    if (!$user) {
-        session_destroy();
-        header("Location: signup.html?form=login&status=invalid_user");
-        exit;
-    }
-
-    // Get user stats from database
-    // 1. Total leads count
-    $stmt = $pdo->prepare("SELECT COUNT(*) FROM leads WHERE user_id = ?");
-    $stmt->execute([$_SESSION['user_id']]);
-    $stats['total_leads'] = $stmt->fetchColumn();
-
-    // 2. Active campaigns count
-    $stmt = $pdo->prepare("SELECT COUNT(*) FROM campaigns WHERE user_id = ? AND status = 'active'");
-    $stmt->execute([$_SESSION['user_id']]);
-    $stats['active_campaigns'] = $stmt->fetchColumn();
-
-    // 3. Credits info (from users table or subscriptions table)
-    $stats['credits_remaining'] = $user['credits'] ?? 1250;
-    
-    // Get total credits from subscriptions if available
-    $stmt = $pdo->prepare("SELECT credits_total FROM subscriptions WHERE user_id = ? AND is_active = 1");
-    $stmt->execute([$_SESSION['user_id']]);
-    $subscription = $stmt->fetch();
-    $stats['credits_total'] = $subscription['credits_total'] ?? 2000;
-    $stats['credits_percentage'] = ($stats['credits_remaining'] / $stats['credits_total']) * 100;
-
-    // 4. Get plan name
-    $stmt = $pdo->prepare("SELECT plan_name FROM subscriptions WHERE user_id = ? AND is_active = 1");
-    $stmt->execute([$_SESSION['user_id']]);
-    $plan = $stmt->fetch();
-    $stats['plan_name'] = ucfirst($plan['plan_name'] ?? 'free');
-
-    // 5. Recent activity count (last 24 hours from search_logs)
-    $stmt = $pdo->prepare("SELECT COUNT(*) FROM search_logs WHERE user_id = ? AND search_time > DATE_SUB(NOW(), INTERVAL 1 DAY)");
-    $stmt->execute([$_SESSION['user_id']]);
-    $stats['recent_activity'] = $stmt->fetchColumn();
-
-    // Calculate leads percentage change (current month vs previous month)
-    $stmt = $pdo->prepare("
-        SELECT 
-            (COUNT(CASE WHEN created_at >= DATE_FORMAT(NOW(), '%Y-%m-01') THEN 1 END) - 
-            COUNT(CASE WHEN created_at BETWEEN DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 1 MONTH), '%Y-%m-01') AND 
-                                LAST_DAY(DATE_SUB(NOW(), INTERVAL 1 MONTH)) THEN 1 END)) / 
-            NULLIF(COUNT(CASE WHEN created_at BETWEEN DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 1 MONTH), '%Y-%m-01') AND 
-                                LAST_DAY(DATE_SUB(NOW(), INTERVAL 1 MONTH)) THEN 1 END), 0) * 100 as change_percentage
-        FROM leads 
-        WHERE user_id = ?
-    ");
-    $stmt->execute([$_SESSION['user_id']]);
-    $leadsChange = $stmt->fetch();
-    $stats['leads_change_percentage'] = $leadsChange['change_percentage'] ?? 0;
-
-    // Calculate new campaigns this week
-    $stmt = $pdo->prepare("
-        SELECT COUNT(*) as new_campaigns 
-        FROM campaigns 
-        WHERE user_id = ? AND 
-              status = 'active' AND 
-              created_at >= DATE_SUB(NOW(), INTERVAL 1 WEEK)
-    ");
-    $stmt->execute([$_SESSION['user_id']]);
-    $campaignsChange = $stmt->fetch();
-    $stats['campaigns_change_count'] = $campaignsChange['new_campaigns'] ?? 0;
-
-    // Calculate activity percentage change (yesterday vs day before)
-    $stmt = $pdo->prepare("
-        SELECT 
-            (COUNT(CASE WHEN search_time >= CURDATE() - INTERVAL 1 DAY THEN 1 END) - 
-             COUNT(CASE WHEN search_time BETWEEN CURDATE() - INTERVAL 2 DAY AND CURDATE() - INTERVAL 1 DAY THEN 1 END)) / 
-            NULLIF(COUNT(CASE WHEN search_time BETWEEN CURDATE() - INTERVAL 2 DAY AND CURDATE() - INTERVAL 1 DAY THEN 1 END), 0) * 100 as change_percentage
-        FROM search_logs 
-        WHERE user_id = ?
-    ");
-    $stmt->execute([$_SESSION['user_id']]);
-    $activityChange = $stmt->fetch();
-    $stats['activity_change_percentage'] = $activityChange['change_percentage'] ?? 0;
-
-    // Get recent activities (combining search_logs and leads)
-    $stmt = $pdo->prepare("
-        (SELECT 
-            'search' as activity_type, 
-            CONCAT('Search with ', COALESCE(filters_used, 'no filters')) as description, 
-            search_time as activity_date
-        FROM search_logs 
-        WHERE user_id = ? 
-        ORDER BY search_time DESC 
-        LIMIT 3)
-        
-        UNION ALL
-        
-        (SELECT 
-            'lead' as activity_type, 
-            'New lead added' as description, 
-            created_at as activity_date
-        FROM leads 
-        WHERE user_id = ? 
-        ORDER BY created_at DESC 
-        LIMIT 2)
-        
-        ORDER BY activity_date DESC 
-        LIMIT 5
-    ");
-    $stmt->execute([$_SESSION['user_id'], $_SESSION['user_id']]);
-    $activities = $stmt->fetchAll();
-
-    // Get chart data (7 days of lead generation)
-    $stmt = $pdo->prepare("
-        SELECT 
-            DATE(created_at) as day, 
-            COUNT(*) as count 
-        FROM leads 
-        WHERE user_id = ? AND created_at > DATE_SUB(NOW(), INTERVAL 7 DAY)
-        GROUP BY DATE(created_at)
-        ORDER BY day ASC
-    ");
-    $stmt->execute([$_SESSION['user_id']]);
-    
-    while ($row = $stmt->fetch()) {
-        $dayOfWeek = date('N', strtotime($row['day'])) - 1; // 0-6 for Mon-Sun
-        if ($dayOfWeek >= 0 && $dayOfWeek < 7) {
-            $chartData['leads'][$dayOfWeek] = (int)$row['count'];
-        }
-    }
-
-} catch (PDOException $e) {
-    error_log("Dashboard error: " . $e->getMessage());
-    // Continue with default values if DB fails
-}
-
-// Generate avatar URL
-$avatarUrl = $user['avatar_url'] ?? "https://ui-avatars.com/api/?name=" . 
-             urlencode($user['full_name'] ?? 'User') . "&background=1E3A8A&color=fff&length=1&size=128";
-?>
-<!DOCTYPE html>
+<!DOCTYPE html>Add commentMore actions
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -290,7 +114,7 @@ $avatarUrl = $user['avatar_url'] ?? "https://ui-avatars.com/api/?name=" .
                             </a>
                         </li>
                         <li class="mb-2">
-                            <a href="Dashboard-com.php" class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-r-lg hover:text-primary transition-colors">
+                            <a href="Dashboard-com.html" class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-r-lg hover:text-primary transition-colors">
                                 <div class="w-6 h-6 flex items-center justify-center mr-3">
                                     <i class="ri-global-line"></i>
                                 </div>
@@ -298,7 +122,7 @@ $avatarUrl = $user['avatar_url'] ?? "https://ui-avatars.com/api/?name=" .
                             </a>
                         </li>
                         <li class="mb-2">
-                            <a href="Dashboard-ecc.php" class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-r-lg hover:text-primary transition-colors">
+                            <a href="Dashboard-ecc.html" class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-r-lg hover:text-primary transition-colors">
                                 <div class="w-6 h-6 flex items-center justify-center mr-3">
                                     <i class="ri-shopping-cart-line"></i>
                                 </div>
@@ -306,13 +130,13 @@ $avatarUrl = $user['avatar_url'] ?? "https://ui-avatars.com/api/?name=" .
                             </a>
                         </li>
                          <li class="mb-2">
-                <a href="Dashboard-pay.php" class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-r-lg hover:text-primary transition-colors">
+                <a href="Dashboard-pay.html" class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-r-lg hover:text-primary transition-colors">
                   <div class="w-6 h-6 flex items-center justify-center mr-3"> <i class="ri-bank-card-line"></i></div>
                   <span class="sidebar-text">Payment</span>
                 </a>
               </li>
                         <li class="mb-2">
-                            <a href="settings.php" class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-r-lg hover:text-primary transition-colors">
+                            <a href="Dashboard-set.html" class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-r-lg hover:text-primary transition-colors">
                                 <div class="w-6 h-6 flex items-center justify-center mr-3">
                                     <i class="ri-settings-line"></i>
                                 </div>
@@ -327,11 +151,11 @@ $avatarUrl = $user['avatar_url'] ?? "https://ui-avatars.com/api/?name=" .
                     <div id="upgrade-expanded" class="bg-gray-50 rounded-lg p-4 mb-3">
                         <p class="text-sm text-gray-600 mb-2">Credits remaining</p>
                         <div class="flex items-center justify-between">
-                            <span class="font-semibold text-lg"><?= number_format($stats['credits_remaining']) ?></span>
-                            <span class="text-xs text-gray-500">of <?= number_format($stats['credits_total']) ?></span>
+                            <span class="font-semibold text-lg">1,250</span>
+                            <span class="text-xs text-gray-500">of 2,000</span>
                         </div>
                         <div class="w-full bg-gray-200 rounded-full h-2 mt-2">
-                            <div class="bg-primary rounded-full h-2" style="width: <?= $stats['credits_percentage'] ?>%"></div>
+                            <div class="bg-primary rounded-full h-2" style="width: 62.5%"></div>
                         </div>
                     </div>
                     <a href="Dashboard-pay.html">
@@ -421,7 +245,7 @@ $avatarUrl = $user['avatar_url'] ?? "https://ui-avatars.com/api/?name=" .
                             <div class="w-5 h-5 flex items-center justify-center mr-2 text-primary">
                                 <i class="ri-coin-line"></i>
                             </div>
-                            <span class="text-sm font-medium"><?= number_format($stats['credits_remaining']) ?> credits</span>
+                            <span class="text-sm font-medium">1,250 credits</span>
                         </div>
                         <a href="Dashboard-pay.html">
                         <button class="bg-primary text-white py-2 px-4 rounded-button whitespace-nowrap hover:bg-blue-600 transition-colors">
@@ -443,7 +267,7 @@ $avatarUrl = $user['avatar_url'] ?? "https://ui-avatars.com/api/?name=" .
             <div class="p-6">
                 <!-- Welcome Section -->
                 <div class="mb-8">
-                    <h1 class="text-2xl font-bold text-gray-800" id="dashboard-greeting">Welcome back, <?= htmlspecialchars($user['full_name'] ?? 'User') ?></h1>
+                    <h1 class="text-2xl font-bold text-gray-800" id="dashboard-greeting">Welcome back, User</h1>
                     <p class="text-gray-600">Here's what's been happening recently.</p>
                 </div>
                 
@@ -461,12 +285,12 @@ $avatarUrl = $user['avatar_url'] ?? "https://ui-avatars.com/api/?name=" .
                         </div>
                         <div class="flex items-end justify-between">
                             <div>
-                                <p class="text-3xl font-bold text-gray-800"><?= number_format($stats['total_leads']) ?></p>
+                                <p class="text-3xl font-bold text-gray-800">12,543</p>
                                 <p class="text-sm text-green-500 flex items-center mt-1">
                                     <div class="w-4 h-4 flex items-center justify-center mr-1">
                                         <i class="ri-arrow-up-line"></i>
                                     </div>
-                                    <span><?= abs(round($stats['leads_change_percentage'], 1)) ?>% from last month</span>
+                                    <span>12.5% from last month</span>
                                 </p>
                             </div>
                         </div>
@@ -484,12 +308,12 @@ $avatarUrl = $user['avatar_url'] ?? "https://ui-avatars.com/api/?name=" .
                         </div>
                         <div class="flex items-end justify-between">
                             <div>
-                                <p class="text-3xl font-bold text-gray-800"><?= number_format($stats['active_campaigns']) ?></p>
+                                <p class="text-3xl font-bold text-gray-800">7</p>
                                 <p class="text-sm text-green-500 flex items-center mt-1">
                                     <div class="w-4 h-4 flex items-center justify-center mr-1">
                                         <i class="ri-arrow-up-line"></i>
                                     </div>
-                                    <span><?= $stats['campaigns_change_count'] ?> new this week</span>
+                                    <span>2 new this week</span>
                                 </p>
                             </div>
                         </div>
@@ -507,11 +331,11 @@ $avatarUrl = $user['avatar_url'] ?? "https://ui-avatars.com/api/?name=" .
                         </div>
                         <div class="flex items-end justify-between">
                             <div>
-                                <p class="text-3xl font-bold text-gray-800"><?= number_format($stats['credits_remaining']) ?></p>
+                                <p class="text-3xl font-bold text-gray-800">1,250</p>
                                 <div class="w-full bg-gray-200 rounded-full h-2 mt-3">
-                                    <div class="bg-primary rounded-full h-2" style="width: <?= $stats['credits_percentage'] ?>%"></div>
+                                    <div class="bg-primary rounded-full h-2" style="width: 62.5%"></div>
                                 </div>
-                                <p class="text-xs text-gray-500 mt-1"><?= round($stats['credits_percentage'], 1) ?>% remaining</p>
+                                <p class="text-xs text-gray-500 mt-1">62.5% remaining</p>
                             </div>
                         </div>
                     </div>
@@ -528,12 +352,12 @@ $avatarUrl = $user['avatar_url'] ?? "https://ui-avatars.com/api/?name=" .
                         </div>
                         <div class="flex items-end justify-between">
                             <div>
-                                <p class="text-3xl font-bold text-gray-800"><?= number_format($stats['recent_activity']) ?></p>
+                                <p class="text-3xl font-bold text-gray-800">243</p>
                                 <p class="text-sm text-green-500 flex items-center mt-1">
                                     <div class="w-4 h-4 flex items-center justify-center mr-1">
                                         <i class="ri-arrow-up-line"></i>
                                     </div>
-                                    <span><?= abs(round($stats['activity_change_percentage'], 1)) ?>% from yesterday</span>
+                                    <span>18% from yesterday</span>
                                 </p>
                             </div>
                         </div>
@@ -550,52 +374,72 @@ $avatarUrl = $user['avatar_url'] ?? "https://ui-avatars.com/api/?name=" .
                         </div>
                         
                         <div class="space-y-4 max-h-[400px] overflow-y-auto pr-2">
-                            <?php if (!empty($activities)): ?>
-                                <?php foreach ($activities as $activity): ?>
-                                    <?php
-                                    // Determine icon and color based on activity type
-                                    $icon = 'ri-search-line';
-                                    $color = 'text-primary';
-                                    $bg = 'bg-blue-100';
-                                    
-                                    if (strpos($activity['activity_type'], 'lead') !== false) {
-                                        $icon = 'ri-user-add-line';
-                                        $color = 'text-green-600';
-                                        $bg = 'bg-green-100';
-                                    } elseif (strpos($activity['activity_type'], 'export') !== false) {
-                                        $icon = 'ri-download-line';
-                                        $color = 'text-yellow-600';
-                                        $bg = 'bg-yellow-100';
-                                    } elseif (strpos($activity['activity_type'], 'campaign') !== false) {
-                                        $icon = 'ri-rocket-line';
-                                        $color = 'text-purple-600';
-                                        $bg = 'bg-purple-100';
-                                    }
-                                    ?>
-                                    <div class="flex items-start space-x-3 pb-4 border-b border-gray-100">
-                                        <div class="w-8 h-8 rounded-full <?= $bg ?> flex items-center justify-center <?= $color ?> flex-shrink-0 mt-1">
-                                            <div class="w-4 h-4 flex items-center justify-center">
-                                                <i class="<?= $icon ?>"></i>
-                                            </div>
-                                        </div>
-                                        <div>
-                                            <p class="text-gray-800 font-medium"><?= htmlspecialchars(ucfirst($activity['activity_type'])) ?></p>
-                                            <p class="text-sm text-gray-500"><?= htmlspecialchars($activity['description']) ?></p>
-                                            <p class="text-xs text-gray-400 mt-1">
-                                                <?= date('M j, Y \a\t g:i A', strtotime($activity['activity_date'])) ?>
-                                            </p>
-                                        </div>
+                            <div class="flex items-start space-x-3 pb-4 border-b border-gray-100">
+                                <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-primary flex-shrink-0 mt-1">
+                                    <div class="w-4 h-4 flex items-center justify-center">
+                                        <i class="ri-filter-line"></i>
                                     </div>
-                                <?php endforeach; ?>
-                            <?php else: ?>
-                                <div class="text-center py-8 text-gray-500">
-                                    <p>No recent activity found</p>
-                                    <a href="#" class="text-primary text-sm hover:underline mt-2 inline-block">Start a new search</a>
                                 </div>
-                            <?php endif; ?>
+                                <div>
+                                    <p class="text-gray-800 font-medium">E-commerce filter applied</p>
+                                    <p class="text-sm text-gray-500">Shopify stores with >500 products</p>
+                                    <p class="text-xs text-gray-400 mt-1">2 hours ago</p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-start space-x-3 pb-4 border-b border-gray-100">
+                                <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center text-green-600 flex-shrink-0 mt-1">
+                                    <div class="w-4 h-4 flex items-center justify-center">
+                                        <i class="ri-rocket-line"></i>
+                                    </div>
+                                </div>
+                                <div>
+                                    <p class="text-gray-800 font-medium">New campaign started</p>
+                                    <p class="text-sm text-gray-500">Fashion retailers in Europe</p>
+                                    <p class="text-xs text-gray-400 mt-1">Yesterday at 4:23 PM</p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-start space-x-3 pb-4 border-b border-gray-100">
+                                <div class="w-8 h-8 rounded-full bg-yellow-100 flex items-center justify-center text-yellow-600 flex-shrink-0 mt-1">
+                                    <div class="w-4 h-4 flex items-center justify-center">
+                                        <i class="ri-download-line"></i>
+                                    </div>
+                                </div>
+                                <div>
+                                    <p class="text-gray-800 font-medium">Lead list exported</p>
+                                    <p class="text-sm text-gray-500">1,245 leads from US tech companies</p>
+                                    <p class="text-xs text-gray-400 mt-1">May 20, 2025 at 10:15 AM</p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-start space-x-3 pb-4 border-b border-gray-100">
+                                <div class="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center text-purple-600 flex-shrink-0 mt-1">
+                                    <div class="w-4 h-4 flex items-center justify-center">
+                                        <i class="ri-search-line"></i>
+                                    </div>
+                                </div>
+                                <div>
+                                    <p class="text-gray-800 font-medium">Website search completed</p>
+                                    <p class="text-sm text-gray-500">Found 327 matching domains</p>
+                                    <p class="text-xs text-gray-400 mt-1">May 19, 2025 at 3:45 PM</p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-start space-x-3 pb-4 border-b border-gray-100">
+                                <div class="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center text-red-600 flex-shrink-0 mt-1">
+                                    <div class="w-4 h-4 flex items-center justify-center">
+                                        <i class="ri-alert-line"></i>
+                                    </div>
+                                </div>
+                                <div>
+                                    <p class="text-gray-800 font-medium">Credit usage alert</p>
+                                    <p class="text-sm text-gray-500">Reached 50% of monthly credits</p>
+                                    <p class="text-xs text-gray-400 mt-1">May 18, 2025 at 9:12 AM</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    
                     
                     <!-- Analytics Charts -->
                     <div class="lg:col-span-2 glassmorphism rounded-lg shadow-sm p-6">
@@ -765,7 +609,7 @@ $avatarUrl = $user['avatar_url'] ?? "https://ui-avatars.com/api/?name=" .
                                 ]
                             }
                         },
-                        data: <?= json_encode($chartData['leads']) ?>
+                        data: [320, 420, 380, 520, 450, 570, 630]
                     }
                 ]
             };
@@ -814,7 +658,12 @@ $avatarUrl = $user['avatar_url'] ?? "https://ui-avatars.com/api/?name=" .
                         labelLine: {
                             show: false
                         },
-                        data: <?= json_encode($chartData['filters']) ?>
+                        data: [
+                            { value: 35, name: 'E-commerce', itemStyle: { color: 'rgba(87, 181, 231, 1)' } },
+                            { value: 25, name: 'Location', itemStyle: { color: 'rgba(141, 211, 199, 1)' } },
+                            { value: 20, name: 'Industry', itemStyle: { color: 'rgba(251, 191, 114, 1)' } },
+                            { value: 20, name: 'Technology', itemStyle: { color: 'rgba(252, 141, 98, 1)' } }
+                        ]
                     }
                 ]
             };
