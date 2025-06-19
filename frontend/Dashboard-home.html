@@ -85,6 +85,13 @@
         input:checked + .slider:before {
             transform: translateX(20px);
         }
+        #website-slideout.show {
+            display: flex !important;
+            transform: translateX(0);
+        }
+        #website-slideout {
+            transform: translateX(100%);
+        }
     </style>
 </head>
 <body>
@@ -468,7 +475,55 @@
                     </div>
                 </div>
             </div>
+            <!-- Website Table Section -->
+            <div class="glassmorphism rounded-lg shadow-sm p-6 mt-8">
+                <div class="flex items-center justify-between mb-4">
+                  <h2 class="text-lg font-semibold text-gray-800">Websites</h2>
+                  <button id="export-csv-btn" class="bg-primary text-white px-4 py-2 rounded-button hover:bg-blue-700 transition-colors flex items-center"><i class="ri-download-line mr-2"></i>Export CSV</button>
+                </div>
+                <table id="websites-table" class="min-w-full bg-white rounded-lg overflow-hidden">
+                  <thead class="bg-gray-100">
+                    <tr>
+                      <th class="px-4 py-2 text-left">Name</th>
+                      <th class="px-4 py-2 text-left">URL</th>
+                      <th class="px-4 py-2 text-left">Platform</th>
+                      <th class="px-4 py-2 text-left">Country</th>
+                      <th class="px-4 py-2 text-left">Category</th>
+                      <th class="px-4 py-2 text-left">Creation Date</th>
+                    </tr>
+                  </thead>
+                  <tbody></tbody>
+                </table>
+            </div>
+            <!-- End Website Table Section -->
         </div>
+    </div>
+    <!-- Slide-Out Panel for Website Details -->
+    <div id="website-slideout" class="fixed top-0 right-0 h-full w-full max-w-md bg-white shadow-2xl z-50 transform translate-x-full transition-transform duration-300 ease-in-out flex flex-col" style="display:none;">
+      <div class="flex items-center justify-between p-4 border-b">
+        <h2 class="text-xl font-semibold" id="slideout-title">Website Details</h2>
+        <button onclick="closeSlideoutPanel()" class="text-gray-500 hover:text-primary text-2xl">&times;</button>
+      </div>
+      <div class="p-6 flex-1 overflow-y-auto">
+        <div class="mb-4">
+          <span class="font-semibold">Name:</span> <span id="slideout-name"></span>
+        </div>
+        <div class="mb-4">
+          <span class="font-semibold">URL:</span> <a id="slideout-url" href="#" target="_blank" class="text-blue-600 underline"></a>
+        </div>
+        <div class="mb-4">
+          <span class="font-semibold">Platform:</span> <span id="slideout-platform"></span>
+        </div>
+        <div class="mb-4">
+          <span class="font-semibold">Country:</span> <span id="slideout-country"></span>
+        </div>
+        <div class="mb-4">
+          <span class="font-semibold">Category:</span> <span id="slideout-category"></span>
+        </div>
+        <div class="mb-4">
+          <span class="font-semibold">Creation Date:</span> <span id="slideout-creation-date"></span>
+        </div>
+      </div>
     </div>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -701,6 +756,64 @@ document.addEventListener('DOMContentLoaded', function() {
   // --- BACKEND INTEGRATION POINT ---
   // On page load, replace localStorage fetch with API call to get user profile image.
 });
+</script>
+<script>
+// Website Table JS
+function renderWebsiteTable(websites) {
+  const tbody = document.querySelector('#websites-table tbody');
+  tbody.innerHTML = '';
+  websites.forEach(site => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td class="px-4 py-2">${site.name}</td>
+      <td class="px-4 py-2"><a href="${site.url}" target="_blank" class="text-blue-600 underline">${site.url}</a></td>
+      <td class="px-4 py-2">${site.platform}</td>
+      <td class="px-4 py-2">${site.country}</td>
+      <td class="px-4 py-2">${site.category}</td>
+      <td class="px-4 py-2">${site.creation_date}</td>
+    `;
+    tr.onclick = () => onWebsiteRowClick(site); // Placeholder for slide-out
+    tbody.appendChild(tr);
+  });
+}
+let lastWebsiteParams = {};
+function fetchWebsites(params = {}) {
+  lastWebsiteParams = params;
+  const url = 'api/filter_websites.php?' + new URLSearchParams(params).toString();
+  fetch(url, { credentials: 'include' })
+    .then(res => res.json())
+    .then(data => {
+      renderWebsiteTable(data.websites);
+      // Optionally handle pagination here
+    });
+}
+document.addEventListener('DOMContentLoaded', function() {
+  fetchWebsites();
+  document.getElementById('export-csv-btn').onclick = function() {
+    downloadCSV(lastWebsiteParams);
+  };
+});
+function downloadCSV(params) {
+  const url = 'api/export_websites.php?' + new URLSearchParams(params).toString();
+  window.open(url, '_blank');
+}
+function onWebsiteRowClick(site) {
+  document.getElementById('slideout-name').textContent = site.name;
+  document.getElementById('slideout-url').textContent = site.url;
+  document.getElementById('slideout-url').href = site.url;
+  document.getElementById('slideout-platform').textContent = site.platform;
+  document.getElementById('slideout-country').textContent = site.country;
+  document.getElementById('slideout-category').textContent = site.category;
+  document.getElementById('slideout-creation-date').textContent = site.creation_date;
+  const panel = document.getElementById('website-slideout');
+  panel.style.display = 'flex';
+  setTimeout(() => panel.classList.add('show'), 10);
+}
+function closeSlideoutPanel() {
+  const panel = document.getElementById('website-slideout');
+  panel.classList.remove('show');
+  setTimeout(() => panel.style.display = 'none', 300);
+}
 </script>
 </body>
 </html>
