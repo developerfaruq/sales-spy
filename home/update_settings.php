@@ -18,7 +18,7 @@ $response = [
 try {
     // Get user data
     $stmt = $pdo->prepare("
-        SELECT u.id, u.full_name, u.email, u.phone, u.role, u.created_at, u.profile_picture
+        SELECT u.id, u.full_name, u.email, u.phone, u.role, u.created_at, u.avatar_url
         FROM users u
         WHERE u.id = ?
     ");
@@ -29,13 +29,13 @@ try {
         throw new Exception("User not found");
     }
 
-    // Ensure profile_picture is a valid URL path
-    if (!empty($user['profile_picture'])) {
+    // Ensure avatar_url is a valid URL path
+    if (!empty($user['avatar_url'])) {
         // Remove any existing uploads/profile_pictures/ prefix to avoid duplication
-        $filename = str_replace('uploads/profile_pictures/', '', $user['profile_picture']);
-        $user['profile_picture'] = '../uploads/profile_pictures/' . $filename;
+        $filename = str_replace('uploads/profile_pictures/', '', $user['avatar_url']);
+        $user['avatar_url'] = '../uploads/profile_pictures/' . $filename;
     } else {
-        $user['profile_picture'] = null;
+        $user['avatar_url'] = null;
     }
 
     // Get user's subscription details
