@@ -82,14 +82,14 @@ try {
     $stmt->execute($params);
 
     // Get updated user data
-    $stmt = $pdo->prepare("SELECT id, full_name, email, phone, role, profile_picture FROM users WHERE id = ?");
+    $stmt = $pdo->prepare("SELECT id, full_name, email, phone, role, avatar_url FROM users WHERE id = ?");
     $stmt->execute([$_SESSION['user_id']]);
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    // Format profile picture path
-    if (!empty($user['profile_picture'])) {
-        $filename = str_replace('uploads/profile_pictures/', '', $user['profile_picture']);
-        $user['profile_picture'] = '../uploads/profile_pictures/' . $filename;
+    // Format avatar_url path
+    if (!empty($user['avatar_url'])) {
+        $filename = str_replace('uploads/profile_pictures/', '', $user['avatar_url']);
+        $user['avatar_url'] = '../uploads/profile_pictures/' . $filename;
     }
 
     $response['success'] = true;
