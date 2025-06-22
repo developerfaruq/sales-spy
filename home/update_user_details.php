@@ -82,7 +82,7 @@ try {
     $stmt->execute($params);
 
     // Get updated user data
-    $stmt = $pdo->prepare("SELECT id, full_name, email, phone, role, avatar_url FROM users WHERE id = ?");
+    $stmt = $pdo->prepare("SELECT id, full_name, email, phone, role, credits, profile_picture FROM users WHERE id = ?");
     $stmt->execute([$_SESSION['user_id']]);
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
