@@ -1,3 +1,43 @@
+<?php
+require '../config/db.php';
+session_start();
+
+if (!isset($_SESSION['user_id'])) {
+    header("Location: signup.html?form=login&status=session_expired");
+    exit;
+}
+
+$user = [];
+$stats = [
+    'credits_remaining' => 1250,
+    'credits_total' => 2000,
+    'credits_percentage' => 0,
+];
+
+try {
+    $stmt = $pdo->prepare("SELECT * FROM users WHERE id = ?");
+    $stmt->execute([$_SESSION['user_id']]);
+    $user = $stmt->fetch();
+
+    if (!$user) {
+        session_destroy();
+        header("Location: signup.html?form=login&status=invalid_user");
+        exit;
+    }
+
+    $stats['credits_remaining'] = $user['credits'] ?? 1250;
+
+    $stmt = $pdo->prepare("SELECT credits_total FROM subscriptions WHERE user_id = ? AND is_active = 1");
+    $stmt->execute([$_SESSION['user_id']]);
+    $subscription = $stmt->fetch();
+    $stats['credits_total'] = $subscription['credits_total'] ?? 2000;
+    $stats['credits_percentage'] = ($stats['credits_remaining'] / $stats['credits_total']) * 100;
+
+} catch (PDOException $e) {
+    error_log("Settings page error: " . $e->getMessage());
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -234,7 +274,7 @@ display: block;
   <nav class="flex-1 overflow-y-auto py-4">
     <ul>
       <li class="mb-2">
-        <a href="Dashboard-home.html" class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-r-lg hover:text-primary transition-colors">
+        <a href="index.php" class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-r-lg hover:text-primary transition-colors">
           <div class="w-6 h-6 flex items-center justify-center mr-3 sidebar-icon">
             <i class="ri-dashboard-line"></i>
           </div>
@@ -275,30 +315,30 @@ display: block;
   </nav>
   <!-- Upgrade section (unchanged) -->
   <div id="upgrade-section" class="p-4 border-t">
-    <div id="upgrade-expanded" class="bg-gray-50 rounded-lg p-4 mb-3">
-      <p class="text-sm text-gray-600 mb-2">Credits remaining</p>
-      <div class="flex items-center justify-between">
-        <span class="font-semibold text-lg">1,250</span>
-        <span class="text-xs text-gray-500">of 2,000</span>
-      </div>
-      <div class="w-full bg-gray-200 rounded-full h-2 mt-2">
-        <div class="bg-primary rounded-full h-2" style="width: 62.5%"></div>
-      </div>
-    </div>
-    <a href="Dashboard-pay.html">
-      <button id="upgrade-btn-expanded" class="w-full bg-primary text-white py-2 px-4 rounded-button flex items-center justify-center whitespace-nowrap hover:bg-blue-600 transition-colors">
-        <div class="w-5 h-5 flex items-center justify-center mr-2">
-          <i class="ri-arrow-up-line"></i>
-        </div>
-        <span>Upgrade Plan</span>
-      </button>
-    </a>
-    <a href="Dashboard-pay.html">
-      <button id="upgrade-btn-collapsed" class="hidden bg-primary text-white w-10 h-10 rounded-full flex items-center justify-center mx-auto mt-2 hover:bg-blue-600 transition-colors" title="Upgrade">
-        <i class="ri-arrow-up-line"></i>
-      </button>
-    </a>
-  </div>
+                    <div id="upgrade-expanded" class="bg-gray-50 rounded-lg p-4 mb-3">
+                        <p class="text-sm text-gray-600 mb-2">Credits remaining</p>
+                        <div class="flex items-center justify-between">
+                            <span class="font-semibold text-lg"><?= number_format($stats['credits_remaining']) ?></span>
+                            <span class="text-xs text-gray-500">of <?= number_format($stats['credits_total']) ?></span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2 mt-2">
+                            <div class="bg-primary rounded-full h-2" style="width: <?= $stats['credits_percentage'] ?>%"></div>
+                        </div>
+                    </div>
+                    <a href="Dashboard-pay.html">
+                    <button id="upgrade-btn-expanded" class="w-full bg-primary text-white py-2 px-4 rounded-button flex items-center justify-center whitespace-nowrap hover:bg-blue-600 transition-colors">
+                        <div class="w-5 h-5 flex items-center justify-center mr-2">
+                            <i class="ri-arrow-up-line"></i>
+                        </div>
+                        <span>Upgrade Plan</span>
+                    </button>
+                    </a>
+                    <a href="Dashboard-pay.html">
+                    <button id="upgrade-btn-collapsed" class="hidden bg-primary text-white w-10 h-10 rounded-full flex items-center justify-center mx-auto mt-2 hover:bg-blue-600 transition-colors" title="Upgrade">
+                        <i class="ri-arrow-up-line"></i>
+                    </button>
+                    </a>
+                </div>
 </div>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
@@ -425,7 +465,7 @@ document.addEventListener('DOMContentLoaded', function() {
           <div class="w-5 h-5 flex items-center justify-center mr-2 text-primary">
             <i class="ri-coin-line"></i>
           </div>
-          <span class="text-sm font-medium">1,250 credits</span>
+          <span class="text-sm font-medium">1,000 credits</span>
         </div>
         <a href="Dashboard-pay.html">
           <button class="bg-primary text-white py-2 px-4 rounded-button whitespace-nowrap hover:bg-blue-600 transition-colors">
@@ -442,7 +482,7 @@ document.addEventListener('DOMContentLoaded', function() {
           <div class="dropdown-content right-0 mt-2">
             <a href="#">Profile</a>
             <a href="#">Settings</a>
-            <a href="#">Logout</a>
+            <a href="logout.php">Logout</a>
           </div>
         </div>
       </div>

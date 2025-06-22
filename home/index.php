@@ -170,9 +170,20 @@ try {
     // Continue with default values if DB fails
 }
 
-// Generate avatar URL
-$avatarUrl = $user['avatar_url'] ?? "https://ui-avatars.com/api/?name=" . 
-             urlencode($user['full_name'] ?? 'User') . "&background=1E3A8A&color=fff&length=1&size=128";
+
+
+// profile picture handling
+if (!empty($user['profile_picture'])) {
+    // Strip any redundant path if needed (just like in settings.php)
+    $filename = str_replace('uploads/profile_pictures/', '', $user['profile_picture']);
+    $avatarUrl = '../uploads/profile_pictures/' . $filename;
+} else {
+    // Fallback to generated avatar
+    $avatarUrl = "https://ui-avatars.com/api/?name=" . 
+                 urlencode($user['full_name'] ?? 'User') . 
+                 "&background=1E3A8A&color=fff&length=1&size=128";
+}
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -217,6 +228,33 @@ $avatarUrl = $user['avatar_url'] ?? "https://ui-avatars.com/api/?name=" .
             margin-left: 80px;
             transition: all 0.6s cubic-bezier(0.4,0,0.2,1);
         }
+
+        .dropdown {
+position: relative;
+display: inline-block;
+}
+.dropdown-content {
+display: none;
+position: absolute;
+background-color: white;
+min-width: 160px;
+box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+z-index: 1;
+border-radius: 8px;
+right: 0;
+}
+.dropdown-content a {
+color: black;
+padding: 12px 16px;
+text-decoration: none;
+display: block;
+}
+.dropdown-content a:hover {
+background-color: #f8f9fa;
+}
+.dropdown:hover .dropdown-content {
+display: block;
+}
         @media (max-width: 768px) {
             .main-content-expanded, .main-content-collapsed {
                 margin-left: 0;
@@ -428,13 +466,24 @@ $avatarUrl = $user['avatar_url'] ?? "https://ui-avatars.com/api/?name=" .
                             <span>Upgrade</span>
                         </button>
                         </a>
-                        <div class="relative">
-                            <button class="flex items-center space-x-2">
-                                <div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
-                                    <img src="https://readdy.ai/api/search-image?query=professional%20headshot%20of%20a%20young%20business%20person%2C%20neutral%20expression%2C%20high%20quality%20portrait%2C%20business%20attire&width=200&height=200&seq=1&orientation=squarish" alt="User avatar" class="w-full h-full object-cover" id="header-profile-img">
-                                </div>
-                            </button>
-                        </div>
+
+
+<div class="dropdown">
+          <button class="flex items-center space-x-2 focus:outline-none">
+            <div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
+              <img src="<?= htmlspecialchars($avatarUrl) ?>" alt="User avatar" class="w-full h-full object-cover">
+            </div>
+            <i class="ri-arrow-down-s-line text-gray-500"></i>
+          </button>
+          <div class="dropdown-content right-0 mt-2">
+            <a href="#">Profile</a>
+            <a href="settings.php">Settings</a>
+            <a href="logout.php">Logout</a>
+          </div>
+        </div>
+
+
+                        
                     </div>
                 </div>
             </header>

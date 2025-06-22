@@ -6,6 +6,8 @@ $dbname = "sales_spy";
 
 // Defining base url
 define("BASE_URL", "http://localhost/sales/");
+//defined('UPLOADS_PATH') || define('UPLOADS_PATH', BASE_URL . 'Uploads/profile_pictures/');
+
 
 try{
   $pdo = new PDO("mysql:host=$servername;dbname=$dbname",$username,$password);

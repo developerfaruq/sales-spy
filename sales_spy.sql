@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jun 14, 2025 at 09:42 PM
+-- Generation Time: Jun 22, 2025 at 11:19 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -184,17 +184,18 @@ CREATE TABLE `users` (
   `failed_attempts` int(11) DEFAULT 0,
   `last_failed_attempt` datetime DEFAULT NULL,
   `avatar_url` varchar(255) DEFAULT NULL,
-  `credits` int(11) DEFAULT 1250
+  `credits` int(11) DEFAULT 1250,
+  `profile_picture` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `users`
 --
 
-INSERT INTO `users` (`id`, `full_name`, `email`, `phone`, `password`, `role`, `created_at`, `reset_token`, `reset_token_expiry`, `failed_attempts`, `last_failed_attempt`, `avatar_url`, `credits`) VALUES
-(8, 'FARUQ ODEWUNMI', 'dev@gmail.com', '0816 127 1354', '$2y$10$QAJUhsYRwyHHOYXC5l5N0e94UUh7KQ8jsiDzqOMsi7nI1Ry8Uh5wG', 'user', '2025-06-11 21:20:16', NULL, NULL, 0, NULL, NULL, 1250),
-(9, 'faru', 'developerfaruq@gmail.com', '08116533380', '$2y$10$46jru8Jh04uDv8lcFtUsAuZT5l5tqSIC9RLHk9rBePenzgEH5L31.', 'user', '2025-06-13 15:54:03', NULL, NULL, 0, NULL, NULL, 1250),
-(10, 'faru', 'deve@gmail.com', '08161271350', '$2y$10$sujhFmBxzcqNfzG9tJsEJed4W3YkakeIlsIZKHyKPT.39ysNmEe0W', 'user', '2025-06-13 16:00:54', NULL, NULL, 0, NULL, NULL, 1250);
+INSERT INTO `users` (`id`, `full_name`, `email`, `phone`, `password`, `role`, `created_at`, `reset_token`, `reset_token_expiry`, `failed_attempts`, `last_failed_attempt`, `avatar_url`, `credits`, `profile_picture`) VALUES
+(8, 'FARUQ ODEWUNMI', 'dev@gmail.com', '0816 1271354', '$2y$10$yb3uUuZpU5FMKPF/4babQ.kggCDwqLPbUOhyk.xNuWDveiMUdSSMm', 'user', '2025-06-11 21:20:16', NULL, NULL, 0, NULL, NULL, 125, 'uploads/profile_pictures/profile_8_1750095476.jpg'),
+(9, 'faru', 'developerfaruq@gmail.com', '08116533380', '$2y$10$46jru8Jh04uDv8lcFtUsAuZT5l5tqSIC9RLHk9rBePenzgEH5L31.', 'user', '2025-06-13 15:54:03', NULL, NULL, 0, NULL, NULL, 1250, NULL),
+(10, 'faru', 'deve@gmail.com', '08161271350', '$2y$10$sujhFmBxzcqNfzG9tJsEJed4W3YkakeIlsIZKHyKPT.39ysNmEe0W', 'user', '2025-06-13 16:00:54', NULL, NULL, 0, NULL, NULL, 1250, NULL);
 
 -- --------------------------------------------------------
 

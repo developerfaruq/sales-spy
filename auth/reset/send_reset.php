@@ -29,14 +29,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $mail = new PHPMailer(true);
 
         try {
-            // Mailtrap SMTP configuration
+            //SMTP configuration
             $mail->isSMTP();
-            $mail->Host = 'sandbox.smtp.mailtrap.io';
+            $mail->Host = 'smtp.ethereal.email';
             $mail->SMTPAuth = true;
-            $mail->Username = '88bcb59d50d9a6'; // Replace with your Mailtrap username
-            $mail->Password = '1ad3c38818dea5'; // Replace with your Mailtrap password
+            $mail->Username = 'dorcas.thiel@ethereal.email'; // Replace with your Mailtrap username
+            $mail->Password = 'Ff733PqPp1PUSDvDup'; // Replace with your Mailtrap password
             $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-            $mail->Port = 2525;
+            $mail->Port = 587;
 
             $mail->setFrom('no-reply@sales-spy.com', 'Sales-Spy');
             $mail->addAddress($email, $user['full_name']);

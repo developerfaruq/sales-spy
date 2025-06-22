@@ -18,7 +18,7 @@ $response = [
 try {
     // Get user data
     $stmt = $pdo->prepare("
-        SELECT u.id, u.full_name, u.email, u.phone, u.role, u.created_at, u.profile_picture
+        SELECT u.id, u.full_name, u.email, u.phone, u.role, u.created_at, u.credits, u.profile_picture
         FROM users u
         WHERE u.id = ?
     ");
@@ -46,7 +46,8 @@ try {
     // Prepare response data (remove sessions)
     $response['data'] = [
         'user' => $user,
-        'subscription' => $subscription
+        'subscription' => $subscription,
+        'credits' => $user['credits']
     ];
     $response['success'] = true;
     $response['message'] = 'User data fetched successfully';
