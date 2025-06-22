@@ -18,11 +18,7 @@ $response = [
 try {
     // Get user data
     $stmt = $pdo->prepare("
-<<<<<<< HEAD
-        SELECT u.id, u.full_name, u.email, u.phone, u.role, u.created_at, u.avatar_url
-=======
         SELECT u.id, u.full_name, u.email, u.phone, u.role, u.created_at, u.credits, u.profile_picture
->>>>>>> ceb4d06 (home page update)
         FROM users u
         WHERE u.id = ?
     ");
@@ -33,13 +29,13 @@ try {
         throw new Exception("User not found");
     }
 
-    // Ensure avatar_url is a valid URL path
-    if (!empty($user['avatar_url'])) {
+    // Ensure profile_picture is a valid URL path
+    if (!empty($user['profile_picture'])) {
         // Remove any existing uploads/profile_pictures/ prefix to avoid duplication
-        $filename = str_replace('uploads/profile_pictures/', '', $user['avatar_url']);
-        $user['avatar_url'] = '../uploads/profile_pictures/' . $filename;
+        $filename = str_replace('uploads/profile_pictures/', '', $user['profile_picture']);
+        $user['profile_picture'] = '../uploads/profile_pictures/' . $filename;
     } else {
-        $user['avatar_url'] = null;
+        $user['profile_picture'] = null;
     }
 
     // Get user's subscription details
@@ -63,3 +59,4 @@ try {
 // Send JSON response
 header('Content-Type: application/json');
 echo json_encode($response);
+
