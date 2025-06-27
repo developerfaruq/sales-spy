@@ -61,9 +61,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $hashed_password = password_hash($password, PASSWORD_BCRYPT);
 
         // Insert user
-        $stmt = $pdo->prepare("INSERT INTO users (full_name, email, phone, password, role, created_at, credits) VALUES (?, ?, ?, ?, 'user', NOW(), 500)");
+        $stmt = $pdo->prepare("INSERT INTO users (full_name, email, phone, password, role) VALUES (?, ?, ?, ?, 'user')");
         $stmt->execute([$full_name, $email, $phone, $hashed_password]);
         $user_id = $pdo->lastInsertId();
+
+        // After inserting into users table
+$user_id = $pdo->lastInsertId(); // Get new user ID
+
+// Insert default free subscription
+$insertSubscription = $pdo->prepare("
+    INSERT INTO subscriptions (user_id, plan_name, credits_remaining, credits_total, leads_balance, is_active)
+    VALUES (?, 'free', 1000, 1000, 1000, 1)
+");
+$insertSubscription->execute([$user_id]);
+
 
         // Generate and store API key (no expiration)
         $api_key = generateApiKey();

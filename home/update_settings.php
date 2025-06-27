@@ -39,7 +39,7 @@ try {
     }
 
     // Get user's subscription details
-    $stmt = $pdo->prepare("SELECT plan_name, start_date, end_date, is_active FROM subscriptions WHERE user_id = ? AND is_active = 1");
+    $stmt = $pdo->prepare("SELECT plan_name, credits_total, start_date, end_date, is_active FROM subscriptions WHERE user_id = ? AND is_active = 1");
     $stmt->execute([$_SESSION['user_id']]);
     $subscription = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -47,7 +47,7 @@ try {
     $response['data'] = [
         'user' => $user,
         'subscription' => $subscription,
-        'credits' => $user['credits']
+        'credits' => $subscription['credits_total']
     ];
     $response['success'] = true;
     $response['message'] = 'User data fetched successfully';
@@ -59,4 +59,3 @@ try {
 // Send JSON response
 header('Content-Type: application/json');
 echo json_encode($response);
-

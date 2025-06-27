@@ -5,10 +5,8 @@ $password = "";
 $dbname = "sales_spy";
 
 
-define("BASE_URL", "http://localhost/sales-spy/");
-//defined('UPLOADS_PATH') || define('UPLOADS_PATH', BASE_URL . 'Uploads/profile_pictures/');
-
-
+// Defining base url
+define ("BASE_URL", "http://localhost/sales-spy/");
 
 // Database connection
 try{
