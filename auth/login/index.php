@@ -52,6 +52,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $_SESSION['ip_address'] = $_SERVER['REMOTE_ADDR'];
         $_SESSION['user_agent'] = $_SERVER['HTTP_USER_AGENT'];
 
+        $session_id = session_id();
+$ip_address = $_SERVER['REMOTE_ADDR'];
+$user_agent = $_SERVER['HTTP_USER_AGENT'];
+
+// Get geolocation
+$geo_json = @file_get_contents("http://ip-api.com/json/" . urlencode($ip_address));
+$geo_data = json_decode($geo_json, true);
+
+$city = ($geo_data && $geo_data['status'] === 'success' && !empty($geo_data['city'])) ? $geo_data['city'] : 'Unknown';
+$country = ($geo_data && $geo_data['status'] === 'success' && !empty($geo_data['country'])) ? $geo_data['country'] : 'Unknown';
+
+// Check if device already exists (by user_agent + IP)
+$stmt = $pdo->prepare("SELECT id FROM user_sessions WHERE user_id = ? AND ip_address = ? AND user_agent = ?");
+$stmt->execute([$user['id'], $ip_address, $user_agent]);
+$existing = $stmt->fetch();
+
+if ($existing) {
+    // Update session ID + last active + location in case IP changed
+    $stmt = $pdo->prepare("UPDATE user_sessions SET session_id = ?, last_active = NOW(), city = ?, country = ? WHERE id = ?");
+    $stmt->execute([$session_id, $city, $country, $existing['id']]);
+} else {
+    // Insert new session
+    $stmt = $pdo->prepare("INSERT INTO user_sessions (user_id, session_id, ip_address, user_agent, city, country) VALUES (?, ?, ?, ?, ?, ?)");
+    $stmt->execute([$user['id'], $session_id, $ip_address, $user_agent, $city, $country]);
+}
+
         // Redirect to dashboard
         header('Location:' .BASE_URL. 'home/index.php?status=login_success');
         exit;

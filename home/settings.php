@@ -1,11 +1,5 @@
 <?php
-require '../config/db.php';
-session_start();
-
-if (!isset($_SESSION['user_id'])) {
-    header("Location: signup.html?form=login&status=session_expired");
-    exit;
-}
+require '../auth/auth_check.php';
 
 $user = [];
 $stats = [
@@ -14,28 +8,23 @@ $stats = [
     'credits_percentage' => 0,
 ];
 
-try {
-    $stmt = $pdo->prepare("SELECT * FROM users WHERE id = ?");
-    $stmt->execute([$_SESSION['user_id']]);
-    $user = $stmt->fetch();
-
-    if (!$user) {
-        session_destroy();
-        header("Location: signup.html?form=login&status=invalid_user");
-        exit;
-    }
-
-    $stats['credits_remaining'] = $user['credits'] ?? 1250;
-
-    $stmt = $pdo->prepare("SELECT credits_total FROM subscriptions WHERE user_id = ? AND is_active = 1");
+// 1. Get user subscription stats (credits, plan, leads_balance)
+    $stmt = $pdo->prepare("SELECT plan_name, credits_remaining, credits_total, leads_balance FROM subscriptions WHERE user_id = ? AND is_active = 1");
     $stmt->execute([$_SESSION['user_id']]);
     $subscription = $stmt->fetch();
-    $stats['credits_total'] = $subscription['credits_total'] ?? 2000;
-    $stats['credits_percentage'] = ($stats['credits_remaining'] / $stats['credits_total']) * 100;
 
-} catch (PDOException $e) {
-    error_log("Settings page error: " . $e->getMessage());
-}
+    $stats['plan_name'] = ucfirst($subscription['plan_name'] ?? 'Free');
+    $stats['credits_remaining'] = $subscription['credits_remaining'] ?? 0;
+    $stats['credits_total'] = $subscription['credits_total'] ?? 1000;
+    $stats['leads_balance'] = $subscription['leads_balance'] ?? 0;
+    $stats['credits_percentage'] = ($stats['credits_total'] > 0)
+        ? ($stats['credits_remaining'] / $stats['credits_total']) * 100
+        : 0;
+
+// Fetch active sessions
+$stmt = $pdo->prepare("SELECT * FROM user_sessions WHERE user_id = ? ORDER BY last_active DESC");
+$stmt->execute([$_SESSION['user_id']]);
+$sessions = $stmt->fetchAll();
 ?>
 
 <!DOCTYPE html>
@@ -723,58 +712,90 @@ document.addEventListener('DOMContentLoaded', function() {
 </div>
 </div>
 <div>
-<h3 class="text-md font-medium text-gray-900 mb-4">Active Sessions</h3>
-<div class="space-y-4">
-<div class="border border-gray-200 rounded-lg p-4 flex flex-col md:flex-row md:items-center md:justify-between bg-blue-50 border-blue-200">
-<div class="flex items-center">
-<div class="w-10 h-10 flex items-center justify-center mr-3 text-blue-500 bg-blue-100 rounded-full">
-<i class="ri-computer-line"></i>
+  <h3 class="text-md font-medium text-gray-900 mb-4">Active Sessions</h3>
+  <div class="space-y-4">
+    <?php foreach ($sessions as $session): ?>
+    <div class="border border-gray-200 rounded-lg p-4 flex flex-col md:flex-row md:items-center md:justify-between session-card" data-session="<?= htmlspecialchars($session['session_id']) ?>">
+      <div class="flex items-center">
+        <div class="w-10 h-10 flex items-center justify-center mr-3 text-gray-500 bg-gray-100 rounded-full">
+          <i class="ri-tablet-line"></i>
+        </div>
+        <div>
+          <p class="text-sm font-medium text-gray-900">
+            <?= ($session['session_id'] === session_id()) ? 'Current Device' : 'Other Device' ?>
+          </p>
+          <p class="text-xs text-gray-500">
+            <?= htmlspecialchars($session['user_agent']) ?>
+          </p>
+          <p class="text-xs text-gray-500">
+            <?= htmlspecialchars($session['city']) ?>, <?= htmlspecialchars($session['country']) ?>
+          </p>
+          <p class="text-xs text-gray-500">
+            IP: <?= htmlspecialchars($session['ip_address']) ?> • Last active: <?= htmlspecialchars($session['last_active']) ?>
+          </p>
+        </div>
+      </div>
+      <div class="mt-3 md:mt-0">
+        <?php if ($session['session_id'] !== session_id()): ?>
+        <button type="button"
+                class="px-4 py-2 border border-gray-300 text-gray-700 rounded-button text-xs font-medium hover:bg-gray-50 transition-colors whitespace-nowrap"
+                onclick="signOutSession('<?= htmlspecialchars($session['session_id']) ?>', this)">
+          Sign Out
+        </button>
+        <?php else: ?>
+        <span class="px-4 py-2 border border-gray-300 text-gray-500 rounded-button text-xs font-medium">Active</span>
+        <?php endif; ?>
+      </div>
+    </div>
+    <?php endforeach; ?>
+  </div>
+
+  <div class="mt-4">
+    <button type="button"
+            class="px-4 py-2 border border-gray-300 text-gray-700 rounded-button text-sm font-medium hover:bg-gray-50 transition-colors whitespace-nowrap"
+            onclick="signOutAll(this)">
+      Sign Out From All Devices
+    </button>
+  </div>
 </div>
-<div>
-<p class="text-sm font-medium text-gray-900">Current Session</p>
-<p class="text-xs text-gray-500">Windows 11 • Chrome • New York, USA</p>
-<p class="text-xs text-gray-500">IP: 192.168.1.1 • Last active: Just now</p>
-</div>
-</div>
-<div class="mt-3 md:mt-0">
-<button class="px-4 py-2 border border-gray-300 text-gray-700 rounded-button text-xs font-medium hover:bg-gray-50 transition-colors whitespace-nowrap">Sign Out</button>
-</div>
-</div>
-<div class="border border-gray-200 rounded-lg p-4 flex flex-col md:flex-row md:items-center md:justify-between">
-<div class="flex items-center">
-<div class="w-10 h-10 flex items-center justify-center mr-3 text-gray-500 bg-gray-100 rounded-full">
-<i class="ri-smartphone-line"></i>
-</div>
-<div>
-<p class="text-sm font-medium text-gray-900">iPhone 15 Pro</p>
-<p class="text-xs text-gray-500">iOS 18 • Safari • San Francisco, USA</p>
-<p class="text-xs text-gray-500">IP: 192.168.1.2 • Last active: 2 hours ago</p>
-</div>
-</div>
-<div class="mt-3 md:mt-0">
-<button class="px-4 py-2 border border-gray-300 text-gray-700 rounded-button text-xs font-medium hover:bg-gray-50 transition-colors whitespace-nowrap">Sign Out</button>
-</div>
-</div>
-<div class="border border-gray-200 rounded-lg p-4 flex flex-col md:flex-row md:items-center md:justify-between">
-<div class="flex items-center">
-<div class="w-10 h-10 flex items-center justify-center mr-3 text-gray-500 bg-gray-100 rounded-full">
-<i class="ri-tablet-line"></i>
-</div>
-<div>
-<p class="text-sm font-medium text-gray-900">iPad Air</p>
-<p class="text-xs text-gray-500">iPadOS 18 • Safari • Boston, USA</p>
-<p class="text-xs text-gray-500">IP: 192.168.1.3 • Last active: Yesterday</p>
-</div>
-</div>
-<div class="mt-3 md:mt-0">
-<button class="px-4 py-2 border border-gray-300 text-gray-700 rounded-button text-xs font-medium hover:bg-gray-50 transition-colors whitespace-nowrap">Sign Out</button>
-</div>
-</div>
-</div>
-<div class="mt-4">
-<button class="px-4 py-2 border border-gray-300 text-gray-700 rounded-button text-sm font-medium hover:bg-gray-50 transition-colors whitespace-nowrap">Sign Out From All Devices</button>
-</div>
-</div>
+
+<script>
+function signOutSession(sessionId, btn) {
+  btn.disabled = true;
+  fetch('signout_session.php', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: 'session_id=' + encodeURIComponent(sessionId)
+  })
+  .then(res => res.text())
+  .then(() => {
+    // Remove the session card
+    const card = btn.closest('.session-card');
+    if (card) card.remove();
+  })
+  .catch(() => {
+    alert('Failed to sign out session.');
+    btn.disabled = false;
+  });
+}
+
+function signOutAll(btn) {
+  btn.disabled = true;
+  fetch('signout_all.php', {
+    method: 'POST'
+  })
+  .then(res => res.text())
+  .then(() => {
+    // Redirect or clear all sessions visually
+    location.href = '<?= BASE_URL ?>signup.html?form=login&status=all_signed_out';
+  })
+  .catch(() => {
+    alert('Failed to sign out from all devices.');
+    btn.disabled = false;
+  });
+}
+</script>
+
 </div>
 </section>
 <!-- Danger Zone Section -->
@@ -988,7 +1009,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         // Update active sessions
-        const sessionsContainer = document.querySelector('.space-y-4');
+       /* const sessionsContainer = document.querySelector('.space-y-4');
         if (sessionsContainer && data.data.sessions) {
           const currentSession = data.data.sessions[0]; // Most recent session
           if (currentSession) {
@@ -1004,16 +1025,16 @@ document.addEventListener('DOMContentLoaded', function() {
               }
             }
           }
-        }
+        }*/
 
         // Update subscription info if available
-        if (data.data.subscription) {
+        /*if (data.data.subscription) {
           const subscription = data.data.subscription;
           const planName = document.querySelector('.text-xs.text-gray-500');
           if (planName) {
             planName.textContent = `of ${subscription.plan_name}`;
           }
-        }
+        }*/
       } else {
         console.error('Failed to fetch user data:', data.message);
       }

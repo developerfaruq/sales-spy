@@ -1,20 +1,14 @@
-<?php
-// Dashboard-home.php
-require '../config/db.php';
-session_start();
+<?php 
+require '../auth/auth_check.php';
 
-if (!isset($_SESSION['user_id'])) {
-    header("Location: signup.html?form=login&status=session_expired");
-    exit;
-}
-
-// Initialize data variables with defaults
+// Initialize data variables
 $user = [];
 $stats = [
     'total_leads' => 0,
     'active_campaigns' => 0,
-    'credits_remaining' => 1250,
-    'credits_total' => 2000,
+    'credits_remaining' => 10000,
+    'credits_total' => 10000,
+    'leads_balance' => 10000,
     'credits_percentage' => 0,
     'recent_activity' => 0,
     'plan_name' => 'Free',
@@ -46,43 +40,39 @@ try {
         exit;
     }
 
-    // Get user stats from database
-    // 1. Total leads count
+    // 1. Get user subscription stats (credits, plan, leads_balance)
+    $stmt = $pdo->prepare("SELECT plan_name, credits_remaining, credits_total, leads_balance FROM subscriptions WHERE user_id = ? AND is_active = 1");
+    $stmt->execute([$_SESSION['user_id']]);
+    $subscription = $stmt->fetch();
+
+    $stats['plan_name'] = ucfirst($subscription['plan_name'] ?? 'Free');
+    $stats['credits_remaining'] = $subscription['credits_remaining'] ?? 0;
+    $stats['credits_total'] = $subscription['credits_total'] ?? 1000;
+    $stats['leads_balance'] = $subscription['leads_balance'] ?? 0;
+    $stats['credits_percentage'] = ($stats['credits_total'] > 0)
+        ? ($stats['credits_remaining'] / $stats['credits_total']) * 100
+        : 0;
+
+    // 2. Total leads
     $stmt = $pdo->prepare("SELECT COUNT(*) FROM leads WHERE user_id = ?");
     $stmt->execute([$_SESSION['user_id']]);
     $stats['total_leads'] = $stmt->fetchColumn();
 
-    // 2. Active campaigns count
+    // 3. Active campaigns
     $stmt = $pdo->prepare("SELECT COUNT(*) FROM campaigns WHERE user_id = ? AND status = 'active'");
     $stmt->execute([$_SESSION['user_id']]);
     $stats['active_campaigns'] = $stmt->fetchColumn();
 
-    // 3. Credits info (from users table or subscriptions table)
-    $stats['credits_remaining'] = $user['credits'] ?? 1250;
-    
-    // Get total credits from subscriptions if available
-    $stmt = $pdo->prepare("SELECT credits_total FROM subscriptions WHERE user_id = ? AND is_active = 1");
-    $stmt->execute([$_SESSION['user_id']]);
-    $subscription = $stmt->fetch();
-    $stats['credits_total'] = $subscription['credits_total'] ?? 2000;
-    $stats['credits_percentage'] = ($stats['credits_remaining'] / $stats['credits_total']) * 100;
-
-    // 4. Get plan name
-    $stmt = $pdo->prepare("SELECT plan_name FROM subscriptions WHERE user_id = ? AND is_active = 1");
-    $stmt->execute([$_SESSION['user_id']]);
-    $plan = $stmt->fetch();
-    $stats['plan_name'] = ucfirst($plan['plan_name'] ?? 'free');
-
-    // 5. Recent activity count (last 24 hours from search_logs)
+    // 4. Recent activity (last 24h)
     $stmt = $pdo->prepare("SELECT COUNT(*) FROM search_logs WHERE user_id = ? AND search_time > DATE_SUB(NOW(), INTERVAL 1 DAY)");
     $stmt->execute([$_SESSION['user_id']]);
     $stats['recent_activity'] = $stmt->fetchColumn();
 
-    // Calculate leads percentage change (current month vs previous month)
+    // 5. Leads change %
     $stmt = $pdo->prepare("
         SELECT 
             (COUNT(CASE WHEN created_at >= DATE_FORMAT(NOW(), '%Y-%m-01') THEN 1 END) - 
-            COUNT(CASE WHEN created_at BETWEEN DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 1 MONTH), '%Y-%m-01') AND 
+             COUNT(CASE WHEN created_at BETWEEN DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 1 MONTH), '%Y-%m-01') AND 
                                 LAST_DAY(DATE_SUB(NOW(), INTERVAL 1 MONTH)) THEN 1 END)) / 
             NULLIF(COUNT(CASE WHEN created_at BETWEEN DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 1 MONTH), '%Y-%m-01') AND 
                                 LAST_DAY(DATE_SUB(NOW(), INTERVAL 1 MONTH)) THEN 1 END), 0) * 100 as change_percentage
@@ -93,19 +83,17 @@ try {
     $leadsChange = $stmt->fetch();
     $stats['leads_change_percentage'] = $leadsChange['change_percentage'] ?? 0;
 
-    // Calculate new campaigns this week
+    // 6. New campaigns this week
     $stmt = $pdo->prepare("
         SELECT COUNT(*) as new_campaigns 
         FROM campaigns 
-        WHERE user_id = ? AND 
-              status = 'active' AND 
-              created_at >= DATE_SUB(NOW(), INTERVAL 1 WEEK)
+        WHERE user_id = ? AND status = 'active' AND created_at >= DATE_SUB(NOW(), INTERVAL 1 WEEK)
     ");
     $stmt->execute([$_SESSION['user_id']]);
     $campaignsChange = $stmt->fetch();
     $stats['campaigns_change_count'] = $campaignsChange['new_campaigns'] ?? 0;
 
-    // Calculate activity percentage change (yesterday vs day before)
+    // 7. Activity change %
     $stmt = $pdo->prepare("
         SELECT 
             (COUNT(CASE WHEN search_time >= CURDATE() - INTERVAL 1 DAY THEN 1 END) - 
@@ -118,7 +106,7 @@ try {
     $activityChange = $stmt->fetch();
     $stats['activity_change_percentage'] = $activityChange['change_percentage'] ?? 0;
 
-    // Get recent activities (combining search_logs and leads)
+    // 8. Recent activities (search + leads)
     $stmt = $pdo->prepare("
         (SELECT 
             'search' as activity_type, 
@@ -128,9 +116,7 @@ try {
         WHERE user_id = ? 
         ORDER BY search_time DESC 
         LIMIT 3)
-        
         UNION ALL
-        
         (SELECT 
             'lead' as activity_type, 
             'New lead added' as description, 
@@ -139,14 +125,13 @@ try {
         WHERE user_id = ? 
         ORDER BY created_at DESC 
         LIMIT 2)
-        
         ORDER BY activity_date DESC 
         LIMIT 5
     ");
     $stmt->execute([$_SESSION['user_id'], $_SESSION['user_id']]);
     $activities = $stmt->fetchAll();
 
-    // Get chart data (7 days of lead generation)
+    // 9. Weekly lead chart
     $stmt = $pdo->prepare("
         SELECT 
             DATE(created_at) as day, 
@@ -157,9 +142,9 @@ try {
         ORDER BY day ASC
     ");
     $stmt->execute([$_SESSION['user_id']]);
-    
+
     while ($row = $stmt->fetch()) {
-        $dayOfWeek = date('N', strtotime($row['day'])) - 1; // 0-6 for Mon-Sun
+        $dayOfWeek = date('N', strtotime($row['day'])) - 1; // 0=Monday
         if ($dayOfWeek >= 0 && $dayOfWeek < 7) {
             $chartData['leads'][$dayOfWeek] = (int)$row['count'];
         }
@@ -167,24 +152,20 @@ try {
 
 } catch (PDOException $e) {
     error_log("Dashboard error: " . $e->getMessage());
-    // Continue with default values if DB fails
+    // Continue with fallback values
 }
 
-
-
-// profile picture handling
+// Profile picture handling
 if (!empty($user['profile_picture'])) {
-    // Strip any redundant path if needed (just like in settings.php)
     $filename = str_replace('uploads/profile_pictures/', '', $user['profile_picture']);
     $avatarUrl = '../uploads/profile_pictures/' . $filename;
 } else {
-    // Fallback to generated avatar
     $avatarUrl = "https://ui-avatars.com/api/?name=" . 
                  urlencode($user['full_name'] ?? 'User') . 
                  "&background=1E3A8A&color=fff&length=1&size=128";
 }
-
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -510,7 +491,7 @@ display: block;
                         </div>
                         <div class="flex items-end justify-between">
                             <div>
-                                <p class="text-3xl font-bold text-gray-800"><?= number_format($stats['total_leads']) ?></p>
+                                <p class="text-3xl font-bold text-gray-800"><?= number_format($stats['leads_balance']) ?></p>
                                 <p class="text-sm text-green-500 flex items-center mt-1">
                                     <div class="w-4 h-4 flex items-center justify-center mr-1">
                                         <i class="ri-arrow-up-line"></i>
