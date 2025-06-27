@@ -4,6 +4,7 @@ $username ="root";
 $password = "";
 $dbname = "sales_spy";
 
+
 // Defining base url
 define ("BASE_URL", "http://localhost/sales-spy/");
 
