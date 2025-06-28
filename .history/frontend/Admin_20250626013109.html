@@ -1,0 +1,2961 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+    <script>tailwind.config={theme:{extend:{colors:{primary:'#3366ff',secondary:'#1e1e2f'},borderRadius:{'none':'0px','sm':'4px',DEFAULT:'8px','md':'12px','lg':'16px','xl':'20px','2xl':'24px','3xl':'32px','full':'9999px','button':'8px'}}}}</script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.5.0/echarts.min.js"></script>
+    <style>
+        :where([class^="ri-"])::before { content: "\f3c2"; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8f9fb;
+        }
+        .sidebar-transition {
+            transition: width 0.3s ease, transform 0.3s ease;
+        }
+        input[type="number"]::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        .custom-switch {
+            position: relative;
+            display: inline-block;
+            width: 44px;
+            height: 24px;
+        }
+        .custom-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .switch-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #e2e8f0;
+            transition: .4s;
+            border-radius: 24px;
+        }
+        .switch-slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        input:checked + .switch-slider {
+            background-color: #3366ff;
+        }
+        input:checked + .switch-slider:before {
+            transform: translateX(20px);
+        }
+        .custom-checkbox {
+            position: relative;
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+        }
+        .custom-checkbox input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .checkbox-mark {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 18px;
+            width: 18px;
+            background-color: #fff;
+            border: 1px solid #d1d5db;
+            border-radius: 4px;
+        }
+        .custom-checkbox input:checked ~ .checkbox-mark {
+            background-color: #3366ff;
+            border-color: #3366ff;
+        }
+        .checkbox-mark:after {
+            content: "";
+            position: absolute;
+            display: none;
+        }
+        .custom-checkbox input:checked ~ .checkbox-mark:after {
+            display: block;
+        }
+        .custom-checkbox .checkbox-mark:after {
+            left: 6px;
+            top: 2px;
+            width: 5px;
+            height: 10px;
+            border: solid white;
+            border-width: 0 2px 2px 0;
+            transform: rotate(45deg);
+        }
+        .custom-radio {
+            position: relative;
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+        }
+        .custom-radio input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .radio-mark {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 18px;
+            width: 18px;
+            background-color: #fff;
+            border: 1px solid #d1d5db;
+            border-radius: 50%;
+        }
+        .custom-radio input:checked ~ .radio-mark {
+            background-color: #fff;
+            border-color: #3366ff;
+        }
+        .radio-mark:after {
+            content: "";
+            position: absolute;
+            display: none;
+        }
+        .custom-radio input:checked ~ .radio-mark:after {
+            display: block;
+        }
+        .custom-radio .radio-mark:after {
+            top: 4px;
+            left: 4px;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #3366ff;
+        }
+        .pagination-item {
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        .pagination-item.active {
+            background-color: #3366ff;
+            color: white;
+        }
+        .custom-select {
+            position: relative;
+            display: inline-block;
+        }
+        .custom-select-trigger {
+            padding: 8px 12px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            background-color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            min-width: 120px;
+        }
+        .custom-select-options {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background-color: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            margin-top: 4px;
+            z-index: 10;
+            display: none;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .custom-select-option {
+            padding: 8px 12px;
+            cursor: pointer;
+        }
+        .custom-select-option:hover {
+            background-color: #f1f5f9;
+        }
+        .custom-select.open .custom-select-options {
+            display: block;
+        }
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 50;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+        .modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        .modal-content {
+            background-color: white;
+            border-radius: 12px;
+            padding: 24px;
+            width: 100%;
+            max-width: 500px;
+            transform: translateY(20px);
+            transition: transform 0.3s ease;
+        }
+        .modal.active .modal-content {
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    <!-- Header -->
+    <header class="bg-white shadow-sm fixed top-0 left-0 right-0 z-30">
+        <div class="flex items-center justify-between px-4 h-16">
+            <div class="flex items-center">
+                <button id="sidebar-toggle" class="w-10 h-10 flex items-center justify-center text-gray-500 hover:text-primary mr-2">
+                    <i class="ri-menu-line ri-lg"></i>
+                </button>
+                <div class="font-['Pacifico'] text-xl text-primary">Sales-Spy</div>
+                <span class="ml-4 text-lg font-medium hidden md:block">Admin Dashboard</span>
+            </div>
+            <div class="flex items-center space-x-4">
+                <div class="relative">
+                    <button id="notification-btn" class="w-10 h-10 flex items-center justify-center text-gray-500 hover:text-primary relative">
+                        <i class="ri-notification-3-line ri-lg"></i>
+                        <span class="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full"></span>
+                    </button>
+                </div>
+                <div class="relative">
+                    <button id="user-menu-btn" class="flex items-center">
+                        <div class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center">
+                            <span class="text-sm font-medium">JD</span>
+                        </div>
+                        <span class="ml-2 text-sm font-medium hidden md:block">John Doe</span>
+                        <i class="ri-arrow-down-s-line ml-1 text-gray-500"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Sidebar -->
+    <aside id="sidebar" class="fixed top-16 left-0 bottom-0 w-64 bg-white shadow-sm z-20 sidebar-transition transform md:translate-x-0 -translate-x-full">
+        <div class="h-full flex flex-col">
+            <div class="p-4 border-b">
+                <div class="flex items-center">
+                    <div class="w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center">
+                        <span class="text-sm font-medium">JD</span>
+                    </div>
+                    <div class="ml-3">
+                        <p class="text-sm font-medium">John Doe</p>
+                        <p class="text-xs text-gray-500">Super Admin</p>
+                    </div>
+                </div>
+            </div>
+            <nav class="flex-1 p-4 overflow-y-auto">
+                <ul class="space-y-1">
+                    <li>
+                        <button data-tab="users" class="nav-link w-full flex items-center px-3 py-2 text-sm font-medium rounded-md text-primary bg-blue-50">
+                            <div class="w-5 h-5 flex items-center justify-center mr-3">
+                                <i class="ri-user-line"></i>
+                            </div>
+                            <span>Users</span>
+                        </button>
+                    </li>
+                    <li>
+                        <button data-tab="subscriptions" class="nav-link w-full flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-600 hover:text-primary hover:bg-blue-50">
+                            <div class="w-5 h-5 flex items-center justify-center mr-3">
+                                <i class="ri-vip-crown-line"></i>
+                            </div>
+                            <span>Subscriptions</span>
+                        </button>
+                    </li>
+                    <li>
+                        <button data-tab="wallets" class="nav-link w-full flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-600 hover:text-primary hover:bg-blue-50">
+                            <div class="w-5 h-5 flex items-center justify-center mr-3">
+                                <i class="ri-wallet-3-line"></i>
+                            </div>
+                            <span>Wallets</span>
+                        </button>
+                    </li>
+                    <li>
+                        <button data-tab="payments" class="nav-link w-full flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-600 hover:text-primary hover:bg-blue-50">
+                            <div class="w-5 h-5 flex items-center justify-center mr-3">
+                                <i class="ri-exchange-dollar-line"></i>
+                            </div>
+                            <span>Payments</span>
+                        </button>
+                    </li>
+                    <li>
+                        <button data-tab="settings" class="nav-link w-full flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-600 hover:text-primary hover:bg-blue-50">
+                            <div class="w-5 h-5 flex items-center justify-center mr-3">
+                                <i class="ri-settings-3-line"></i>
+                            </div>
+                            <span>Settings</span>
+                        </button>
+                    </li>
+                </ul>
+            </nav>
+            <div class="p-4 border-t">
+                <button id="logout-btn" class="w-full flex items-center px-3 py-2 text-sm font-medium rounded-md text-red-600 hover:bg-red-50">
+                    <div class="w-5 h-5 flex items-center justify-center mr-3">
+                        <i class="ri-logout-box-line"></i>
+                    </div>
+                    <span>Logout</span>
+                </button>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="pt-16 md:pl-64 transition-all duration-300">
+        <!-- Users Tab -->
+        <div id="users-tab" class="tab-content p-4 md:p-6">
+            <div class="mb-6">
+            <h1 class="text-2xl font-semibold text-gray-800">Users Management</h1>
+            <p class="text-sm text-gray-500 mt-1">Manage all registered users and their accounts</p>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-sm p-4 mb-6">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                <div class="relative flex-1">
+                <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                    <i class="ri-search-line text-gray-400"></i>
+                </div>
+                <input type="text" id="user-search" class="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary" placeholder="Search users by name or email...">
+                </div>
+                <div class="flex flex-wrap items-center gap-3">
+                <div class="custom-select" id="plan-filter">
+                    <div class="custom-select-trigger">
+                    <span>All Plans</span>
+                    <i class="ri-arrow-down-s-line ml-2"></i>
+                    </div>
+                    <div class="custom-select-options">
+                    <div class="custom-select-option" data-value="all">All Plans</div>
+                    <div class="custom-select-option" data-value="basic">Basic</div>
+                    <div class="custom-select-option" data-value="pro">Pro</div>
+                    <div class="custom-select-option" data-value="enterprise">Enterprise</div>
+                    </div>
+                </div>
+                <div class="custom-select" id="status-filter">
+                    <div class="custom-select-trigger">
+                    <span>All Status</span>
+                    <i class="ri-arrow-down-s-line ml-2"></i>
+                    </div>
+                    <div class="custom-select-options">
+                    <div class="custom-select-option" data-value="all">All Status</div>
+                    <div class="custom-select-option" data-value="active">Active</div>
+                    <div class="custom-select-option" data-value="suspended">Suspended</div>
+                    </div>
+                </div>
+                <button class="px-4 py-2 bg-primary text-white rounded-button whitespace-nowrap flex items-center">
+                    <i class="ri-download-2-line mr-2"></i>
+                    Export
+                </button>
+                </div>
+            </div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                <thead>
+                    <tr class="bg-gray-50">
+                    <th class="px-4 py-3 text-left">
+                        <label class="custom-checkbox">
+                        <input type="checkbox" id="select-all-users">
+                        <span class="checkbox-mark"></span>
+                        </label>
+                    </th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Plan</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Wallet</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Joined</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                    <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200">
+                    <!-- Table rows rendered by JS -->
+                </tbody>
+                </table>
+            </div>
+            <div id="users-pagination" class="px-4 py-3 flex items-center justify-between border-t">
+              <div class="flex items-center text-sm text-gray-500">
+                <span>Showing</span>
+                <div class="custom-select mx-2" id="page-size-select">
+                  <div class="custom-select-trigger">
+                <span>10</span>
+                <i class="ri-arrow-down-s-line ml-1"></i>
+                  </div>
+                  <div class="custom-select-options">
+                <div class="custom-select-option" data-value="10">10</div>
+                <div class="custom-select-option" data-value="20">20</div>
+                <div class="custom-select-option" data-value="50">50</div>
+                  </div>
+                </div>
+                <span id="users-total-count-label">of 50 users</span>
+              </div>
+              <div class="flex items-center space-x-1" id="users-pagination-controls">
+                <!-- Pagination buttons will be rendered here -->
+              </div>
+            </div>
+            <script>
+            (function() {
+      // Demo user data (30+ users for pagination)
+      const demoUsers = [
+        { initials: "EB", name: "Emma Brown", email: "emma.brown@example.com", plan: "Pro", planClass: "bg-blue-50 text-primary", wallet: "Connected", walletClass: "text-green-600 bg-green-50", joined: "Jun 12, 2025", status: "Active", statusClass: "bg-green-50 text-green-600", id: 1 },
+        { initials: "RJ", name: "Robert Johnson", email: "robert.j@example.com", plan: "Enterprise", planClass: "bg-purple-50 text-purple-600", wallet: "Connected", walletClass: "text-green-600 bg-green-50", joined: "May 28, 2025", status: "Active", statusClass: "bg-green-50 text-green-600", id: 2 },
+        { initials: "SW", name: "Sarah Wilson", email: "sarah.w@example.com", plan: "Basic", planClass: "bg-gray-100 text-gray-600", wallet: "Not Connected", walletClass: "text-gray-600 bg-gray-100", joined: "Jun 20, 2025", status: "Suspended", statusClass: "bg-yellow-50 text-yellow-600", id: 3 },
+        { initials: "DM", name: "David Miller", email: "david.m@example.com", plan: "Pro", planClass: "bg-blue-50 text-primary", wallet: "Connected", walletClass: "text-green-600 bg-green-50", joined: "Jun 05, 2025", status: "Active", statusClass: "bg-green-50 text-green-600", id: 4 },
+        { initials: "JT", name: "Jessica Thompson", email: "jessica.t@example.com", plan: "Basic", planClass: "bg-gray-100 text-gray-600", wallet: "Not Connected", walletClass: "text-gray-600 bg-gray-100", joined: "Jun 18, 2025", status: "Active", statusClass: "bg-green-50 text-green-600", id: 5 },
+        { initials: "AL", name: "Alice Lee", email: "alice.lee@example.com", plan: "Pro", planClass: "bg-blue-50 text-primary", wallet: "Connected", walletClass: "text-green-600 bg-green-50", joined: "Jun 10, 2025", status: "Active", statusClass: "bg-green-50 text-green-600", id: 6 },
+        { initials: "BW", name: "Brian White", email: "brian.w@example.com", plan: "Enterprise", planClass: "bg-purple-50 text-purple-600", wallet: "Connected", walletClass: "text-green-600 bg-green-50", joined: "May 30, 2025", status: "Active", statusClass: "bg-green-50 text-green-600", id: 7 },
+        { initials: "CL", name: "Cathy Lin", email: "cathy.lin@example.com", plan: "Basic", planClass: "bg-gray-100 text-gray-600", wallet: "Not Connected", walletClass: "text-gray-600 bg-gray-100", joined: "Jun 21, 2025", status: "Suspended", statusClass: "bg-yellow-50 text-yellow-600", id: 8 },
+        { initials: "DS", name: "Daniel Smith", email: "daniel.smith@example.com", plan: "Pro", planClass: "bg-blue-50 text-primary", wallet: "Connected", walletClass: "text-green-600 bg-green-50", joined: "Jun 06, 2025", status: "Active", statusClass: "bg-green-50 text-green-600", id: 9 },
+        { initials: "EM", name: "Evelyn Moore", email: "evelyn.moore@example.com", plan: "Basic", planClass: "bg-gray-100 text-gray-600", wallet: "Not Connected", walletClass: "text-gray-600 bg-gray-100", joined: "Jun 19, 2025", status: "Active", statusClass: "bg-green-50 text-green-600", id: 10 },
+        { initials: "FM", name: "Frank Miller", email: "frank.miller@example.com", plan: "Enterprise", planClass: "bg-purple-50 text-purple-600", wallet: "Connected", walletClass: "text-green-600 bg-green-50", joined: "May 29, 2025", status: "Active", statusClass: "bg-green-50 text-green-600", id: 11 },
+        { initials: "GH", name: "Grace Hall", email: "grace.hall@example.com", plan: "Pro", planClass: "bg-blue-50 text-primary", wallet: "Connected", walletClass: "text-green-600 bg-green-50", joined: "Jun 11, 2025", status: "Active", statusClass: "bg-green-50 text-green-600", id: 12 },
+        { initials: "HW", name: "Henry Walker", email: "henry.walker@example.com", plan: "Basic", planClass: "bg-gray-100 text-gray-600", wallet: "Not Connected", walletClass: "text-gray-600 bg-gray-100", joined: "Jun 22, 2025", status: "Suspended", statusClass: "bg-yellow-50 text-yellow-600", id: 13 },
+        { initials: "IS", name: "Ivy Scott", email: "ivy.scott@example.com", plan: "Pro", planClass: "bg-blue-50 text-primary", wallet: "Connected", walletClass: "text-green-600 bg-green-50", joined: "Jun 07, 2025", status: "Active", statusClass: "bg-green-50 text-green-600", id: 14 },
+        { initials: "JK", name: "Jack King", email: "jack.king@example.com", plan: "Enterprise", planClass: "bg-purple-50 text-purple-600", wallet: "Connected", walletClass: "text-green-600 bg-green-50", joined: "May 31, 2025", status: "Active", statusClass: "bg-green-50 text-green-600", id: 15 },
+        { initials: "KL", name: "Karen Lee", email: "karen.lee@example.com", plan: "Basic", planClass: "bg-gray-100 text-gray-600", wallet: "Not Connected", walletClass: "text-gray-600 bg-gray-100", joined: "Jun 23, 2025", status: "Active", statusClass: "bg-green-50 text-green-600", id: 16 },
+        { initials: "LM", name: "Leo Martin", email: "leo.martin@example.com", plan: "Pro", planClass: "bg-blue-50 text-primary", wallet: "Connected", walletClass: "text-green-600 bg-green-50", joined: "Jun 08, 2025", status: "Active", statusClass: "bg-green-50 text-green-600", id: 17 },
+        { initials: "MN", name: "Mia Nelson", email: "mia.nelson@example.com", plan: "Enterprise", planClass: "bg-purple-50 text-purple-600", wallet: "Connected", walletClass: "text-green-600 bg-green-50", joined: "Jun 01, 2025", status: "Active", statusClass: "bg-green-50 text-green-600", id: 18 },
+        { initials: "NO", name: "Noah Owens", email: "noah.owens@example.com", plan: "Basic", planClass: "bg-gray-100 text-gray-600", wallet: "Not Connected", walletClass: "text-gray-600 bg-gray-100", joined: "Jun 24, 2025", status: "Suspended", statusClass: "bg-yellow-50 text-yellow-600", id: 19 },
+        { initials: "OP", name: "Olivia Perez", email: "olivia.perez@example.com", plan: "Pro", planClass: "bg-blue-50 text-primary", wallet: "Connected", walletClass: "text-green-600 bg-green-50", joined: "Jun 09, 2025", status: "Active", statusClass: "bg-green-50 text-green-600", id: 20 },
+        { initials: "PQ", name: "Paul Quinn", email: "paul.quinn@example.com", plan: "Enterprise", planClass: "bg-purple-50 text-purple-600", wallet: "Connected", walletClass: "text-green-600 bg-green-50", joined: "Jun 02, 2025", status: "Active", statusClass: "bg-green-50 text-green-600", id: 21 },
+        { initials: "QR", name: "Quinn Reed", email: "quinn.reed@example.com", plan: "Basic", planClass: "bg-gray-100 text-gray-600", wallet: "Not Connected", walletClass: "text-gray-600 bg-gray-100", joined: "Jun 25, 2025", status: "Active", statusClass: "bg-green-50 text-green-600", id: 22 },
+        { initials: "RS", name: "Rachel Stone", email: "rachel.stone@example.com", plan: "Pro", planClass: "bg-blue-50 text-primary", wallet: "Connected", walletClass: "text-green-600 bg-green-50", joined: "Jun 13, 2025", status: "Active", statusClass: "bg-green-50 text-green-600", id: 23 },
+        { initials: "ST", name: "Sam Taylor", email: "sam.taylor@example.com", plan: "Enterprise", planClass: "bg-purple-50 text-purple-600", wallet: "Connected", walletClass: "text-green-600 bg-green-50", joined: "Jun 03, 2025", status: "Active", statusClass: "bg-green-50 text-green-600", id: 24 },
+        { initials: "TU", name: "Tina Underwood", email: "tina.underwood@example.com", plan: "Basic", planClass: "bg-gray-100 text-gray-600", wallet: "Not Connected", walletClass: "text-gray-600 bg-gray-100", joined: "Jun 26, 2025", status: "Suspended", statusClass: "bg-yellow-50 text-yellow-600", id: 25 },
+        { initials: "UV", name: "Uma Vance", email: "uma.vance@example.com", plan: "Pro", planClass: "bg-blue-50 text-primary", wallet: "Connected", walletClass: "text-green-600 bg-green-50", joined: "Jun 14, 2025", status: "Active", statusClass: "bg-green-50 text-green-600", id: 26 },
+        { initials: "VW", name: "Victor White", email: "victor.white@example.com", plan: "Enterprise", planClass: "bg-purple-50 text-purple-600", wallet: "Connected", walletClass: "text-green-600 bg-green-50", joined: "Jun 04, 2025", status: "Active", statusClass: "bg-green-50 text-green-600", id: 27 },
+        { initials: "WX", name: "Wendy Xu", email: "wendy.xu@example.com", plan: "Basic", planClass: "bg-gray-100 text-gray-600", wallet: "Not Connected", walletClass: "text-gray-600 bg-gray-100", joined: "Jun 27, 2025", status: "Active", statusClass: "bg-green-50 text-green-600", id: 28 },
+        { initials: "XY", name: "Xander Young", email: "xander.young@example.com", plan: "Pro", planClass: "bg-blue-50 text-primary", wallet: "Connected", walletClass: "text-green-600 bg-green-50", joined: "Jun 15, 2025", status: "Active", statusClass: "bg-green-50 text-green-600", id: 29 },
+        { initials: "YZ", name: "Yara Zane", email: "yara.zane@example.com", plan: "Enterprise", planClass: "bg-purple-50 text-purple-600", wallet: "Connected", walletClass: "text-green-600 bg-green-50", joined: "Jun 05, 2025", status: "Active", statusClass: "bg-green-50 text-green-600", id: 30 }
+      ];
+
+      // Filter state
+      let pageSize = 10;
+      let currentPage = 1;
+      let planFilter = "all";
+      let statusFilter = "all";
+      let searchQuery = "";
+
+      const usersTableBody = document.querySelector('#users-tab table tbody');
+      const totalCountLabel = document.getElementById('users-total-count-label');
+      const pageSizeSelect = document.getElementById('page-size-select');
+      const paginationControls = document.getElementById('users-pagination-controls');
+      const planFilterSelect = document.getElementById('plan-filter');
+      const statusFilterSelect = document.getElementById('status-filter');
+      const userSearchInput = document.getElementById('user-search');
+
+      function getFilteredUsers() {
+        return demoUsers.filter(user => {
+          // Plan filter
+          if (planFilter !== "all" && user.plan.toLowerCase() !== planFilter) return false;
+          // Status filter
+          if (statusFilter !== "all" && user.status.toLowerCase() !== statusFilter) return false;
+          // Search filter
+          if (searchQuery) {
+        const q = searchQuery.toLowerCase();
+        if (
+          !user.name.toLowerCase().includes(q) &&
+          !user.email.toLowerCase().includes(q)
+        ) return false;
+          }
+          return true;
+        });
+      }
+
+      function renderTable() {
+        usersTableBody.innerHTML = '';
+        const filteredUsers = getFilteredUsers();
+        const start = (currentPage - 1) * pageSize;
+        const end = start + pageSize;
+        const pageUsers = filteredUsers.slice(start, end);
+
+        for (const user of pageUsers) {
+          usersTableBody.innerHTML += `
+    <tr>
+      <td class="px-4 py-3 whitespace-nowrap">
+        <label class="custom-checkbox">
+          <input type="checkbox" class="user-checkbox">
+          <span class="checkbox-mark"></span>
+        </label>
+      </td>
+      <td class="px-4 py-3 whitespace-nowrap">
+        <div class="flex items-center">
+          <div class="w-8 h-8 rounded-full ${user.planClass.split(' ')[0]} ${user.planClass.split(' ')[1]} flex items-center justify-center">
+        <span class="text-sm font-medium">${user.initials}</span>
+          </div>
+          <div class="ml-3">
+        <p class="text-sm font-medium text-gray-800">${user.name}</p>
+          </div>
+        </div>
+      </td>
+      <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-600">${user.email}</td>
+      <td class="px-4 py-3 whitespace-nowrap">
+        <span class="px-2 py-1 text-xs font-medium ${user.planClass} rounded-full">${user.plan}</span>
+      </td>
+      <td class="px-4 py-3 whitespace-nowrap">
+        <span class="text-xs font-medium ${user.walletClass} px-2 py-1 rounded-full">${user.wallet}</span>
+      </td>
+      <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-600">${user.joined}</td>
+      <td class="px-4 py-3 whitespace-nowrap">
+        <span class="px-2 py-1 text-xs font-medium ${user.statusClass} rounded-full">${user.status}</span>
+      </td>
+      <td class="px-4 py-3 whitespace-nowrap text-right text-sm font-medium">
+        <div class="flex items-center justify-end space-x-2">
+          <button class="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-primary rounded-full hover:bg-blue-50" data-action="view" data-user-id="${user.id}">
+        <i class="ri-eye-line"></i>
+          </button>
+          ${
+        user.status === "Suspended"
+        ? `<button class="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-green-500 rounded-full hover:bg-green-50" data-action="activate" data-user-id="${user.id}">
+          <i class="ri-play-circle-line"></i>
+        </button>`
+        : `<button class="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-yellow-500 rounded-full hover:bg-yellow-50" data-action="suspend" data-user-id="${user.id}">
+          <i class="ri-pause-circle-line"></i>
+        </button>`
+          }
+          <button class="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-red-500 rounded-full hover:bg-red-50" data-action="delete" data-user-id="${user.id}">
+        <i class="ri-delete-bin-line"></i>
+          </button>
+        </div>
+      </td>
+    </tr>
+          `;
+        }
+        totalCountLabel.textContent = `of ${filteredUsers.length} users`;
+        if (window.dispatchEvent) window.dispatchEvent(new Event('DOMContentLoaded'));
+      }
+
+      function renderPagination() {
+        const filteredUsers = getFilteredUsers();
+        const totalPages = Math.ceil(filteredUsers.length / pageSize) || 1;
+        let html = '';
+        html += `<button class="pagination-item text-gray-500 hover:bg-gray-100" ${currentPage === 1 ? 'disabled' : ''} data-page="${currentPage - 1}">
+          <i class="ri-arrow-left-s-line"></i>
+        </button>`;
+        let start = Math.max(1, currentPage - 2);
+        let end = Math.min(totalPages, start + 4);
+        if (end - start < 4) start = Math.max(1, end - 4);
+        for (let i = start; i <= end; i++) {
+          html += `<button class="pagination-item ${i === currentPage ? 'active' : 'text-gray-600 hover:bg-gray-100'}" data-page="${i}">${i}</button>`;
+        }
+        html += `<button class="pagination-item text-gray-500 hover:bg-gray-100" ${currentPage === totalPages ? 'disabled' : ''} data-page="${currentPage + 1}">
+          <i class="ri-arrow-right-s-line"></i>
+        </button>`;
+        paginationControls.innerHTML = html;
+      }
+
+      // Handle plan filter change
+      planFilterSelect.addEventListener('change', function(e) {
+        if (e.detail && e.detail.value) {
+          planFilter = e.detail.value;
+          currentPage = 1;
+          renderTable();
+          renderPagination();
+        }
+      });
+
+      // Handle status filter change
+      statusFilterSelect.addEventListener('change', function(e) {
+        if (e.detail && e.detail.value) {
+          statusFilter = e.detail.value;
+          currentPage = 1;
+          renderTable();
+          renderPagination();
+        }
+      });
+
+      // Handle search input
+      userSearchInput.addEventListener('input', function(e) {
+        searchQuery = e.target.value.trim();
+        currentPage = 1;
+        renderTable();
+        renderPagination();
+      });
+
+      // Handle page size change
+      pageSizeSelect.addEventListener('change', function(e) {
+        if (e.detail && e.detail.value) {
+          pageSize = parseInt(e.detail.value, 10);
+          currentPage = 1;
+          renderTable();
+          renderPagination();
+        }
+      });
+
+      // Handle pagination click
+      paginationControls.addEventListener('click', function(e) {
+        const btn = e.target.closest('button[data-page]');
+        if (btn && !btn.disabled) {
+          const page = parseInt(btn.getAttribute('data-page'), 10);
+          const filteredUsers = getFilteredUsers();
+          const totalPages = Math.ceil(filteredUsers.length / pageSize) || 1;
+          if (page >= 1 && page <= totalPages) {
+        currentPage = page;
+        renderTable();
+        renderPagination();
+          }
+        }
+      });
+
+      // Initial render
+      renderTable();
+      renderPagination();
+
+      // Listen for custom-select change events for plan/status filters
+      document.addEventListener('change', function(e) {
+        if (e.target.closest('#plan-filter')) {
+          const value = e.detail && e.detail.value ? e.detail.value : "all";
+          planFilter = value;
+          currentPage = 1;
+          renderTable();
+          renderPagination();
+        }
+        if (e.target.closest('#status-filter')) {
+          const value = e.detail && e.detail.value ? e.detail.value : "all";
+          statusFilter = value;
+          currentPage = 1;
+          renderTable();
+          renderPagination();
+        }
+      });
+
+    })();
+            </script>
+            </div>
+        </div>
+
+        <!-- Subscriptions Tab -->
+        <div id="subscriptions-tab" class="tab-content hidden p-4 md:p-6">
+            <div class="mb-6">
+                <h1 class="text-2xl font-semibold text-gray-800">Subscription Management</h1>
+                <p class="text-sm text-gray-500 mt-1">Manage user subscriptions and plans</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                <div class="bg-white rounded-lg shadow-sm p-4">
+                    <div class="flex items-center">
+                        <div class="w-12 h-12 rounded-full bg-blue-100 text-primary flex items-center justify-center">
+                            <i class="ri-user-line ri-lg"></i>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-sm text-gray-500">Total Users</p>
+                            <p class="text-2xl font-semibold">1,254</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white rounded-lg shadow-sm p-4">
+                    <div class="flex items-center">
+                        <div class="w-12 h-12 rounded-full bg-green-100 text-green-600 flex items-center justify-center">
+                            <i class="ri-vip-crown-line ri-lg"></i>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-sm text-gray-500">Active Subscriptions</p>
+                            <p class="text-2xl font-semibold">876</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white rounded-lg shadow-sm p-4">
+                    <div class="flex items-center">
+                        <div class="w-12 h-12 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center">
+                            <i class="ri-money-dollar-circle-line ri-lg"></i>
+                        </div>
+                        <div class="ml-4">
+                            <p class="text-sm text-gray-500">Monthly Revenue</p>
+                            <p class="text-2xl font-semibold">$45,890</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                <div class="bg-white rounded-lg shadow-sm p-4 md:col-span-2">
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="text-lg font-medium text-gray-800">Subscription Distribution</h2>
+                        <div class="custom-select" id="chart-period-select">
+                            <div class="custom-select-trigger">
+                                <span>This Month</span>
+                                <i class="ri-arrow-down-s-line ml-2"></i>
+                            </div>
+                            <div class="custom-select-options">
+                                <div class="custom-select-option" data-value="week">This Week</div>
+                                <div class="custom-select-option" data-value="month">This Month</div>
+                                <div class="custom-select-option" data-value="quarter">This Quarter</div>
+                                <div class="custom-select-option" data-value="year">This Year</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="subscription-chart" class="w-full h-64"></div>
+                </div>
+                <div class="bg-white rounded-lg shadow-sm p-4">
+                    <h2 class="text-lg font-medium text-gray-800 mb-4">Plan Distribution</h2>
+                    <div id="plan-distribution-chart" class="w-full h-64"></div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+                <div class="p-4 border-b">
+                    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                        <h2 class="text-lg font-medium text-gray-800">Active Subscriptions</h2>
+                        <div class="flex flex-wrap items-center gap-3">
+                            <div class="custom-select" id="subscription-plan-filter">
+                                <div class="custom-select-trigger">
+                                    <span>All Plans</span>
+                                    <i class="ri-arrow-down-s-line ml-2"></i>
+                                </div>
+                                <div class="custom-select-options">
+                                    <div class="custom-select-option" data-value="all">All Plans</div>
+                                    <div class="custom-select-option" data-value="basic">Basic</div>
+                                    <div class="custom-select-option" data-value="pro">Pro</div>
+                                    <div class="custom-select-option" data-value="enterprise">Enterprise</div>
+                                </div>
+                            </div>
+                            <div class="custom-select" id="subscription-status-filter">
+                                <div class="custom-select-trigger">
+                                    <span>All Status</span>
+                                    <i class="ri-arrow-down-s-line ml-2"></i>
+                                </div>
+                                <div class="custom-select-options">
+                                    <div class="custom-select-option" data-value="all">All Status</div>
+                                    <div class="custom-select-option" data-value="active">Active</div>
+                                    <div class="custom-select-option" data-value="suspended">Suspended</div>
+                                </div>
+                            </div>
+                            <button class="px-4 py-2 bg-primary text-white rounded-button whitespace-nowrap flex items-center">
+                                <i class="ri-add-line mr-2"></i>
+                                New Subscription
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead>
+                            <tr class="bg-gray-50">
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Plan</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Joined</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Wallet</th>
+                                <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="subscriptions-table-body" class="divide-y divide-gray-200">
+                            <!-- Subscription rows rendered by JS -->
+                        </tbody>
+                    </table>
+                </div>
+                <div class="px-4 py-3 flex items-center justify-between border-t">
+                    <div class="flex items-center text-sm text-gray-500">
+                        <span>Showing</span>
+                        <div class="custom-select mx-2" id="subscriptions-page-size-select">
+                            <div class="custom-select-trigger">
+                                <span>10</span>
+                                <i class="ri-arrow-down-s-line ml-1"></i>
+                            </div>
+                            <div class="custom-select-options">
+                                <div class="custom-select-option" data-value="10">10</div>
+                                <div class="custom-select-option" data-value="20">20</div>
+                                <div class="custom-select-option" data-value="50">50</div>
+                            </div>
+                        </div>
+                        <span id="subscriptions-total-count-label">of 30 subscriptions</span>
+                    </div>
+                    <div class="flex items-center space-x-1" id="subscriptions-pagination-controls">
+                        <!-- Pagination buttons will be rendered here -->
+                    </div>
+                </div>
+            </div>
+            <script>
+            (function() {
+                // More demo users for realistic pagination
+                const demoUsers = [
+                    { initials: "EB", name: "Emma Brown", email: "emma.brown@example.com", plan: "Pro", planClass: "bg-blue-50 text-primary", wallet: "Connected", walletClass: "text-green-600 bg-green-50", joined: "Jun 12, 2025", status: "Active", statusClass: "bg-green-50 text-green-600", id: 1 },
+                    { initials: "RJ", name: "Robert Johnson", email: "robert.j@example.com", plan: "Enterprise", planClass: "bg-purple-50 text-purple-600", wallet: "Connected", walletClass: "text-green-600 bg-green-50", joined: "May 28, 2025", status: "Active", statusClass: "bg-green-50 text-green-600", id: 2 },
+                    { initials: "SW", name: "Sarah Wilson", email: "sarah.w@example.com", plan: "Basic", planClass: "bg-gray-100 text-gray-600", wallet: "Not Connected", walletClass: "text-gray-600 bg-gray-100", joined: "Jun 20, 2025", status: "Suspended", statusClass: "bg-yellow-50 text-yellow-600", id: 3 },
+                    { initials: "DM", name: "David Miller", email: "david.m@example.com", plan: "Pro", planClass: "bg-blue-50 text-primary", wallet: "Connected", walletClass: "text-green-600 bg-green-50", joined: "Jun 05, 2025", status: "Active", statusClass: "bg-green-50 text-green-600", id: 4 },
+                    { initials: "JT", name: "Jessica Thompson", email: "jessica.t@example.com", plan: "Basic", planClass: "bg-gray-100 text-gray-600", wallet: "Not Connected", walletClass: "text-gray-600 bg-gray-100", joined: "Jun 18, 2025", status: "Active", statusClass: "bg-green-50 text-green-600", id: 5 },
+                    { initials: "AL", name: "Alice Lee", email: "alice.lee@example.com", plan: "Pro", planClass: "bg-blue-50 text-primary", wallet: "Connected", walletClass: "text-green-600 bg-green-50", joined: "Jun 10, 2025", status: "Active", statusClass: "bg-green-50 text-green-600", id: 6 },
+                    { initials: "BW", name: "Brian White", email: "brian.w@example.com", plan: "Enterprise", planClass: "bg-purple-50 text-purple-600", wallet: "Connected", walletClass: "text-green-600 bg-green-50", joined: "May 30, 2025", status: "Active", statusClass: "bg-green-50 text-green-600", id: 7 },
+                    { initials: "CL", name: "Cathy Lin", email: "cathy.lin@example.com", plan: "Basic", planClass: "bg-gray-100 text-gray-600", wallet: "Not Connected", walletClass: "text-gray-600 bg-gray-100", joined: "Jun 21, 2025", status: "Suspended", statusClass: "bg-yellow-50 text-yellow-600", id: 8 },
+                    { initials: "DS", name: "Daniel Smith", email: "daniel.smith@example.com", plan: "Pro", planClass: "bg-blue-50 text-primary", wallet: "Connected", walletClass: "text-green-600 bg-green-50", joined: "Jun 06, 2025", status: "Active", statusClass: "bg-green-50 text-green-600", id: 9 },
+                    { initials: "EM", name: "Evelyn Moore", email: "evelyn.moore@example.com", plan: "Basic", planClass: "bg-gray-100 text-gray-600", wallet: "Not Connected", walletClass: "text-gray-600 bg-gray-100", joined: "Jun 19, 2025", status: "Active", statusClass: "bg-green-50 text-green-600", id: 10 },
+                    { initials: "FM", name: "Frank Miller", email: "frank.miller@example.com", plan: "Enterprise", planClass: "bg-purple-50 text-purple-600", wallet: "Connected", walletClass: "text-green-600 bg-green-50", joined: "May 29, 2025", status: "Active", statusClass: "bg-green-50 text-green-600", id: 11 },
+                    { initials: "GH", name: "Grace Hall", email: "grace.hall@example.com", plan: "Pro", planClass: "bg-blue-50 text-primary", wallet: "Connected", walletClass: "text-green-600 bg-green-50", joined: "Jun 11, 2025", status: "Active", statusClass: "bg-green-50 text-green-600", id: 12 },
+                    { initials: "HW", name: "Henry Walker", email: "henry.walker@example.com", plan: "Basic", planClass: "bg-gray-100 text-gray-600", wallet: "Not Connected", walletClass: "text-gray-600 bg-gray-100", joined: "Jun 22, 2025", status: "Suspended", statusClass: "bg-yellow-50 text-yellow-600", id: 13 },
+                    { initials: "IS", name: "Ivy Scott", email: "ivy.scott@example.com", plan: "Pro", planClass: "bg-blue-50 text-primary", wallet: "Connected", walletClass: "text-green-600 bg-green-50", joined: "Jun 07, 2025", status: "Active", statusClass: "bg-green-50 text-green-600", id: 14 },
+                    { initials: "JK", name: "Jack King", email: "jack.king@example.com", plan: "Enterprise", planClass: "bg-purple-50 text-purple-600", wallet: "Connected", walletClass: "text-green-600 bg-green-50", joined: "May 31, 2025", status: "Active", statusClass: "bg-green-50 text-green-600", id: 15 },
+                    { initials: "KL", name: "Karen Lee", email: "karen.lee@example.com", plan: "Basic", planClass: "bg-gray-100 text-gray-600", wallet: "Not Connected", walletClass: "text-gray-600 bg-gray-100", joined: "Jun 23, 2025", status: "Active", statusClass: "bg-green-50 text-green-600", id: 16 },
+                    { initials: "LM", name: "Leo Martin", email: "leo.martin@example.com", plan: "Pro", planClass: "bg-blue-50 text-primary", wallet: "Connected", walletClass: "text-green-600 bg-green-50", joined: "Jun 08, 2025", status: "Active", statusClass: "bg-green-50 text-green-600", id: 17 },
+                    { initials: "MN", name: "Mia Nelson", email: "mia.nelson@example.com", plan: "Enterprise", planClass: "bg-purple-50 text-purple-600", wallet: "Connected", walletClass: "text-green-600 bg-green-50", joined: "Jun 01, 2025", status: "Active", statusClass: "bg-green-50 text-green-600", id: 18 },
+                    { initials: "NO", name: "Noah Owens", email: "noah.owens@example.com", plan: "Basic", planClass: "bg-gray-100 text-gray-600", wallet: "Not Connected", walletClass: "text-gray-600 bg-gray-100", joined: "Jun 24, 2025", status: "Suspended", statusClass: "bg-yellow-50 text-yellow-600", id: 19 },
+                    { initials: "OP", name: "Olivia Perez", email: "olivia.perez@example.com", plan: "Pro", planClass: "bg-blue-50 text-primary", wallet: "Connected", walletClass: "text-green-600 bg-green-50", joined: "Jun 09, 2025", status: "Active", statusClass: "bg-green-50 text-green-600", id: 20 },
+                    { initials: "PQ", name: "Paul Quinn", email: "paul.quinn@example.com", plan: "Enterprise", planClass: "bg-purple-50 text-purple-600", wallet: "Connected", walletClass: "text-green-600 bg-green-50", joined: "Jun 02, 2025", status: "Active", statusClass: "bg-green-50 text-green-600", id: 21 },
+                    { initials: "QR", name: "Quinn Reed", email: "quinn.reed@example.com", plan: "Basic", planClass: "bg-gray-100 text-gray-600", wallet: "Not Connected", walletClass: "text-gray-600 bg-gray-100", joined: "Jun 25, 2025", status: "Active", statusClass: "bg-green-50 text-green-600", id: 22 },
+                    { initials: "RS", name: "Rachel Stone", email: "rachel.stone@example.com", plan: "Pro", planClass: "bg-blue-50 text-primary", wallet: "Connected", walletClass: "text-green-600 bg-green-50", joined: "Jun 13, 2025", status: "Active", statusClass: "bg-green-50 text-green-600", id: 23 },
+                    { initials: "ST", name: "Sam Taylor", email: "sam.taylor@example.com", plan: "Enterprise", planClass: "bg-purple-50 text-purple-600", wallet: "Connected", walletClass: "text-green-600 bg-green-50", joined: "Jun 03, 2025", status: "Active", statusClass: "bg-green-50 text-green-600", id: 24 },
+                    { initials: "TU", name: "Tina Underwood", email: "tina.underwood@example.com", plan: "Basic", planClass: "bg-gray-100 text-gray-600", wallet: "Not Connected", walletClass: "text-gray-600 bg-gray-100", joined: "Jun 26, 2025", status: "Suspended", statusClass: "bg-yellow-50 text-yellow-600", id: 25 },
+                    { initials: "UV", name: "Uma Vance", email: "uma.vance@example.com", plan: "Pro", planClass: "bg-blue-50 text-primary", wallet: "Connected", walletClass: "text-green-600 bg-green-50", joined: "Jun 14, 2025", status: "Active", statusClass: "bg-green-50 text-green-600", id: 26 },
+                    { initials: "VW", name: "Victor White", email: "victor.white@example.com", plan: "Enterprise", planClass: "bg-purple-50 text-purple-600", wallet: "Connected", walletClass: "text-green-600 bg-green-50", joined: "Jun 04, 2025", status: "Active", statusClass: "bg-green-50 text-green-600", id: 27 },
+                    { initials: "WX", name: "Wendy Xu", email: "wendy.xu@example.com", plan: "Basic", planClass: "bg-gray-100 text-gray-600", wallet: "Not Connected", walletClass: "text-gray-600 bg-gray-100", joined: "Jun 27, 2025", status: "Active", statusClass: "bg-green-50 text-green-600", id: 28 },
+                    { initials: "XY", name: "Xander Young", email: "xander.young@example.com", plan: "Pro", planClass: "bg-blue-50 text-primary", wallet: "Connected", walletClass: "text-green-600 bg-green-50", joined: "Jun 15, 2025", status: "Active", statusClass: "bg-green-50 text-green-600", id: 29 },
+                    { initials: "YZ", name: "Yara Zane", email: "yara.zane@example.com", plan: "Enterprise", planClass: "bg-purple-50 text-purple-600", wallet: "Connected", walletClass: "text-green-600 bg-green-50", joined: "Jun 05, 2025", status: "Active", statusClass: "bg-green-50 text-green-600", id: 30 }
+                ];
+
+                let subscriptionsPageSize = 10;
+                let subscriptionsCurrentPage = 1;
+                let subscriptionsPlanFilter = "all";
+                let subscriptionsStatusFilter = "all";
+
+                const subscriptionsTableBody = document.getElementById('subscriptions-table-body');
+                const subscriptionsTotalCountLabel = document.getElementById('subscriptions-total-count-label');
+                const subscriptionsPageSizeSelect = document.getElementById('subscriptions-page-size-select');
+                const subscriptionsPaginationControls = document.getElementById('subscriptions-pagination-controls');
+                const subscriptionsPlanFilterSelect = document.getElementById('subscription-plan-filter');
+                const subscriptionsStatusFilterSelect = document.getElementById('subscription-status-filter');
+
+                function getFilteredSubscriptions() {
+                    return demoUsers.filter(user => {
+                        if (subscriptionsPlanFilter !== "all" && user.plan.toLowerCase() !== subscriptionsPlanFilter) return false;
+                        if (subscriptionsStatusFilter !== "all" && user.status.toLowerCase() !== subscriptionsStatusFilter) return false;
+                        return true;
+                    });
+                }
+
+                function renderSubscriptionsTable() {
+                    subscriptionsTableBody.innerHTML = '';
+                    const filtered = getFilteredSubscriptions();
+                    const start = (subscriptionsCurrentPage - 1) * subscriptionsPageSize;
+                    const end = start + subscriptionsPageSize;
+                    const pageUsers = filtered.slice(start, end);
+
+                    for (const user of pageUsers) {
+                        subscriptionsTableBody.innerHTML += `
+            <tr>
+                <td class="px-4 py-3 whitespace-nowrap">
+                    <div class="flex items-center">
+                        <div class="w-8 h-8 rounded-full ${user.planClass.split(' ')[0]} ${user.planClass.split(' ')[1]} flex items-center justify-center">
+                            <span class="text-sm font-medium">${user.initials}</span>
+                        </div>
+                        <div class="ml-3">
+                            <p class="text-sm font-medium text-gray-800">${user.name}</p>
+                            <p class="text-xs text-gray-500">${user.email}</p>
+                        </div>
+                    </div>
+                </td>
+                <td class="px-4 py-3 whitespace-nowrap">
+                    <span class="px-2 py-1 text-xs font-medium ${user.planClass} rounded-full">${user.plan}</span>
+                </td>
+                <td class="px-4 py-3 whitespace-nowrap">
+                    <span class="px-2 py-1 text-xs font-medium ${user.statusClass} rounded-full">${user.status}</span>
+                </td>
+                <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-600">${user.joined}</td>
+                <td class="px-4 py-3 whitespace-nowrap">
+                    <span class="text-xs font-medium ${user.walletClass} px-2 py-1 rounded-full">${user.wallet}</span>
+                </td>
+                <td class="px-4 py-3 whitespace-nowrap text-right text-sm font-medium">
+                    <div class="flex items-center justify-end space-x-2">
+                        <button class="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-primary rounded-full hover:bg-blue-50" data-action="view" data-user-id="${user.id}">
+                            <i class="ri-eye-line"></i>
+                        </button>
+                        ${
+                            user.status === "Suspended"
+                            ? `<button class="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-green-500 rounded-full hover:bg-green-50" data-action="activate" data-user-id="${user.id}">
+                                <i class="ri-play-circle-line"></i>
+                            </button>`
+                            : `<button class="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-yellow-500 rounded-full hover:bg-yellow-50" data-action="suspend" data-user-id="${user.id}">
+                                <i class="ri-pause-circle-line"></i>
+                            </button>`
+                        }
+                        <button class="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-red-500 rounded-full hover:bg-red-50" data-action="delete" data-user-id="${user.id}">
+                            <i class="ri-delete-bin-line"></i>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+                        `;
+                    }
+                    subscriptionsTotalCountLabel.textContent = `of ${filtered.length} subscriptions`;
+                    if (window.dispatchEvent) window.dispatchEvent(new Event('DOMContentLoaded'));
+                }
+
+                function renderSubscriptionsPagination() {
+                    const filtered = getFilteredSubscriptions();
+                    const totalPages = Math.ceil(filtered.length / subscriptionsPageSize) || 1;
+                    let html = '';
+                    html += `<button class="pagination-item text-gray-500 hover:bg-gray-100" ${subscriptionsCurrentPage === 1 ? 'disabled' : ''} data-page="${subscriptionsCurrentPage - 1}">
+                        <i class="ri-arrow-left-s-line"></i>
+                    </button>`;
+                    let start = Math.max(1, subscriptionsCurrentPage - 2);
+                    let end = Math.min(totalPages, start + 4);
+                    if (end - start < 4) start = Math.max(1, end - 4);
+                    for (let i = start; i <= end; i++) {
+                        html += `<button class="pagination-item ${i === subscriptionsCurrentPage ? 'active' : 'text-gray-600 hover:bg-gray-100'}" data-page="${i}">${i}</button>`;
+                    }
+                    html += `<button class="pagination-item text-gray-500 hover:bg-gray-100" ${subscriptionsCurrentPage === totalPages ? 'disabled' : ''} data-page="${subscriptionsCurrentPage + 1}">
+                        <i class="ri-arrow-right-s-line"></i>
+                    </button>`;
+                    subscriptionsPaginationControls.innerHTML = html;
+                }
+
+                // Plan filter
+                subscriptionsPlanFilterSelect.addEventListener('change', function(e) {
+                    if (e.detail && e.detail.value) {
+                        subscriptionsPlanFilter = e.detail.value;
+                        subscriptionsCurrentPage = 1;
+                        renderSubscriptionsTable();
+                        renderSubscriptionsPagination();
+                    }
+                });
+
+                // Status filter
+                subscriptionsStatusFilterSelect.addEventListener('change', function(e) {
+                    if (e.detail && e.detail.value) {
+                        subscriptionsStatusFilter = e.detail.value;
+                        subscriptionsCurrentPage = 1;
+                        renderSubscriptionsTable();
+                        renderSubscriptionsPagination();
+                    }
+                });
+
+                // Page size
+                subscriptionsPageSizeSelect.addEventListener('change', function(e) {
+                    if (e.detail && e.detail.value) {
+                        subscriptionsPageSize = parseInt(e.detail.value, 10);
+                        subscriptionsCurrentPage = 1;
+                        renderSubscriptionsTable();
+                        renderSubscriptionsPagination();
+                    }
+                });
+
+                // Pagination click
+                subscriptionsPaginationControls.addEventListener('click', function(e) {
+                    const btn = e.target.closest('button[data-page]');
+                    if (btn && !btn.disabled) {
+                        const page = parseInt(btn.getAttribute('data-page'), 10);
+                        const filtered = getFilteredSubscriptions();
+                        const totalPages = Math.ceil(filtered.length / subscriptionsPageSize) || 1;
+                        if (page >= 1 && page <= totalPages) {
+                            subscriptionsCurrentPage = page;
+                            renderSubscriptionsTable();
+                            renderSubscriptionsPagination();
+                        }
+                    }
+                });
+
+                // Initial render
+                renderSubscriptionsTable();
+                renderSubscriptionsPagination();
+
+                // Listen for custom-select change events for plan/status filters (for fallback)
+                document.addEventListener('change', function(e) {
+                    if (e.target.closest('#subscription-plan-filter')) {
+                        const value = e.detail && e.detail.value ? e.detail.value : "all";
+                        subscriptionsPlanFilter = value;
+                        subscriptionsCurrentPage = 1;
+                        renderSubscriptionsTable();
+                        renderSubscriptionsPagination();
+                    }
+                    if (e.target.closest('#subscription-status-filter')) {
+                        const value = e.detail && e.detail.value ? e.detail.value : "all";
+                        subscriptionsStatusFilter = value;
+                        subscriptionsCurrentPage = 1;
+                        renderSubscriptionsTable();
+                        renderSubscriptionsPagination();
+                    }
+                });
+            })();
+            </script>
+        </div>
+
+        <!-- Wallets Tab -->
+        <div id="wallets-tab" class="tab-content hidden p-4 md:p-6">
+            <div class="mb-6">
+                <h1 class="text-2xl font-semibold text-gray-800">Wallet Management</h1>
+                <p class="text-sm text-gray-500 mt-1">Manage user wallets and platform wallet settings</p>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
+                <h2 class="text-lg font-medium text-gray-800 mb-4">Platform Wallet</h2>
+                <div class="flex flex-col md:flex-row gap-6">
+                    <div class="flex-1"></div>
+                        <div class="space-y-4">
+                            <div>
+                                <label for="wallet-name" class="block text-sm font-medium text-gray-700 mb-1">Wallet Name</label>
+                                <input type="text" id="wallet-name" class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary" value="Sales-Spy Wallet">
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label for="blockchain" class="block text-sm font-medium text-gray-700 mb-1">Blockchain</label>
+                                    <div class="custom-select" id="blockchain-select">
+                                        <div class="custom-select-trigger">
+                                            <div class="flex items-center">
+                                                <div class="w-5 h-5 flex items-center justify-center mr-2">
+                                                    <i class="ri-ethereum-line"></i>
+                                                </div>
+                                                <span>USDT</span>
+                                            </div>
+                                            <i class="ri-arrow-down-s-line ml-2"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label for="token-standard" class="block text-sm font-medium text-gray-700 mb-1">Token Standard</label>
+                                    <div class="custom-select" id="token-standard-select">
+                                        <div class="custom-select-trigger">
+                                            <span>ERC-20</span>
+                                            <i class="ri-arrow-down-s-line ml-2"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div>
+                                <label for="wallet-address" class="block text-sm font-medium text-gray-700 mb-1">Wallet Address</label>
+                                <div class="relative"></div>
+                                    <input type="text" id="wallet-address" class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary" value="TVTkZq3ghDZgF8txTdDM3s8g76XM2pgiey" readonly>
+                                    <button class="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-primary"></button>
+                                        <i class="ri-file-copy-line"></i>
+                                    </button>
+                                </div>
+                                <p class="mt-1 text-xs text-gray-500">This is the wallet address that will receive all payments from users.</p>
+                            </div>
+                            <div class="flex items-center justify-end space-x-3"></div>
+                                <button class="px-4 py-2 border border-gray-200 text-gray-600 rounded-button whitespace-nowrap hover:bg-gray-50"></button>
+                                    Cancel
+                                </button>
+                                <button class="px-4 py-2 bg-primary text-white rounded-button whitespace-nowrap"></button>
+                                    Save Changes
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex-1 flex flex-col items-center justify-center p-6 border border-gray-200 rounded-lg min-w-[260px]"></div>
+                        <div class="w-full flex justify-center"></div>
+                            <div class="w-48 h-48 max-w-full max-h-full bg-gray-100 rounded-lg flex items-center justify-center mb-4" style="aspect-ratio: 1;"></div>
+                                <div id="wallet-qr-code" class="w-full h-full flex items-center justify-center"></div>
+                            </div>
+                        </div>
+                        <p class="text-sm text-gray-500 text-center">QR Code for the wallet address</p>
+                        <button id="download-wallet-qr" class="mt-4 px-4 py-2 border border-gray-200 text-gray-600 rounded-button whitespace-nowrap hover:bg-gray-50 flex items-center"></button>
+                            <i class="ri-download-2-line mr-2"></i>
+                            Download QR
+                        </button>
+                    </div>
+            </div>
+
+            
+        </div>
+
+        <!-- Payments Tab -->
+        <div id="payments-tab" class="tab-content hidden p-4 md:p-6">
+            <div class="mb-6">
+                <h1 class="text-2xl font-semibold text-gray-800">Payment Transactions</h1>
+                <p class="text-sm text-gray-500 mt-1">Monitor and manage all crypto payment transactions</p>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-sm p-4 mb-6">
+                <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                    <div class="flex items-center gap-4">
+                        <div class="custom-select" id="transaction-date-filter">
+                            <div class="custom-select-trigger">
+                                <span>Last 7 days</span>
+                                <i class="ri-arrow-down-s-line ml-2"></i>
+                            </div>
+                            <div class="custom-select-options">
+                                <div class="custom-select-option" data-value="today">Today</div>
+                                <div class="custom-select-option" data-value="yesterday">Yesterday</div>
+                                <div class="custom-select-option" data-value="7days">Last 7 days</div>
+                                <div class="custom-select-option" data-value="30days">Last 30 days</div>
+                                <div class="custom-select-option" data-value="custom">Custom Range</div>
+                            </div>
+                        </div>
+                        <div class="custom-select" id="transaction-status-filter">
+                            <div class="custom-select-trigger">
+                                <span>All Status</span>
+                                <i class="ri-arrow-down-s-line ml-2"></i>
+                            </div>
+                            <div class="custom-select-options">
+                                <div class="custom-select-option" data-value="all">All Status</div>
+                                <div class="custom-select-option" data-value="success">Success</div>
+                                <div class="custom-select-option" data-value="pending">Pending</div>
+                                <div class="custom-select-option" data-value="failed">Failed</div>
+                            </div>
+                        </div>
+                        <div class="custom-select" id="transaction-token-filter">
+                            <div class="custom-select-trigger">
+                                <span>All Tokens</span>
+                                <i class="ri-arrow-down-s-line ml-2"></i>
+                            </div>
+                            <div class="custom-select-options">
+                                <div class="custom-select-option" data-value="all">All Tokens</div>
+                                <div class="custom-select-option" data-value="eth">ETH</div>
+                                <div class="custom-select-option" data-value="bnb">BNB</div>
+                                <div class="custom-select-option" data-value="matic">MATIC</div>
+                                <div class="custom-select-option" data-value="usdt">USDT</div>
+                                <div class="custom-select-option" data-value="usdc">USDC</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                                <i class="ri-search-line text-gray-400"></i>
+                            </div>
+                            <input type="text" id="transaction-search" class="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary" placeholder="Search transactions...">
+                        </div>
+                        <button class="px-4 py-2 bg-primary text-white rounded-button whitespace-nowrap flex items-center">
+                            <i class="ri-download-2-line mr-2"></i>
+                            Export
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead>
+                            <tr class="bg-gray-50">
+                                <th class="px-4 py-3 text-left">
+                                    <label class="custom-checkbox">
+                                        <input type="checkbox" id="select-all-transactions">
+                                        <span class="checkbox-mark"></span>
+                                    </label>
+                                </th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Transaction ID</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Plan</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Token</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-200">
+                            <tr>
+                                <td class="px-4 py-3 whitespace-nowrap">
+                                    <label class="custom-checkbox">
+                                        <input type="checkbox" class="transaction-checkbox">
+                                        <span class="checkbox-mark"></span>
+                                    </label>
+                                </td>
+                                <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-600">TX-25062501</td>
+                                <td class="px-4 py-3 whitespace-nowrap">
+                                    <div class="flex items-center">
+                                        <div class="w-8 h-8 rounded-full bg-blue-100 text-primary flex items-center justify-center">
+                                            <span class="text-sm font-medium">EB</span>
+                                        </div>
+                                        <div class="ml-3">
+                                            <p class="text-sm font-medium text-gray-800">Emma Brown</p>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-4 py-3 whitespace-nowrap">
+                                    <span class="px-2 py-1 text-xs font-medium bg-blue-50 text-primary rounded-full">Pro</span>
+                                </td>
+                                <td class="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-800">0.05 ETH</td>
+                                <td class="px-4 py-3 whitespace-nowrap">
+                                    <div class="flex items-center">
+                                        <div class="w-5 h-5 flex items-center justify-center mr-2">
+                                            <i class="ri-ethereum-line"></i>
+                                        </div>
+                                        <span class="text-sm text-gray-600">Ethereum</span>
+                                    </div>
+                                </td>
+                                <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-600">Jun 25, 2025 14:30</td>
+                                <td class="px-4 py-3 whitespace-nowrap">
+                                    <span class="px-2 py-1 text-xs font-medium bg-green-50 text-green-600 rounded-full">Success</span>
+                                </td>
+                                <td class="px-4 py-3 whitespace-nowrap text-right text-sm font-medium">
+                                    <div class="flex items-center justify-end space-x-2">
+                                        <button class="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-primary rounded-full hover:bg-blue-50">
+                                            <i class="ri-eye-line"></i>
+                                        </button>
+                                        <button class="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-green-500 rounded-full hover:bg-green-50">
+                                            <i class="ri-checkbox-circle-line"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="px-4 py-3 whitespace-nowrap">
+                                    <label class="custom-checkbox">
+                                        <input type="checkbox" class="transaction-checkbox">
+                                        <span class="checkbox-mark"></span>
+                                    </label>
+                                </td>
+                                <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-600">TX-25062502</td>
+                                <td class="px-4 py-3 whitespace-nowrap">
+                                    <div class="flex items-center">
+                                        <div class="w-8 h-8 rounded-full bg-green-100 text-green-600 flex items-center justify-center">
+                                            <span class="text-sm font-medium">RJ</span>
+                                        </div>
+                                        <div class="ml-3">
+                                            <p class="text-sm font-medium text-gray-800">Robert Johnson</p>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-4 py-3 whitespace-nowrap">
+                                    <span class="px-2 py-1 text-xs font-medium bg-purple-50 text-purple-600 rounded-full">Enterprise</span>
+                                </td>
+                                <td class="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-800">0.25 BNB</td>
+                                <td class="px-4 py-3 whitespace-nowrap">
+                                    <div class="flex items-center">
+                                        <div class="w-5 h-5 flex items-center justify-center mr-2">
+                                            <i class="ri-coin-line"></i>
+                                        </div>
+                                        <span class="text-sm text-gray-600">Binance Smart Chain</span>
+                                    </div>
+                                </td>
+                                <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-600">Jun 25, 2025 12:15</td>
+                                <td class="px-4 py-3 whitespace-nowrap">
+                                    <span class="px-2 py-1 text-xs font-medium bg-green-50 text-green-600 rounded-full">Success</span>
+                                </td>
+                                <td class="px-4 py-3 whitespace-nowrap text-right text-sm font-medium">
+                                    <div class="flex items-center justify-end space-x-2">
+                                        <button class="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-primary rounded-full hover:bg-blue-50">
+                                            <i class="ri-eye-line"></i>
+                                        </button>
+                                        <button class="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-green-500 rounded-full hover:bg-green-50">
+                                            <i class="ri-checkbox-circle-line"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="px-4 py-3 whitespace-nowrap">
+                                    <label class="custom-checkbox">
+                                        <input type="checkbox" class="transaction-checkbox">
+                                        <span class="checkbox-mark"></span>
+                                    </label>
+                                </td>
+                                <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-600">TX-25062503</td>
+                                <td class="px-4 py-3 whitespace-nowrap">
+                                    <div class="flex items-center">
+                                        <div class="w-8 h-8 rounded-full bg-red-100 text-red-600 flex items-center justify-center">
+                                            <span class="text-sm font-medium">DM</span>
+                                        </div>
+                                        <div class="ml-3">
+                                            <p class="text-sm font-medium text-gray-800">David Miller</p>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-4 py-3 whitespace-nowrap">
+                                    <span class="px-2 py-1 text-xs font-medium bg-blue-50 text-primary rounded-full">Pro</span>
+                                </td>
+                                <td class="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-800">50 USDT</td>
+                                <td class="px-4 py-3 whitespace-nowrap">
+                                    <div class="flex items-center">
+                                        <div class="w-5 h-5 flex items-center justify-center mr-2">
+                                            <i class="ri-coin-line"></i>
+                                        </div>
+                                        <span class="text-sm text-gray-600">USDT (ERC-20)</span>
+                                    </div>
+                                </td>
+                                <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-600">Jun 25, 2025 10:45</td>
+                                <td class="px-4 py-3 whitespace-nowrap">
+                                    <span class="px-2 py-1 text-xs font-medium bg-yellow-50 text-yellow-600 rounded-full">Pending</span>
+                                </td>
+                                <td class="px-4 py-3 whitespace-nowrap text-right text-sm font-medium">
+                                    <div class="flex items-center justify-end space-x-2">
+                                        <button class="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-primary rounded-full hover:bg-blue-50">
+                                            <i class="ri-eye-line"></i>
+                                        </button>
+                                        <button class="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-yellow-500 rounded-full hover:bg-yellow-50">
+                                            <i class="ri-refresh-line"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="px-4 py-3 whitespace-nowrap">
+                                    <label class="custom-checkbox">
+                                        <input type="checkbox" class="transaction-checkbox">
+                                        <span class="checkbox-mark"></span>
+                                    </label>
+                                </td>
+                                <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-600">TX-25062504</td>
+                                <td class="px-4 py-3 whitespace-nowrap">
+                                    <div class="flex items-center">
+                                        <div class="w-8 h-8 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center">
+                                            <span class="text-sm font-medium">JT</span>
+                                        </div>
+                                        <div class="ml-3">
+                                            <p class="text-sm font-medium text-gray-800">Jessica Thompson</p>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-4 py-3 whitespace-nowrap">
+                                    <span class="px-2 py-1 text-xs font-medium bg-gray-100 text-gray-600 rounded-full">Basic</span>
+                                </td>
+                                <td class="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-800">10 MATIC</td>
+                                <td class="px-4 py-3 whitespace-nowrap">
+                                    <div class="flex items-center">
+                                        <div class="w-5 h-5 flex items-center justify-center mr-2">
+                                            <i class="ri-shape-line"></i>
+                                        </div>
+                                        <span class="text-sm text-gray-600">Polygon</span>
+                                    </div>
+                                </td>
+                                <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-600">Jun 24, 2025 18:20</td>
+                                <td class="px-4 py-3 whitespace-nowrap">
+                                    <span class="px-2 py-1 text-xs font-medium bg-red-50 text-red-600 rounded-full">Failed</span>
+                                </td>
+                                <td class="px-4 py-3 whitespace-nowrap text-right text-sm font-medium">
+                                    <div class="flex items-center justify-end space-x-2">
+                                        <button class="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-primary rounded-full hover:bg-blue-50">
+                                            <i class="ri-eye-line"></i>
+                                        </button>
+                                        <button class="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-green-500 rounded-full hover:bg-green-50">
+                                            <i class="ri-refresh-line"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="px-4 py-3 whitespace-nowrap">
+                                    <label class="custom-checkbox">
+                                        <input type="checkbox" class="transaction-checkbox">
+                                        <span class="checkbox-mark"></span>
+                                    </label>
+                                </td>
+                                <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-600">TX-25062505</td>
+                                <td class="px-4 py-3 whitespace-nowrap">
+                                    <div class="flex items-center">
+                                        <div class="w-8 h-8 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center">
+                                            <span class="text-sm font-medium">SW</span>
+                                        </div>
+                                        <div class="ml-3">
+                                            <p class="text-sm font-medium text-gray-800">Sarah Wilson</p>
+                                            <p class="text-xs text-gray-500">sarah.w@example.com</p>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-4 py-3 whitespace-nowrap">
+                                    <span class="px-2 py-1 text-xs font-medium bg-gray-100 text-gray-600 rounded-full">Basic</span>
+                                </td>
+                                <td class="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-800">25 USDC</td>
+                                <td class="px-4 py-3 whitespace-nowrap">
+                                    <div class="flex items-center">
+                                        <div class="w-5 h-5 flex items-center justify-center mr-2">
+                                            <i class="ri-coin-line"></i>
+                                        </div>
+                                        <span class="text-sm text-gray-600">USDC (ERC-20)</span>
+                                    </div>
+                                </td>
+                                <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-600">Jun 24, 2025 15:10</td>
+                                <td class="px-4 py-3 whitespace-nowrap">
+                                    <span class="px-2 py-1 text-xs font-medium bg-green-50 text-green-600 rounded-full">Success</span>
+                                </td>
+                                <td class="px-4 py-3 whitespace-nowrap text-right text-sm font-medium">
+                                    <div class="flex items-center justify-end space-x-2">
+                                        <button class="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-primary rounded-full hover:bg-blue-50">
+                                            <i class="ri-eye-line"></i>
+                                        </button>
+                                        <button class="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-green-500 rounded-full hover:bg-green-50">
+                                            <i class="ri-checkbox-circle-line"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="px-4 py-3 flex items-center justify-between border-t">
+                    <div class="flex items-center text-sm text-gray-500">
+                        <span>Showing</span>
+                        <div class="custom-select mx-2" id="transaction-page-size-select">
+                            <div class="custom-select-trigger">
+                                <span>10</span>
+                                <i class="ri-arrow-down-s-line ml-1"></i>
+                            </div>
+                            <div class="custom-select-options">
+                                <div class="custom-select-option" data-value="10">10</div>
+                                <div class="custom-select-option" data-value="20">20</div>
+                                <div class="custom-select-option" data-value="50">50</div>
+                            </div>
+                        </div>
+                        <span>of 42 transactions</span>
+                    </div>
+                    <div class="flex items-center space-x-1">
+                        <button class="pagination-item text-gray-500 hover:bg-gray-100">
+                            <i class="ri-arrow-left-s-line"></i>
+                        </button>
+                        <button class="pagination-item active">1</button>
+                        <button class="pagination-item text-gray-600 hover:bg-gray-100">2</button>
+                        <button class="pagination-item text-gray-600 hover:bg-gray-100">3</button>
+                        <button class="pagination-item text-gray-600 hover:bg-gray-100">4</button>
+                        <button class="pagination-item text-gray-600 hover:bg-gray-100">5</button>
+                        <button class="pagination-item text-gray-500 hover:bg-gray-100">
+                            <i class="ri-arrow-right-s-line"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-6">
+                <h2 class="text-lg font-medium text-gray-800 mb-4">QR Payment Attempts</h2>
+                <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead>
+                                <tr class="bg-gray-50">
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Plan</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">QR Generated</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Scanned</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Payment Status</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Error</th>
+                                    <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-200">
+                                <tr>
+                                    <td class="px-4 py-3 whitespace-nowrap">
+                                        <div class="flex items-center">
+                                            <div class="w-8 h-8 rounded-full bg-blue-100 text-primary flex items-center justify-center">
+                                                <span class="text-sm font-medium">EB</span>
+                                            </div>
+                                            <div class="ml-3">
+                                                <p class="text-sm font-medium text-gray-800">Emma Brown</p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="px-4 py-3 whitespace-nowrap">
+                                        <span class="px-2 py-1 text-xs font-medium bg-blue-50 text-primary rounded-full">Pro</span>
+                                    </td>
+                                    <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-600">Jun 25, 2025 14:25</td>
+                                    <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-600">Jun 25, 2025 14:28</td>
+                                    <td class="px-4 py-3 whitespace-nowrap">
+                                        <span class="px-2 py-1 text-xs font-medium bg-green-50 text-green-600 rounded-full">Success</span>
+                                    </td>
+                                    <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-600">None</td>
+                                    <td class="px-4 py-3 whitespace-nowrap text-right text-sm font-medium">
+                                        <button class="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-primary rounded-full hover:bg-blue-50">
+                                            <i class="ri-eye-line"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="px-4 py-3 whitespace-nowrap">
+                                        <div class="flex items-center">
+                                            <div class="w-8 h-8 rounded-full bg-red-100 text-red-600 flex items-center justify-center">
+                                                <span class="text-sm font-medium">DM</span>
+                                            </div>
+                                            <div class="ml-3">
+                                                <p class="text-sm font-medium text-gray-800">David Miller</p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="px-4 py-3 whitespace-nowrap">
+                                        <span class="px-2 py-1 text-xs font-medium bg-blue-50 text-primary rounded-full">Pro</span>
+                                    </td>
+                                    <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-600">Jun 25, 2025 10:40</td>
+                                    <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-600">Jun 25, 2025 10:42</td>
+                                    <td class="px-4 py-3 whitespace-nowrap">
+                                        <span class="px-2 py-1 text-xs font-medium bg-yellow-50 text-yellow-600 rounded-full">Pending</span>
+                                    </td>
+                                    <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-600">None</td>
+                                    <td class="px-4 py-3 whitespace-nowrap text-right text-sm font-medium">
+                                        <button class="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-primary rounded-full hover:bg-blue-50">
+                                            <i class="ri-eye-line"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="px-4 py-3 whitespace-nowrap">
+                                        <div class="flex items-center">
+                                            <div class="w-8 h-8 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center">
+                                                <span class="text-sm font-medium">JT</span>
+                                            </div>
+                                            <div class="ml-3">
+                                                <p class="text-sm font-medium text-gray-800">Jessica Thompson</p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="px-4 py-3 whitespace-nowrap">
+                                        <span class="px-2 py-1 text-xs font-medium bg-gray-100 text-gray-600 rounded-full">Basic</span>
+                                    </td>
+                                    <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-600
+                                    <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-600">Jun 24, 2025 18:18</td>
+                                    <td class="px-4 py-3 whitespace-nowrap">
+                                        <span class="px-2 py-1 text-xs font-medium bg-red-50 text-red-600 rounded-full">Failed</span>
+                                    </td>
+                                    <td class="px-4 py-3 whitespace-nowrap text-sm text-red-600">Invalid token address</td>
+                                    <td class="px-4 py-3 whitespace-nowrap text-right text-sm font-medium">
+                                        <button class="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-primary rounded-full hover:bg-blue-50">
+                                            <i class="ri-eye-line"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Settings Tab -->
+        <div id="settings-tab" class="tab-content hidden p-4 md:p-6">
+            <div class="mb-6">
+                <h1 class="text-2xl font-semibold text-gray-800">Platform Settings</h1>
+                <p class="text-sm text-gray-500 mt-1">Manage platform settings and configurations</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="md:col-span-2 space-y-6">
+                    <div class="bg-white rounded-lg shadow-sm p-6">
+                        <h2 class="text-lg font-medium text-gray-800 mb-4">Branding</h2>
+                        <div class="space-y-4">
+                          <div>
+                            <label for="platform-name" class="block text-sm font-medium text-gray-700 mb-1">Platform Name</label>
+                            <input type="text" id="platform-name" class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary" value="CryptoAdmin Dashboard">
+                          </div>
+                          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label for="blockchain" class="block text-sm font-medium text-gray-700 mb-1">Blockchain</label>
+                                    <div class="custom-select" id="blockchain-select">
+                                        <div class="custom-select-trigger">
+                                            <div class="flex items-center">
+                                                <div class="w-5 h-5 flex items-center justify-center mr-2">
+                                                    <i class="ri-ethereum-line"></i>
+                                                </div>
+                                                <span>Ethereum</span>
+                                            </div>
+                                            <i class="ri-arrow-down-s-line ml-2"></i>
+                                        </div>
+                                        <div class="custom-select-options">
+                                            <div class="custom-select-option" data-value="ethereum">
+                                                <div class="flex items-center">
+                                                    <div class="w-5 h-5 flex items-center justify-center mr-2">
+                                                        <i class="ri-ethereum-line"></i>
+                                                    </div>
+                                                    <span>Ethereum</span>
+                                                </div>
+                                            </div>
+                                            <div class="custom-select-option" data-value="binance">
+                                                <div class="flex items-center">
+                                                    <div class="w-5 h-5 flex items-center justify-center mr-2">
+                                                        <i class="ri-coin-line"></i>
+                                                    </div>
+                                                    <span>Binance Smart Chain</span>
+                                                </div>
+                                            </div>
+                                            <div class="custom-select-option" data-value="polygon">
+                                                <div class="flex items-center">
+                                                    <div class="w-5 h-5 flex items-center justify-center mr-2">
+                                                        <i class="ri-shape-line"></i>
+                                                    </div>
+                                                    <span>Polygon</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label for="token-standard" class="block text-sm font-medium text-gray-700 mb-1">Token Standard</label>
+                                    <div class="custom-select" id="token-standard-select">
+                                        <div class="custom-select-trigger">
+                                            <span>ERC-20</span>
+                                            <i class="ri-arrow-down-s-line ml-2"></i>
+                                        </div>
+                                        <div class="custom-select-options">
+                                            <div class="custom-select-option" data-value="erc20">ERC-20</div>
+                                            <div class="custom-select-option" data-value="bep20">BEP-20</div>
+                                            <div class="custom-select-option" data-value="erc721">ERC-721</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div>
+                                <label for="wallet-address" class="block text-sm font-medium text-gray-700 mb-1">Wallet Address</label>
+                                <div class="relative">
+                                    <input type="text" id="wallet-address" class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary" value="0x71C7656EC7ab88b098defB751B7401B5f6d8976F">
+                                    <button class="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-primary">
+                                        <i class="ri-file-copy-line"></i>
+                                    </button>
+                                </div>
+                                <p class="mt-1 text-xs text-gray-500">This is the wallet address that will receive all payments from users.</p>
+                            </div>
+                            <div class="flex items-center justify-end space-x-3">
+                                <button class="px-4 py-2 border border-gray-200 text-gray-600 rounded-button whitespace-nowrap hover:bg-gray-50">
+                                    Cancel
+                                </button>
+                                <button class="px-4 py-2 bg-primary text-white rounded-button whitespace-nowrap">
+                                    Save Changes
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-lg shadow-sm p-6">
+                        <h2 class="text-lg font-medium text-gray-800 mb-4">Payment Settings</h2>
+                        <div class="space-y-4">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-sm font-medium text-gray-800">Enable Crypto-Only Payments</p>
+                                    <p class="text-xs text-gray-500">If enabled, users can only pay with cryptocurrency.</p>
+                                </div>
+                                <label class="custom-switch">
+                                    <input type="checkbox" checked>
+                                    <span class="switch-slider"></span>
+                                </label>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-sm font-medium text-gray-800">Allow Multiple Wallets Per User</p>
+                                    <p class="text-xs text-gray-500">If enabled, users can connect multiple wallets to their account.</p>
+                                </div>
+                                <label class="custom-switch">
+                                    <input type="checkbox" checked>
+                                    <span class="switch-slider"></span>
+                                </label>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-sm font-medium text-gray-800">Require Wallet Verification</p>
+                                    <p class="text-xs text-gray-500">If enabled, wallet addresses must be verified before use.</p>
+                                </div>
+                                <label class="custom-switch">
+                                    <input type="checkbox">
+                                    <span class="switch-slider"></span>
+                                </label>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Accepted Tokens</label>
+                                <div class="space-y-2">
+                                    <div class="flex items-center">
+                                        <label class="custom-checkbox">
+                                            <input type="checkbox" checked>
+                                            <span class="checkbox-mark"></span>
+                                        </label>
+                                        <div class="ml-2 flex items-center">
+                                            <div class="w-5 h-5 flex items-center justify-center mr-2">
+                                                <i class="ri-ethereum-line"></i>
+                                            </div>
+                                            <span class="text-sm text-gray-600">Ethereum (ETH)</span>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <label class="custom-checkbox">
+                                            <input type="checkbox" checked>
+                                            <span class="checkbox-mark"></span>
+                                        </label>
+                                        <div class="ml-2 flex items-center">
+                                            <div class="w-5 h-5 flex items-center justify-center mr-2">
+                                                <i class="ri-coin-line"></i>
+                                            </div>
+                                            <span class="text-sm text-gray-600">Binance Coin (BNB)</span>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <label class="custom-checkbox">
+                                            <input type="checkbox" checked>
+                                            <span class="checkbox-mark"></span>
+                                        </label>
+                                        <div class="ml-2 flex items-center">
+                                            <div class="w-5 h-5 flex items-center justify-center mr-2">
+                                                <i class="ri-shape-line"></i>
+                                            </div>
+                                            <span class="text-sm text-gray-600">Polygon (MATIC)</span>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <label class="custom-checkbox">
+                                            <input type="checkbox" checked>
+                                            <span class="checkbox-mark"></span>
+                                        </label>
+                                        <div class="ml-2 flex items-center">
+                                            <div class="w-5 h-5 flex items-center justify-center mr-2">
+                                                <i class="ri-coin-line"></i>
+                                            </div>
+                                            <span class="text-sm text-gray-600">USD Tether (USDT)</span>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <label class="custom-checkbox">
+                                            <input type="checkbox" checked>
+                                            <span class="checkbox-mark"></span>
+                                        </label>
+                                        <div class="ml-2 flex items-center">
+                                            <div class="w-5 h-5 flex items-center justify-center mr-2">
+                                                <i class="ri-coin-line"></i>
+                                            </div>
+                                            <span class="text-sm text-gray-600">USD Coin (USDC)</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-lg shadow-sm p-6">
+                        <h2 class="text-lg font-medium text-gray-800 mb-4">Email Notifications</h2>
+                        <div class="space-y-4">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-sm font-medium text-gray-800">Payment Success</p>
+                                    <p class="text-xs text-gray-500">Send email when a payment is successful.</p>
+                                </div>
+                                <label class="custom-switch">
+                                    <input type="checkbox" checked>
+                                    <span class="switch-slider"></span>
+                                </label>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-sm font-medium text-gray-800">Payment Failed</p>
+                                    <p class="text-xs text-gray-500">Send email when a payment fails.</p>
+                                </div>
+                                <label class="custom-switch">
+                                    <input type="checkbox" checked>
+                                    <span class="switch-slider"></span>
+                                </label>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-sm font-medium text-gray-800">Subscription Renewal</p>
+                                    <p class="text-xs text-gray-500">Send email before subscription renewal.</p>
+                                </div>
+                                <label class="custom-switch">
+                                    <input type="checkbox" checked>
+                                    <span class="switch-slider"></span>
+                                </label>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-sm font-medium text-gray-800">Wallet Connection</p>
+                                    <p class="text-xs text-gray-500">Send email when a new wallet is connected.</p>
+                                </div>
+                                <label class="custom-switch">
+                                    <input type="checkbox">
+                                    <span class="switch-slider"></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="space-y-6">
+                    <div class="bg-white rounded-lg shadow-sm p-6">
+                        <h2 class="text-lg font-medium text-gray-800 mb-4">System Settings</h2>
+                        <div class="space-y-4">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-sm font-medium text-gray-800">Maintenance Mode</p>
+                                    <p class="text-xs text-gray-500">Put the platform in maintenance mode.</p>
+                                </div>
+                                <label class="custom-switch">
+                                    <input type="checkbox">
+                                    <span class="switch-slider"></span>
+                                </label>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-sm font-medium text-gray-800">User Registration</p>
+                                    <p class="text-xs text-gray-500">Allow new user registrations.</p>
+                                </div>
+                                <label class="custom-switch">
+                                    <input type="checkbox" checked>
+                                    <span class="switch-slider"></span>
+                                </label>
+                            </div>
+                            <div>
+                                <label for="session-timeout" class="block text-sm font-medium text-gray-700 mb-1">Admin Session Timeout (minutes)</label>
+                                <input type="number" id="session-timeout" class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary" value="30">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-lg shadow-sm p-6">
+                        <h2 class="text-lg font-medium text-gray-800 mb-4">Security</h2>
+                        <div class="space-y-4">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-sm font-medium text-gray-800">Two-Factor Authentication</p>
+                                    <p class="text-xs text-gray-500">Require 2FA for admin login.</p>
+                                </div>
+                                <label class="custom-switch">
+                                    <input type="checkbox" checked>
+                                    <span class="switch-slider"></span>
+                                </label>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-sm font-medium text-gray-800">IP Restriction</p>
+                                    <p class="text-xs text-gray-500">Restrict admin access to specific IPs.</p>
+                                </div>
+                                <label class="custom-switch">
+                                    <input type="checkbox">
+                                    <span class="switch-slider"></span>
+                                </label>
+                            </div>
+                            <div>
+                                <button class="w-full px-4 py-2 border border-gray-200 text-gray-600 rounded-button whitespace-nowrap hover:bg-gray-50 flex items-center justify-center">
+                                    <i class="ri-lock-password-line mr-2"></i>
+                                    Change Admin Password
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-lg shadow-sm p-6">
+                        <h2 class="text-lg font-medium text-gray-800 mb-4">Admin Activity Log</h2>
+                        <div class="space-y-3">
+                            <div class="border-l-2 border-primary pl-3">
+                                <p class="text-sm font-medium text-gray-800">User suspended</p>
+                                <p class="text-xs text-gray-500">Jun 25, 2025 10:30 AM</p>
+                            </div>
+                            <div class="border-l-2 border-primary pl-3">
+                                <p class="text-sm font-medium text-gray-800">Wallet settings updated</p>
+                                <p class="text-xs text-gray-500">Jun 24, 2025 3:45 PM</p>
+                            </div>
+                            <div class="border-l-2 border-primary pl-3">
+                                <p class="text-sm font-medium text-gray-800">Subscription plan modified</p>
+                                <p class="text-xs text-gray-500">Jun 23, 2025 11:20 AM</p>
+                            </div>
+                            <div class="mt-4">
+                                <button class="w-full px-4 py-2 border border-gray-200 text-gray-600 rounded-button whitespace-nowrap hover:bg-gray-50">
+                                    View Full Log
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-6 flex justify-end">
+                <div class="flex items-center space-x-3">
+                    <button class="px-4 py-2 border border-gray-200 text-gray-600 rounded-button whitespace-nowrap hover:bg-gray-50">
+                        Reset to Defaults
+                    </button>
+                    <button class="px-4 py-2 bg-primary text-white rounded-button whitespace-nowrap">
+                        Save All Changes
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modals -->
+    <div id="view-user-modal" class="modal">
+        <div class="modal-content">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-medium text-gray-800">User Details</h3>
+                <button class="modal-close text-gray-400 hover:text-gray-500">
+                    <i class="ri-close-line ri-lg"></i>
+                </button>
+            </div>
+            <div class="space-y-4">
+                <div class="flex items-center">
+                    <div class="w-16 h-16 rounded-full bg-blue-100 text-primary flex items-center justify-center">
+                        <span class="text-xl font-medium">EB</span>
+                    </div>
+                    <div class="ml-4">
+                        <h4 class="text-xl font-medium text-gray-800">Emma Brown</h4>
+                        <p class="text-sm text-gray-500">emma.brown@example.com</p>
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <p class="text-sm text-gray-500">Subscription</p>
+                        <p class="text-sm font-medium text-gray-800">Pro Plan</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500">Status</p>
+                        <p class="text-sm font-medium text-green-600">Active</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500">Joined</p>
+                        <p class="text-sm font-medium text-gray-800">Jun 12, 2025</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500">Wallet</p>
+                        <p class="text-sm font-medium text-green-600">Connected</p>
+                    </div>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-500">Wallet Address</p>
+                    <div class="flex items-center mt-1">
+                        <p class="text-sm font-medium text-gray-800 truncate">0x71C7656EC7ab88b098defB751B7401B5f6d8976F</p>
+                        <button class="ml-2 text-gray-400 hover:text-primary">
+                            <i class="ri-file-copy-line"></i>
+                        </button>
+                    </div>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-500">Recent Transactions</p>
+                    <div class="mt-2 space-y-2">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center">
+                                <div class="w-8 h-8 rounded-full bg-green-100 text-green-600 flex items-center justify-center">
+                                    <i class="ri-arrow-down-line"></i>
+                                </div>
+                                <div class="ml-3">
+                                    <p class="text-sm font-medium text-gray-800">Pro Plan Subscription</p>
+                                    <p class="text-xs text-gray-500">Jun 25, 2025</p>
+                                </div>
+                            </div>
+                            <p class="text-sm font-medium text-gray-800">0.05 ETH</p>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center">
+                                <div class="w-8 h-8 rounded-full bg-green-100 text-green-600 flex items-center justify-center">
+                                    <i class="ri-arrow-down-line"></i>
+                                </div>
+                                <div class="ml-3">
+                                    <p class="text-sm font-medium text-gray-800">Pro Plan Subscription</p>
+                                    <p class="text-xs text-gray-500">May 25, 2025</p>
+                                </div>
+                            </div>
+                            <p class="text-sm font-medium text-gray-800">0.05 ETH</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex items-center justify-end space-x-3 pt-4 border-t">
+                    <button class="px-4 py-2 border border-gray-200 text-gray-600 rounded-button whitespace-nowrap hover:bg-gray-50 modal-close">
+                        Close
+                    </button>
+                                    <td class="px-4 py-3 whitespace-nowrap">
+                                        <span class="px-2 py-1 text-xs font-medium bg-gray-100 text-gray-600 rounded-full">Basic</span>
+                                    </td>
+                                    <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-600">Jun 24, 2025 18:15</td>
+                                    <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-600">Jun 24, 2025 18:18</td>
+                                    <td class="px-4 py-3 whitespace-nowrap">
+                                        <span class="px-2 py-1 text-xs font-medium bg-red-50 text-red-600 rounded-full">Failed</span>
+                                    </td>
+                                    <td class="px-4 py-3 whitespace-nowrap text-sm text-red-600">Invalid token address</td>
+                                    <td class="px-4 py-3 whitespace-nowrap text-right text-sm font-medium">
+                                        <button class="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-primary rounded-full hover:bg-blue-50">
+                                            <i class="ri-eye-line"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Settings Tab -->
+        <div id="settings-tab" class="tab-content hidden p-4 md:p-6">
+            <div class="mb-6">
+                <h1 class="text-2xl font-semibold text-gray-800">Platform Settings</h1>
+                <p class="text-sm text-gray-500 mt-1">Manage platform settings and configurations</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="md:col-span-2 space-y-6">
+                    <div class="bg-white rounded-lg shadow-sm p-6">
+                        <h2 class="text-lg font-medium text-gray-800 mb-4">Branding</h2>
+                        <div class="space-y-4">
+                          <div>
+                            <label for="platform-name" class="block text-sm font-medium text-gray-700 mb-1">Platform Name</label>
+                            <input type="text" id="platform-name" class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary" value="CryptoAdmin Dashboard">
+                          </div>
+                          <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Platform Logo</label>
+                            <div class="flex items-center">
+                              <div class="w-16 h-16 rounded-lg bg-gray-100 flex items-center justify-center mr-4 overflow-hidden">
+                                <img
+                                  src="https://res.cloudinary.com/dtrn8j0sz/image/upload/v1749075914/SS_s4jkfw.jpg"
+                                  alt="Logo"
+                                  id="sidebar-logo-img"
+                                   class="w-full h-full object-contain"
+                                />
+                              </div>
+                              <div>
+                                <button class="px-4 py-2 border border-gray-200 text-gray-600 rounded-button whitespace-nowrap hover:bg-gray-50 mb-2">
+                                  Upload New Logo
+                                </button>
+                                <p class="text-xs text-gray-500">Recommended size: 512x512px. Max file size: 2MB.</p>
+                              </div>
+                            </div>
+                          </div>
+                          <div>
+                            <label for="favicon" class="block text-sm font-medium text-gray-700 mb-1">Favicon</label>
+                            <div class="flex items-center">
+                                    <div class="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center mr-4">
+                                       <img
+              src="https://res.cloudinary.com/dtrn8j0sz/image/upload/v1749075914/SS_s4jkfw.jpg"
+              alt="Logo"
+              id="sidebar-logo-img"
+              
+               class="w-full h-full object-contain"
+            />
+                                    </div>
+                                    <div>
+                                        <button class="px-4 py-2 border border-gray-200 text-gray-600 rounded-button whitespace-nowrap hover:bg-gray-50 mb-2">
+                                            Upload New Favicon
+                                        </button>
+                                        <p class="text-xs text-gray-500">Recommended size: 32x32px. Max file size: 1MB.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-lg shadow-sm p-6">
+                        <h2 class="text-lg font-medium text-gray-800 mb-4">Payment Settings</h2>
+                        <div class="space-y-4">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-sm font-medium text-gray-800">Enable Crypto-Only Payments</p>
+                                    <p class="text-xs text-gray-500">If enabled, users can only pay with cryptocurrency.</p>
+                                </div>
+                                <label class="custom-switch">
+                                    <input type="checkbox" checked>
+                                    <span class="switch-slider"></span>
+                                </label>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-sm font-medium text-gray-800">Allow Multiple Wallets Per User</p>
+                                    <p class="text-xs text-gray-500">If enabled, users can connect multiple wallets to their account.</p>
+                                </div>
+                                <label class="custom-switch">
+                                    <input type="checkbox" checked>
+                                    <span class="switch-slider"></span>
+                                </label>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-sm font-medium text-gray-800">Require Wallet Verification</p>
+                                    <p class="text-xs text-gray-500">If enabled, wallet addresses must be verified before use.</p>
+                                </div>
+                                <label class="custom-switch">
+                                    <input type="checkbox">
+                                    <span class="switch-slider"></span>
+                                </label>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Accepted Tokens</label>
+                                <div class="space-y-2">
+                                    <div class="flex items-center">
+                                        <label class="custom-checkbox">
+                                            <input type="checkbox" checked>
+                                            <span class="checkbox-mark"></span>
+                                        </label>
+                                        <div class="ml-2 flex items-center">
+                                            <div class="w-5 h-5 flex items-center justify-center mr-2">
+                                                <i class="ri-ethereum-line"></i>
+                                            </div>
+                                            <span class="text-sm text-gray-600">Ethereum (ETH)</span>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <label class="custom-checkbox">
+                                            <input type="checkbox" checked>
+                                            <span class="checkbox-mark"></span>
+                                        </label>
+                                        <div class="ml-2 flex items-center">
+                                            <div class="w-5 h-5 flex items-center justify-center mr-2">
+                                                <i class="ri-coin-line"></i>
+                                            </div>
+                                            <span class="text-sm text-gray-600">Binance Coin (BNB)</span>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <label class="custom-checkbox">
+                                            <input type="checkbox" checked>
+                                            <span class="checkbox-mark"></span>
+                                        </label>
+                                        <div class="ml-2 flex items-center">
+                                            <div class="w-5 h-5 flex items-center justify-center mr-2">
+                                                <i class="ri-shape-line"></i>
+                                            </div>
+                                            <span class="text-sm text-gray-600">Polygon (MATIC)</span>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <label class="custom-checkbox">
+                                            <input type="checkbox" checked>
+                                            <span class="checkbox-mark"></span>
+                                        </label>
+                                        <div class="ml-2 flex items-center">
+                                            <div class="w-5 h-5 flex items-center justify-center mr-2">
+                                                <i class="ri-coin-line"></i>
+                                            </div>
+                                            <span class="text-sm text-gray-600">USD Tether (USDT)</span>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <label class="custom-checkbox">
+                                            <input type="checkbox" checked>
+                                            <span class="checkbox-mark"></span>
+                                        </label>
+                                        <div class="ml-2 flex items-center">
+                                            <div class="w-5 h-5 flex items-center justify-center mr-2">
+                                                <i class="ri-coin-line"></i>
+                                            </div>
+                                            <span class="text-sm text-gray-600">USD Coin (USDC)</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-lg shadow-sm p-6">
+                        <h2 class="text-lg font-medium text-gray-800 mb-4">Email Notifications</h2>
+                        <div class="space-y-4">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-sm font-medium text-gray-800">Payment Success</p>
+                                    <p class="text-xs text-gray-500">Send email when a payment is successful.</p>
+                                </div>
+                                <label class="custom-switch">
+                                    <input type="checkbox" checked>
+                                    <span class="switch-slider"></span>
+                                </label>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-sm font-medium text-gray-800">Payment Failed</p>
+                                    <p class="text-xs text-gray-500">Send email when a payment fails.</p>
+                                </div>
+                                <label class="custom-switch">
+                                    <input type="checkbox" checked>
+                                    <span class="switch-slider"></span>
+                                </label>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-sm font-medium text-gray-800">Subscription Renewal</p>
+                                    <p class="text-xs text-gray-500">Send email before subscription renewal.</p>
+                                </div>
+                                <label class="custom-switch">
+                                    <input type="checkbox" checked>
+                                    <span class="switch-slider"></span>
+                                </label>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-sm font-medium text-gray-800">Wallet Connection</p>
+                                    <p class="text-xs text-gray-500">Send email when a new wallet is connected.</p>
+                                </div>
+                                <label class="custom-switch">
+                                    <input type="checkbox">
+                                    <span class="switch-slider"></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="space-y-6">
+                    <div class="bg-white rounded-lg shadow-sm p-6">
+                        <h2 class="text-lg font-medium text-gray-800 mb-4">System Settings</h2>
+                        <div class="space-y-4">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-sm font-medium text-gray-800">Maintenance Mode</p>
+                                    <p class="text-xs text-gray-500">Put the platform in maintenance mode.</p>
+                                </div>
+                                <label class="custom-switch">
+                                    <input type="checkbox">
+                                    <span class="switch-slider"></span>
+                                </label>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-sm font-medium text-gray-800">User Registration</p>
+                                    <p class="text-xs text-gray-500">Allow new user registrations.</p>
+                                </div>
+                                <label class="custom-switch">
+                                    <input type="checkbox" checked>
+                                    <span class="switch-slider"></span>
+                                </label>
+                            </div>
+                            <div>
+                                <label for="session-timeout" class="block text-sm font-medium text-gray-700 mb-1">Admin Session Timeout (minutes)</label>
+                                <input type="number" id="session-timeout" class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary" value="30">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-lg shadow-sm p-6">
+                        <h2 class="text-lg font-medium text-gray-800 mb-4">Security</h2>
+                        <div class="space-y-4">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-sm font-medium text-gray-800">Two-Factor Authentication</p>
+                                    <p class="text-xs text-gray-500">Require 2FA for admin login.</p>
+                                </div>
+                                <label class="custom-switch">
+                                    <input type="checkbox" checked>
+                                    <span class="switch-slider"></span>
+                                </label>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-sm font-medium text-gray-800">IP Restriction</p>
+                                    <p class="text-xs text-gray-500">Restrict admin access to specific IPs.</p>
+                                </div>
+                                <label class="custom-switch">
+                                    <input type="checkbox">
+                                    <span class="switch-slider"></span>
+                                </label>
+                            </div>
+                            <div>
+                                <button class="w-full px-4 py-2 border border-gray-200 text-gray-600 rounded-button whitespace-nowrap hover:bg-gray-50 flex items-center justify-center">
+                                    <i class="ri-lock-password-line mr-2"></i>
+                                    Change Admin Password
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-lg shadow-sm p-6">
+                        <h2 class="text-lg font-medium text-gray-800 mb-4">Admin Activity Log</h2>
+                        <div class="space-y-3">
+                            <div class="border-l-2 border-primary pl-3">
+                                <p class="text-sm font-medium text-gray-800">User suspended</p>
+                                <p class="text-xs text-gray-500">Jun 25, 2025 10:30 AM</p>
+                            </div>
+                            <div class="border-l-2 border-primary pl-3">
+                                <p class="text-sm font-medium text-gray-800">Wallet settings updated</p>
+                                <p class="text-xs text-gray-500">Jun 24, 2025 3:45 PM</p>
+                            </div>
+                            <div class="border-l-2 border-primary pl-3">
+                                <p class="text-sm font-medium text-gray-800">Subscription plan modified</p>
+                                <p class="text-xs text-gray-500">Jun 23, 2025 11:20 AM</p>
+                            </div>
+                            <div class="mt-4">
+                                <button class="w-full px-4 py-2 border border-gray-200 text-gray-600 rounded-button whitespace-nowrap hover:bg-gray-50">
+                                    View Full Log
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-6 flex justify-end">
+                <div class="flex items-center space-x-3">
+                    <button class="px-4 py-2 border border-gray-200 text-gray-600 rounded-button whitespace-nowrap hover:bg-gray-50">
+                        Reset to Defaults
+                    </button>
+                    <button class="px-4 py-2 bg-primary text-white rounded-button whitespace-nowrap">
+                        Save All Changes
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modals -->
+    <div id="view-user-modal" class="modal">
+        <div class="modal-content">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-medium text-gray-800">User Details</h3>
+                <button class="modal-close text-gray-400 hover:text-gray-500">
+                    <i class="ri-close-line ri-lg"></i>
+                </button>
+            </div>
+            <div class="space-y-4">
+                <div class="flex items-center">
+                    <div class="w-16 h-16 rounded-full bg-blue-100 text-primary flex items-center justify-center">
+                        <span class="text-xl font-medium">EB</span>
+                    </div>
+                    <div class="ml-4">
+                        <h4 class="text-xl font-medium text-gray-800">Emma Brown</h4>
+                        <p class="text-sm text-gray-500">emma.brown@example.com</p>
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <p class="text-sm text-gray-500">Subscription</p>
+                        <p class="text-sm font-medium text-gray-800">Pro Plan</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500">Status</p>
+                        <p class="text-sm font-medium text-green-600">Active</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500">Joined</p>
+                        <p class="text-sm font-medium text-gray-800">Jun 12, 2025</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500">Wallet</p>
+                        <p class="text-sm font-medium text-green-600">Connected</p>
+                    </div>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-500">Wallet Address</p>
+                    <div class="flex items-center mt-1">
+                        <p class="text-sm font-medium text-gray-800 truncate">0x71C7656EC7ab88b098defB751B7401B5f6d8976F</p>
+                        <button class="ml-2 text-gray-400 hover:text-primary">
+                            <i class="ri-file-copy-line"></i>
+                        </button>
+                    </div>
+                </div>
+                <div>
+                    <p class="text-sm text-gray-500">Recent Transactions</p>
+                    <div class="mt-2 space-y-2">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center">
+                                <div class="w-8 h-8 rounded-full bg-green-100 text-green-600 flex items-center justify-center">
+                                    <i class="ri-arrow-down-line"></i>
+                                </div>
+                                <div class="ml-3">
+                                    <p class="text-sm font-medium text-gray-800">Pro Plan Subscription</p>
+                                    <p class="text-xs text-gray-500">Jun 25, 2025</p>
+                                </div>
+                            </div>
+                            <p class="text-sm font-medium text-gray-800">0.05 ETH</p>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center">
+                                <div class="w-8 h-8 rounded-full bg-green-100 text-green-600 flex items-center justify-center">
+                                    <i class="ri-arrow-down-line"></i>
+                                </div>
+                                <div class="ml-3">
+                                    <p class="text-sm font-medium text-gray-800">Pro Plan Subscription</p>
+                                    <p class="text-xs text-gray-500">May 25, 2025</p>
+                                </div>
+                            </div>
+                            <p class="text-sm font-medium text-gray-800">0.05 ETH</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex items-center justify-end space-x-3 pt-4 border-t">
+                    <button class="px-4 py-2 border border-gray-200 text-gray-600 rounded-button whitespace-nowrap hover:bg-gray-50 modal-close">
+                        Close
+                    </button>
+                    <button class="px-4 py-2 border border-yellow-200 text-yellow-600 rounded-button whitespace-nowrap hover:bg-yellow-50">
+                        Suspend User
+                    </button>
+                    <button class="px-4 py-2 border border-red-200 text-red-600 rounded-button whitespace-nowrap hover:bg-red-50">
+                        Delete User
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="delete-user-modal" class="modal">
+        <div class="modal-content">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-medium text-gray-800">Delete User</h3>
+                <button class="modal-close text-gray-400 hover:text-gray-500">
+                    <i class="ri-close-line ri-lg"></i>
+                </button>
+            </div>
+            <div class="space-y-4">
+                <div class="flex items-center">
+                    <div class="w-12 h-12 rounded-full bg-red-100 text-red-600 flex items-center justify-center">
+                        <i class="ri-delete-bin-line ri-lg"></i>
+                    </div>
+                    <div class="ml-4">
+                        <h4 class="text-lg font-medium text-gray-800">Are you sure you want to delete this user?</h4>
+                        <p class="text-sm text-gray-500">This action cannot be undone. All user data, subscriptions, and wallet information will be permanently removed.</p>
+                    </div>
+                </div>
+                <div class="bg-yellow-50 p-4 rounded-lg">
+                    <div class="flex">
+                        <div class="flex-shrink-0">
+                            <i class="ri-error-warning-line text-yellow-600"></i>
+                        </div>
+                        <div class="ml-3">
+                            <h3 class="text-sm font-medium text-yellow-800">Warning</h3>
+                            <div class="mt-2 text-sm text-yellow-700">
+                                <p>Deleting a user with active subscriptions may result in payment issues. Consider suspending the user instead.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <label for="delete-confirmation" class="block text-sm font-medium text-gray-700 mb-1">Type "DELETE" to confirm</label>
+                    <input type="text" id="delete-confirmation" class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary" placeholder="DELETE">
+                </div>
+                <div class="flex items-center justify-end space-x-3 pt-4 border-t">
+                    <button class="px-4 py-2 border border-gray-200 text-gray-600 rounded-button whitespace-nowrap hover:bg-gray-50 modal-close">
+                        Cancel
+                    </button>
+                    <button class="px-4 py-2 bg-red-600 text-white rounded-button whitespace-nowrap">
+                        Delete User
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="suspend-user-modal" class="modal">
+        <div class="modal-content">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-medium text-gray-800">Suspend User</h3>
+                <button class="modal-close text-gray-400 hover:text-gray-500">
+                    <i class="ri-close-line ri-lg"></i>
+                </button>
+            </div>
+            <div class="space-y-4">
+                <div class="flex items-center">
+                    <div class="w-12 h-12 rounded-full bg-yellow-100 text-yellow-600 flex items-center justify-center">
+                        <i class="ri-pause-circle-line ri-lg"></i>
+                    </div>
+                    <div class="ml-4">
+                        <h4 class="text-lg font-medium text-gray-800">Are you sure you want to suspend this user?</h4>
+                        <p class="text-sm text-gray-500">The user will not be able to access their account until you reactivate it.</p>
+                    </div>
+                </div>
+                <div>
+                    <label for="suspension-reason" class="block text-sm font-medium text-gray-700 mb-1">Reason for suspension (optional)</label>
+                    <textarea id="suspension-reason" rows="3" class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary" placeholder="Enter reason for suspension..."></textarea>
+                </div>
+                <div>
+                    <label for="suspension-duration" class="block text-sm font-medium text-gray-700 mb-1">Suspension Duration</label>
+                    <div class="custom-select" id="suspension-duration-select">
+                        <div class="custom-select-trigger">
+                            <span>1 week</span>
+                            <i class="ri-arrow-down-s-line ml-2"></i>
+                        </div>
+                        <div class="custom-select-options">
+                            <div class="custom-select-option" data-value="1day">1 day</div>
+                            <div class="custom-select-option" data-value="1week">1 week</div>
+                            <div class="custom-select-option" data-value="1month">1 month</div>
+                            <div class="custom-select-option" data-value="indefinite">Indefinite</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex items-center">
+                    <label class="custom-checkbox">
+                        <input type="checkbox">
+                        <span class="checkbox-mark"></span>
+                    </label>
+                    <span class="ml-2 text-sm text-gray-600">Send email notification to user</span>
+                </div>
+                <div class="flex items-center justify-end space-x-3 pt-4 border-t">
+                    <button class="px-4 py-2 border border-gray-200 text-gray-600 rounded-button whitespace-nowrap hover:bg-gray-50 modal-close">
+                        Cancel
+                    </button>
+                    <button class="px-4 py-2 bg-yellow-600 text-white rounded-button whitespace-nowrap">
+                        Suspend User
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script id="navigation-script">
+        document.addEventListener('DOMContentLoaded', function() {
+            const sidebarToggle = document.getElementById('sidebar-toggle');
+            const sidebar = document.getElementById('sidebar');
+            const main = document.querySelector('main');
+            
+            sidebarToggle.addEventListener('click', function() {
+                if (sidebar.classList.contains('-translate-x-full')) {
+                    sidebar.classList.remove('-translate-x-full');
+                    sidebar.classList.add('translate-x-0');
+                } else {
+                    sidebar.classList.remove('translate-x-0');
+                    sidebar.classList.add('-translate-x-full');
+                }
+            });
+            
+            // Handle tab navigation
+            const navLinks = document.querySelectorAll('.nav-link');
+            const tabContents = document.querySelectorAll('.tab-content');
+            
+            navLinks.forEach(link => {
+                link.addEventListener('click', function() {
+                    const tabId = this.getAttribute('data-tab');
+                    
+                    // Remove active class from all links and hide all tabs
+                    navLinks.forEach(link => {
+                        link.classList.remove('text-primary', 'bg-blue-50');
+                        link.classList.add('text-gray-600', 'hover:text-primary', 'hover:bg-blue-50');
+                    });
+                    
+                    tabContents.forEach(tab => {
+                        tab.classList.add('hidden');
+                    });
+                    
+                    // Add active class to clicked link and show corresponding tab
+                    this.classList.remove('text-gray-600', 'hover:text-primary', 'hover:bg-blue-50');
+                    this.classList.add('text-primary', 'bg-blue-50');
+                    
+                    document.getElementById(`${tabId}-tab`).classList.remove('hidden');
+                    
+                    // Close sidebar on mobile after clicking a link
+                    if (window.innerWidth < 768) {
+                        sidebar.classList.remove('translate-x-0');
+                        sidebar.classList.add('-translate-x-full');
+                    }
+                });
+            });
+            
+            // Handle responsive sidebar
+            function handleResize() {
+                if (window.innerWidth >= 768) {
+                    sidebar.classList.remove('-translate-x-full');
+                    sidebar.classList.add('translate-x-0');
+                    main.classList.add('md:pl-64');
+                } else {
+                    sidebar.classList.remove('translate-x-0');
+                    sidebar.classList.add('-translate-x-full');
+                    main.classList.remove('md:pl-64');
+                }
+            }
+            
+            window.addEventListener('resize', handleResize);
+            handleResize();
+        });
+    </script>
+
+    <script id="custom-select-script">
+        document.addEventListener('DOMContentLoaded', function() {
+            const customSelects = document.querySelectorAll('.custom-select');
+            
+            customSelects.forEach(select => {
+                const trigger = select.querySelector('.custom-select-trigger');
+                const options = select.querySelector('.custom-select-options');
+                const optionItems = select.querySelectorAll('.custom-select-option');
+                const triggerText = trigger.querySelector('span');
+                
+                trigger.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    
+                    // Close all other open selects
+                    customSelects.forEach(otherSelect => {
+                        if (otherSelect !== select) {
+                            otherSelect.classList.remove('open');
+                        }
+                    });
+                    
+                    select.classList.toggle('open');
+                });
+                
+                optionItems.forEach(option => {
+                    option.addEventListener('click', function() {
+                        const value = this.getAttribute('data-value');
+                        const text = this.textContent.trim();
+                        
+                        // For subscription plan select which has spans with classes
+                        if (select.classList.contains('subscription-plan-select')) {
+                            const optionHtml = this.innerHTML;
+                            trigger.querySelector('span').outerHTML = optionHtml;
+                        } else {
+                            triggerText.textContent = text;
+                        }
+                        
+                        select.setAttribute('data-value', value);
+                        select.classList.remove('open');
+                        
+                        // Dispatch a change event
+                        const event = new CustomEvent('change', {
+                            detail: { value, text }
+                        });
+                        select.dispatchEvent(event);
+                    });
+                });
+            });
+            
+            // Close all selects when clicking outside
+            document.addEventListener('click', function() {
+                customSelects.forEach(select => {
+                    select.classList.remove('open');
+                });
+            });
+        });
+    </script>
+
+    <script id="modal-script">
+        document.addEventListener('DOMContentLoaded', function() {
+            const modals = document.querySelectorAll('.modal');
+            const modalCloseButtons = document.querySelectorAll('.modal-close');
+            
+            // Action buttons for user actions
+            const viewUserButtons = document.querySelectorAll('[data-action="view"]');
+            const deleteUserButtons = document.querySelectorAll('[data-action="delete"]');
+            const suspendUserButtons = document.querySelectorAll('[data-action="suspend"]');
+            
+            function openModal(modalId) {
+                const modal = document.getElementById(modalId);
+                if (modal) {
+                    modal.classList.add('active');
+                    document.body.style.overflow = 'hidden';
+                }
+            }
+            
+            function closeModal(modal) {
+                modal.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+            
+            // Close modal when clicking close button
+            modalCloseButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const modal = this.closest('.modal');
+                    closeModal(modal);
+                });
+            });
+            
+            // Close modal when clicking outside the modal content
+            modals.forEach(modal => {
+                modal.addEventListener('click', function(e) {
+                    if (e.target === this) {
+                        closeModal(this);
+                    }
+                });
+            });
+            
+            // Open user action modals
+            viewUserButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const userId = this.getAttribute('data-user-id');
+                    openModal('view-user-modal');
+                });
+            });
+            
+            deleteUserButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const userId = this.getAttribute('data-user-id');
+                    openModal('delete-user-modal');
+                });
+            });
+            
+            suspendUserButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const userId = this.getAttribute('data-user-id');
+                    openModal('suspend-user-modal');
+                });
+            });
+        });
+    </script>
+
+    <script id="charts-script">
+        document.addEventListener('DOMContentLoaded', function() {
+            // Subscription Chart
+            if (document.getElementById('subscription-chart')) {
+                const subscriptionChart = echarts.init(document.getElementById('subscription-chart'));
+                
+                const subscriptionOption = {
+                    animation: false,
+                    tooltip: {
+                        trigger: 'axis',
+                        backgroundColor: 'rgba(255, 255, 255, 0.8)',
+                        borderColor: '#e2e8f0',
+                        textStyle: {
+                            color: '#1f2937'
+                        }
+                    },
+                    legend: {
+                        data: ['Basic', 'Pro', 'Enterprise'],
+                        bottom: 0,
+                        textStyle: {
+                            color: '#1f2937'
+                        }
+                    },
+                    grid: {
+                        left: 0,
+                        right: 0,
+                        top: 10,
+                        bottom: 30,
+                        containLabel: true
+                    },
+                    xAxis: {
+                        type: 'category',
+                        boundaryGap: false,
+                        data: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                        axisLine: {
+                            lineStyle: {
+                                color: '#e2e8f0'
+                            }
+                        },
+                        axisLabel: {
+                            color: '#1f2937'
+                        }
+                    },
+                    yAxis: {
+                        type: 'value',
+                        axisLine: {
+                            show: false
+                        },
+                        axisLabel: {
+                            color: '#1f2937'
+                        },
+                        splitLine: {
+                            lineStyle: {
+                                color: '#e2e8f0'
+                            }
+                        }
+                    },
+                    series: [
+                        {
+                            name: 'Basic',
+                            type: 'line',
+                            stack: 'Total',
+                            smooth: true,
+                            symbol: 'none',
+                            lineStyle: {
+                                width: 3
+                            },
+                            areaStyle: {
+                                opacity: 0.1
+                            },
+                            emphasis: {
+                                focus: 'series'
+                            },
+                            color: 'rgba(141, 211, 199, 1)',
+                            data: [120, 132, 101, 134, 90, 230]
+                        },
+                        {
+                            name: 'Pro',
+                            type: 'line',
+                            stack: 'Total',
+                            smooth: true,
+                            symbol: 'none',
+                            lineStyle: {
+                                width: 3
+                            },
+                            areaStyle: {
+                                opacity: 0.1
+                            },
+                            emphasis: {
+                                focus: 'series'
+                            },
+                            color: 'rgba(87, 181, 231, 1)',
+                            data: [220, 182, 191, 234, 290, 330]
+                        },
+                        {
+                            name: 'Enterprise',
+                            type: 'line',
+                            stack: 'Total',
+                            smooth: true,
+                            symbol: 'none',
+                            lineStyle: {
+                                width: 3
+                            },
+                            areaStyle: {
+                                opacity: 0.1
+                            },
+                            emphasis: {
+                                focus: 'series'
+                            },
+                            color: 'rgba(252, 141, 98, 1)',
+                            data: [150, 232, 201, 154, 190, 330]
+                        }
+                    ]
+                };
+                
+                subscriptionChart.setOption(subscriptionOption);
+                
+                window.addEventListener('resize', function() {
+                    subscriptionChart.resize();
+                });
+            }
+            
+            // Plan Distribution Chart
+            if (document.getElementById('plan-distribution-chart')) {
+                const planDistributionChart = echarts.init(document.getElementById('plan-distribution-chart'));
+                
+                const planDistributionOption = {
+                    animation: false,
+                    tooltip: {
+                        trigger: 'item',
+                        backgroundColor: 'rgba(255, 255, 255, 0.8)',
+                        borderColor: '#e2e8f0',
+                        textStyle: {
+                            color: '#1f2937'
+                        }
+                    },
+                    legend: {
+                        orient: 'vertical',
+                        right: 10,
+                        top: 'center',
+                        textStyle: {
+                            color: '#1f2937'
+                        }
+                    },
+                    series: [
+                        {
+                            name: 'Plan Distribution',
+                            type: 'pie',
+                            radius: ['40%', '70%'],
+                            center: ['40%', '50%'],
+                            avoidLabelOverlap: false,
+                            itemStyle: {
+                                borderRadius: 8,
+                                borderColor: '#fff',
+                                borderWidth: 2
+                            },
+                            label: {
+                                show: false
+                            },
+                            emphasis: {
+                                label: {
+                                    show: false
+                                }
+                            },
+                            labelLine: {
+                                show: false
+                            },
+                            data: [
+                                { value: 485, name: 'Basic', itemStyle: { color: 'rgba(141, 211, 199, 1)' } },
+                                { value: 300, name: 'Pro', itemStyle: { color: 'rgba(87, 181, 231, 1)' } },
+                                { value: 91, name: 'Enterprise', itemStyle: { color: 'rgba(252, 141, 98, 1)' } }
+                            ]
+                        }
+                    ]
+                };
+                
+                planDistributionChart.setOption(planDistributionOption);
+                
+                window.addEventListener('resize', function() {
+                    planDistributionChart.resize();
+                });
+            }
+        });
+    </script>
+
+   
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  let subscriptionChart, planDistributionChart;
+
+  function initCharts() {
+    // Only initialize if not already done
+    if (!subscriptionChart && document.getElementById("subscription-chart")) {
+      subscriptionChart = echarts.init(document.getElementById("subscription-chart"));
+      subscriptionChart.setOption({
+        animation: false,
+        tooltip: { trigger: "axis", backgroundColor: "rgba(255,255,255,0.8)", borderColor: "#e2e8f0", textStyle: { color: "#1f2937" } },
+        legend: { data: ["Basic", "Pro", "Enterprise"], bottom: 0, textStyle: { color: "#1f2937" } },
+        grid: { left: 0, right: 0, top: 10, bottom: 30, containLabel: true },
+        xAxis: { type: "category", boundaryGap: false, data: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"], axisLine: { lineStyle: { color: "#e2e8f0" } }, axisLabel: { color: "#1f2937" } },
+        yAxis: { type: "value", axisLine: { show: false }, axisLabel: { color: "#1f2937" }, splitLine: { lineStyle: { color: "#e2e8f0" } } },
+        series: [
+          { name: "Basic", type: "line", stack: "Total", smooth: true, symbol: "none", lineStyle: { width: 3 }, areaStyle: { opacity: 0.1 }, emphasis: { focus: "series" }, color: "rgba(141, 211, 199, 1)", data: [120, 132, 101, 134, 90, 230] },
+          { name: "Pro", type: "line", stack: "Total", smooth: true, symbol: "none", lineStyle: { width: 3 }, areaStyle: { opacity: 0.1 }, emphasis: { focus: "series" }, color: "rgba(87, 181, 231, 1)", data: [220, 182, 191, 234, 290, 330] },
+          { name: "Enterprise", type: "line", stack: "Total", smooth: true, symbol: "none", lineStyle: { width: 3 }, areaStyle: { opacity: 0.1 }, emphasis: { focus: "series" }, color: "rgba(252, 141, 98, 1)", data: [150, 232, 201, 154, 190, 330] }
+        ]
+      });
+    }
+    if (!planDistributionChart && document.getElementById("plan-distribution-chart")) {
+      planDistributionChart = echarts.init(document.getElementById("plan-distribution-chart"));
+      planDistributionChart.setOption({
+        animation: false,
+        tooltip: { trigger: "item", backgroundColor: "rgba(255,255,255,0.8)", borderColor: "#e2e8f0", textStyle: { color: "#1f2937" } },
+        legend: { orient: "vertical", right: 10, top: "center", textStyle: { color: "#1f2937" } },
+        series: [{
+          name: "Plan Distribution",
+          type: "pie",
+          radius: ["40%", "70%"],
+          center: ["40%", "50%"],
+          avoidLabelOverlap: false,
+          itemStyle: { borderRadius: 8, borderColor: "#fff", borderWidth: 2 },
+          label: { show: false },
+          emphasis: { label: { show: false } },
+          labelLine: { show: false },
+          data: [
+            { value: 485, name: "Basic", itemStyle: { color: "rgba(141, 211, 199, 1)" } },
+            { value: 300, name: "Pro", itemStyle: { color: "rgba(87, 181, 231, 1)" } },
+            { value: 91, name: "Enterprise", itemStyle: { color: "rgba(252, 141, 98, 1)" } }
+          ]
+        }]
+      });
+    }
+    // Always resize in case container size changed
+    if (subscriptionChart) subscriptionChart.resize();
+    if (planDistributionChart) planDistributionChart.resize();
+  }
+
+  // Listen for tab switch to subscriptions
+  document.querySelectorAll('.nav-link[data-tab="subscriptions"]').forEach(btn => {
+    btn.addEventListener("click", function () {
+      setTimeout(initCharts, 100); // Wait for tab to become visible
+    });
+  });
+
+  // Also handle window resize
+  window.addEventListener("resize", function () {
+    if (subscriptionChart) subscriptionChart.resize();
+    if (planDistributionChart) planDistributionChart.resize();
+  });
+
+  // If already visible on load, initialize
+  if (!document.getElementById("subscriptions-tab").classList.contains("hidden")) {
+    setTimeout(initCharts, 100);
+  }
+});
+</script>
+
+    <script id="checkbox-script">
+        document.addEventListener('DOMContentLoaded', function() {
+            // Select all checkboxes
+            const selectAllUsers = document.getElementById('select-all-users');
+            const userCheckboxes = document.querySelectorAll('.user-checkbox');
+            
+            const selectAllWallets = document.getElementById('select-all-wallets');
+            const walletCheckboxes = document.querySelectorAll('.wallet-checkbox');
+            
+            const selectAllTransactions = document.getElementById('select-all-transactions');
+            const transactionCheckboxes = document.querySelectorAll('.transaction-checkbox');
+            
+            // Handle select all users
+            if (selectAllUsers) {
+                selectAllUsers.addEventListener('change', function() {
+                    userCheckboxes.forEach(checkbox => {
+                        checkbox.checked = this.checked;
+                    });
+                });
+            }
+            
+            // Handle select all wallets
+            if (selectAllWallets) {
+                selectAllWallets.addEventListener('change', function() {
+                    walletCheckboxes.forEach(checkbox => {
+                        checkbox.checked = this.checked;
+                    });
+                });
+            }
+            
+            // Handle select all transactions
+            if (selectAllTransactions) {
+                selectAllTransactions.addEventListener('change', function() {
+                    transactionCheckboxes.forEach(checkbox => {
+                        checkbox.checked = this.checked;
+                    });
+                });
+            }
+        });
+    </script>
+</body>
+</html>
