@@ -1,5 +1,6 @@
 <?php
-require_once '../config/db.php';
+require_once(__DIR__ . '/../config/db.php');
+
 
 if (USE_MOCK_DATA) {
     echo "Inserting mock data...\n";

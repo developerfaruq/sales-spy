@@ -37,7 +37,7 @@ if (!$user) {
 <head>
   <meta charset="UTF-8">
   <title>Reset Password</title>
-  <link href="https://cdn.tailwindcss.com" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com/3.4.16"></script>
 </head>
 <body class="bg-gray-100 flex items-center justify-center min-h-screen">
   <div class="bg-white p-8 rounded-lg shadow-md w-full max-w-md">

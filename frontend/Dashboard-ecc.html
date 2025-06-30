@@ -37,6 +37,7 @@
       href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css"
     />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.5.0/echarts.min.js"></script>
+    <script src="js/backend-integration.js"></script>
     <style>
       :where([class^="ri-"])::before {
         content: "\f3c2";
@@ -650,7 +651,9 @@
               <div class="text-sm text-gray-600">Found 317,455 Stores</div>
               <div class="flex items-center">
                 <button
+                  id="export-button"
                   class="bg-gray-100 text-gray-700 px-3 py-1.5 rounded-button text-sm whitespace-nowrap mr-3"
+                  onclick="exportData()"
                 >
                   <div class="flex items-center">
                     <div class="w-4 h-4 flex items-center justify-center mr-1">
@@ -2798,12 +2801,23 @@
       const resultsDiv = document.getElementById('results');
       const paginationDiv = document.getElementById('pagination');
 
+      // Gather all filter parameters
+      const keyword = document.getElementById('search-keyword') ? document.getElementById('search-keyword').value : '';
+      const sns_email = document.getElementById('sns-filter') ? document.getElementById('sns-filter').value : '';
+      
       // Construct URL with filters and pagination
-      const url = `../api/filter_stores.php?page=${currentPage}&limit=${itemsPerPage}&platform=${platform}&created_after=${createdAfter}&created_before=${createdBefore}`;
+      const url = `../api/filter_stores.php?page=${currentPage}&limit=${itemsPerPage}&platform=${platform}&created_after=${createdAfter}&created_before=${createdBefore}&keyword=${keyword}&sns_email=${sns_email}`;
 
+      // Show loading indicator
+      resultsDiv.innerHTML = '<div class="flex justify-center p-8"><div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div></div>';
+      
       fetch(url)
         .then(response => {
           if (!response.ok) {
+            if (response.status === 401) {
+              window.location.href = '../auth/login/index.php?redirect=' + encodeURIComponent(window.location.href);
+              throw new Error('Authentication required');
+            }
             throw new Error(`HTTP error! status: ${response.status}`);
           }
           return response.json();
@@ -2900,6 +2914,22 @@
           console.error('Error fetching stores:', error);
           resultsDiv.innerHTML = '<p class="text-red-500">Failed to load stores. Please try again later.</p>';
         });
+    }
+
+    // Export data function
+    function exportData() {
+      // Get current filter values
+      const platform = document.getElementById('platform-filter') ? document.getElementById('platform-filter').value : '';
+      const createdAfter = document.getElementById('date-from') ? document.getElementById('date-from').value : '';
+      const createdBefore = document.getElementById('date-to') ? document.getElementById('date-to').value : '';
+      const keyword = document.getElementById('search-keyword') ? document.getElementById('search-keyword').value : '';
+      const sns_email = document.getElementById('sns-filter') ? document.getElementById('sns-filter').value : '';
+      
+      // Construct URL with filters
+      const url = `../api/export_csv.php?platform=${platform}&created_after=${createdAfter}&created_before=${createdBefore}&keyword=${keyword}&sns_email=${sns_email}`;
+      
+      // Open in a new window to trigger download
+      window.open(url, '_blank');
     }
 
     function showStoreDetails(store) {

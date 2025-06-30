@@ -4,30 +4,33 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Authentication</title>
-  <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
   <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            primary: '#1E3A8A',
-            secondary: '#F2E49C'
-          },
-          borderRadius: {
-            'none': '0px',
-            'sm': '4px',
-            DEFAULT: '8px',
-            'md': '12px',
-            'lg': '16px',
-            'xl': '20px',
-            '2xl': '24px',
-            '3xl': '32px',
-            'full': '9999px',
-            'button': '8px'
+    // Use inline configuration
+    tailwind = {
+      config: {
+        theme: {
+          extend: {
+            colors: {
+              primary: '#1E3A8A',
+              secondary: '#F2E49C'
+            },
+            borderRadius: {
+              'none': '0px',
+              'sm': '4px',
+              DEFAULT: '8px',
+              'md': '12px',
+              'lg': '16px',
+              'xl': '20px',
+              '2xl': '24px',
+              '3xl': '32px',
+              'full': '9999px',
+              'button': '8px'
+            }
           }
         }
       }
-    }
+    };
   </script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -308,196 +311,124 @@
   </div>
   <script>
     document.addEventListener('DOMContentLoaded', function() {
-      const showSignUp = document.getElementById('showSignUp');
-      const showSignIn = document.getElementById('showSignIn');
-      const signinForm = document.getElementById('signinForm');
-      const signupForm = document.getElementById('signupForm');
-      const formsWrapper = document.getElementById('formsWrapper');
-      const signinImage = document.getElementById('signinImage');
-      const signupImage = document.getElementById('signupImage');
-      const toast = document.getElementById('toast');
-      const forgotPasswordLink = document.getElementById('forgotPasswordLink');
-      const forgotPasswordModal = document.getElementById('forgotPasswordModal');
-      const resetForm = document.getElementById('resetForm');
-      const confirmationMessage = document.getElementById('confirmationMessage');
-      const sendResetLink = document.getElementById('sendResetLink');
-      const cancelReset = document.getElementById('cancelReset');
-      const closeConfirmation = document.getElementById('closeConfirmation');
-      const resetEmail = document.getElementById('reset-email');
-
-      // Form toggle function
-      function showForm(formType) {
-        if (formType === 'signup') {
-          signinForm.classList.remove('visible-form');
-          signinForm.classList.add('hidden-form');
-          signupForm.classList.remove('hidden-form');
-          signupForm.classList.add('visible-form');
-          formsWrapper.style.transform = 'translateX(-50%)';
-          signinImage.classList.remove('fade-in');
-          signinImage.classList.add('fade-out');
-          signupImage.classList.remove('fade-out');
-          signupImage.classList.add('fade-in');
-        } else {
-          signupForm.classList.remove('visible-form');
-          signupForm.classList.add('hidden-form');
-          signinForm.classList.remove('hidden-form');
-          signinForm.classList.add('visible-form');
-          formsWrapper.style.transform = 'translateX(0)';
-          signinImage.classList.remove('fade-out');
-          signinImage.classList.add('fade-in');
-          signupImage.classList.remove('fade-in');
-          signupImage.classList.add('fade-out');
-        }
+      // Get URL parameters
+      const urlParams = new URLSearchParams(window.location.search);
+      const formType = urlParams.get('form') || 'login';
+      const status = urlParams.get('status');
+      
+      // Handle database error by redirecting to the error page
+      if (status === 'database_error') {
+        window.location.href = 'database_error.php';
+        return;
       }
 
-      // Check query parameter on load
-      const params = new URLSearchParams(window.location.search);
-      const formParam = params.get('form');
-      if (formParam === 'signup') {
-        showForm('signup');
-      } else {
-        showForm('login');
+      // Show the appropriate form based on URL parameter
+      if (formType === 'signup') {
+        showSignupForm();
+      } else if (formType === 'login') {
+        showLoginForm();
       }
-
-      // Show toast notification for success (from query param)
-      const status = params.get('status');
-      if (status === 'login_success') {
-        showToast('Signed in successfully!', 'success');
-      } else if (status === 'signup_success') {
-        showToast('Account created successfully!', 'success');
+      
+      // Handle status messages
+      if (status) {
+        let message = '';
+        let type = 'error';
+        
+        switch (status) {
+          case 'empty_fields':
+            message = 'Please fill in all required fields';
+            break;
+          case 'invalid_email':
+            message = 'Please enter a valid email address';
+            break;
+          case 'invalid_phone':
+            message = 'Please enter a valid phone number';
+            break;
+          case 'password_mismatch':
+            message = 'Passwords do not match';
+            break;
+          case 'weak_password':
+            message = 'Password must be at least 8 characters long';
+            break;
+          case 'duplicate_email_or_phone':
+            message = 'Email or phone number already registered';
+            break;
+          case 'invalid_credentials':
+            message = 'Invalid email or password';
+            break;
+          case 'account_locked':
+            message = 'Account locked due to too many failed attempts. Try again later.';
+            break;
+          case 'signup_success':
+            message = 'Account created successfully! Please log in.';
+            type = 'success';
+            break;
+          case 'login_success':
+            message = 'Login successful! Redirecting...';
+            type = 'success';
+            break;
+          case 'password_reset_sent':
+            message = 'Password reset instructions sent to your email';
+            type = 'success';
+            break;
+          case 'password_reset_success':
+            message = 'Password reset successful! Please log in with your new password.';
+            type = 'success';
+            break;
+        }
+        
+        if (message) {
+          showToast(message, type);
+        }
       }
-
-      // Toast notification function
-      function showToast(message, type = 'success') {
-        toast.innerHTML = `
-          <div class="flex items-center px-5 py-3 rounded-xl shadow-lg glass-effect border ${type === 'success' ? 'border-green-400 bg-green-50' : 'border-red-400 bg-red-50'}">
-            <i class="ri-${type === 'success' ? 'checkbox-circle-fill text-green-600' : 'close-circle-fill text-red-600'} ri-xl mr-3"></i>
-            <span class="text-base font-medium text-gray-800">${message}</span>
-          </div>
-        `;
-        toast.classList.remove('opacity-0', 'pointer-events-none');
-        toast.classList.add('opacity-100');
-        setTimeout(() => {
-          toast.classList.remove('opacity-100');
-          toast.classList.add('opacity-0', 'pointer-events-none');
-        }, 2500);
-      }
-
-      // Toggle form links
-      showSignUp.addEventListener('click', function(e) {
-        e.preventDefault();
-        showForm('signup');
+      
+      // Form toggle buttons
+      document.getElementById('showSignUp').addEventListener('click', showSignupForm);
+      document.getElementById('showSignIn').addEventListener('click', showLoginForm);
+      
+      // Forgot password link
+      document.getElementById('forgotPasswordLink').addEventListener('click', function() {
+        // Implement forgot password functionality
+        alert('Forgot password functionality will be implemented soon.');
       });
-      showSignIn.addEventListener('click', function(e) {
-        e.preventDefault();
-        showForm('login');
-      });
-
-      // Input validation for label animation
-      const inputs = document.querySelectorAll('input');
-      inputs.forEach(input => {
-        input.addEventListener('blur', function() {
-          if (this.value.trim() !== '') {
-            this.classList.add('not-empty');
-          } else {
-            this.classList.remove('not-empty');
-          }
-        });
-      });
-
-      // Sign In Form Validation
-      signinForm.addEventListener('submit', function(e) {
-        const email = document.getElementById('signin-email').value.trim();
-        const password = document.getElementById('signin-password').value.trim();
-        if (!email || !password) {
-          e.preventDefault();
-          showToast('Please enter both email and password.', 'error');
-          return;
-        }
-        if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
-          e.preventDefault();
-          showToast('Please enter a valid email address.', 'error');
-          return;
-        }
-      });
-
-      // Sign Up Form Validation
-      signupForm.addEventListener('submit', function(e) {
-        const fullname = document.getElementById('fullname').value.trim();
-        const email = document.getElementById('signup-email').value.trim();
-        const phone = document.getElementById('phone').value.trim();
-        const password = document.getElementById('signup-password').value.trim();
-        const confirmPassword = document.getElementById('confirm-password').value.trim();
-        const terms = document.getElementById('terms').checked;
-        if (!fullname || !email || !phone || !password || !confirmPassword) {
-          e.preventDefault();
-          showToast('Please fill in all fields.', 'error');
-          return;
-        }
-        if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
-          e.preventDefault();
-          showToast('Please enter a valid email address.', 'error');
-          return;
-        }
-        if (password.length < 6) {
-          e.preventDefault();
-          showToast('Password must be at least 6 characters.', 'error');
-          return;
-        }
-        if (password !== confirmPassword) {
-          e.preventDefault();
-          showToast('Passwords do not match.', 'error');
-          return;
-        }
-        if (!terms) {
-          e.preventDefault();
-          showToast('You must agree to the Terms and Privacy Policy.', 'error');
-          return;
-        }
-      });
-
-      // Forgot Password Modal Logic
-      forgotPasswordLink.addEventListener('click', function(e) {
-        e.preventDefault();
-        forgotPasswordModal.classList.remove('hidden');
-        forgotPasswordModal.classList.add('flex');
-        resetForm.classList.remove('hidden');
-        confirmationMessage.classList.add('hidden');
-        resetEmail.value = '';
-      });
-      function closeModal() {
-        forgotPasswordModal.classList.add('hidden');
-        forgotPasswordModal.classList.remove('flex');
-      }
-      cancelReset.addEventListener('click', closeModal);
-      closeConfirmation.addEventListener('click', closeModal);
-      forgotPasswordModal.addEventListener('click', function(e) {
-        if (e.target === forgotPasswordModal) {
-          closeModal();
-        }
-      });
-      sendResetLink.addEventListener('click', function () {
-  if (resetEmail.value.trim() === '') {
-    resetEmail.focus();
-    return;
-  }
-
-  // Send the email to backend
-  fetch('auth/reset/send_reset.php', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded'
-    },
-    body: 'email=' + encodeURIComponent(resetEmail.value.trim())
-  })
-    .then(res => res.text())
-    .then(response => {
-      confirmationMessage.querySelector('p').innerHTML = response;
-      resetForm.classList.add('hidden');
-      confirmationMessage.classList.remove('hidden');
     });
-});
-});
+    
+    function showLoginForm() {
+      document.getElementById('formsWrapper').style.transform = 'translateX(0)';
+      document.getElementById('signinForm').classList.add('visible-form');
+      document.getElementById('signinForm').classList.remove('hidden-form');
+      document.getElementById('signupForm').classList.add('hidden-form');
+      document.getElementById('signupForm').classList.remove('visible-form');
+    }
+    
+    function showSignupForm() {
+      document.getElementById('formsWrapper').style.transform = 'translateX(-50%)';
+      document.getElementById('signinForm').classList.add('hidden-form');
+      document.getElementById('signinForm').classList.remove('visible-form');
+      document.getElementById('signupForm').classList.add('visible-form');
+      document.getElementById('signupForm').classList.remove('hidden-form');
+    }
+    
+    function showToast(message, type = 'error') {
+      const toast = document.getElementById('toast');
+      const toastContent = `
+        <div class="glass-effect p-4 shadow-lg flex items-center space-x-3">
+          <div class="${type === 'error' ? 'text-red-500' : 'text-green-500'}">
+            <i class="ri-${type === 'error' ? 'error-warning' : 'checkbox-circle'}-line text-xl"></i>
+          </div>
+          <p class="${type === 'error' ? 'text-red-800' : 'text-green-800'}">${message}</p>
+        </div>
+      `;
+      
+      toast.innerHTML = toastContent;
+      toast.classList.add('opacity-100');
+      toast.classList.remove('opacity-0', 'pointer-events-none');
+      
+      setTimeout(() => {
+        toast.classList.add('opacity-0', 'pointer-events-none');
+        toast.classList.remove('opacity-100');
+      }, 5000);
+    }
   </script>
 </body>
 </html>

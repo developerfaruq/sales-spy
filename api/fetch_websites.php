@@ -1,42 +1,115 @@
 <?php
-require_once __DIR__ . '/../config/db.php';
+require_once '../config/db.php';
 
-if (!USE_MOCK_DATA) {
-    http_response_code(403);
-    echo json_encode(["error" => "Mock data insertion is disabled."]);
-    exit;
-}
+if (USE_MOCK_DATA) {
+    echo "Inserting mock website data...\n";
 
-$mockWebsites = [
-    ["name" => "WP Design Studio", "url" => "https://wpdesignstudio.com", "platform" => "WordPress", "country" => "USA", "category" => "Web Design", "creation_date" => "2021-03-15"],
-    ["name" => "Wixly", "url" => "https://wixly.io", "platform" => "Wix", "country" => "UK", "category" => "Marketing", "creation_date" => "2022-07-10"],
-    ["name" => "SquareSpace Creatives", "url" => "https://sscreatives.com", "platform" => "Squarespace", "country" => "Canada", "category" => "Portfolio", "creation_date" => "2020-11-22"],
-    ["name" => "GoDaddy Pros", "url" => "https://godaddypros.com", "platform" => "GoDaddy", "country" => "Australia", "category" => "Business", "creation_date" => "2023-01-05"],
-    ["name" => "Webflow Wizards", "url" => "https://webflowwizards.com", "platform" => "Webflow", "country" => "Germany", "category" => "Agency", "creation_date" => "2021-09-30"],
-    ["name" => "Weebly Works", "url" => "https://weeblyworks.com", "platform" => "Weebly", "country" => "India", "category" => "Ecommerce", "creation_date" => "2022-04-18"],
-    ["name" => "Namecheap Ninjas", "url" => "https://namecheapninjas.com", "platform" => "Namecheap", "country" => "Nigeria", "category" => "Blog", "creation_date" => "2020-06-12"],
-    ["name" => "Hostinger Hub", "url" => "https://hostingerhub.com", "platform" => "Hostinger", "country" => "Brazil", "category" => "Landing Page", "creation_date" => "2023-02-14"],
-    ["name" => "HostGator Heroes", "url" => "https://hostgatorheroes.com", "platform" => "HostGator", "country" => "France", "category" => "Web Design", "creation_date" => "2021-12-01"],
-    ["name" => "Bluehost Builders", "url" => "https://bluehostbuilders.com", "platform" => "Bluehost", "country" => "South Africa", "category" => "Portfolio", "creation_date" => "2022-08-25"],
-];
+    $mockWebsites = [
+        [
+            'name' => 'WordPress Blog',
+            'url' => 'wordpress-example.com',
+            'platform' => 'WordPress',
+            'category' => 'Blog, Business',
+            'country' => 'US',
+            'creation_date' => '2023-05-15'
+        ],
+        [
+            'name' => 'Wix Portfolio',
+            'url' => 'wix-portfolio.com',
+            'platform' => 'Wix',
+            'category' => 'Portfolio, Creative',
+            'country' => 'UK',
+            'creation_date' => '2023-08-21'
+        ],
+        [
+            'name' => 'Squarespace Store',
+            'url' => 'squarespace-store.com',
+            'platform' => 'Squarespace',
+            'category' => 'E-commerce, Fashion',
+            'country' => 'CA',
+            'creation_date' => '2024-01-10'
+        ],
+        [
+            'name' => 'GoDaddy Business',
+            'url' => 'godaddy-business.com',
+            'platform' => 'GoDaddy',
+            'category' => 'Business, Services',
+            'country' => 'AU',
+            'creation_date' => '2023-11-05'
+        ],
+        [
+            'name' => 'Webflow Agency',
+            'url' => 'webflow-agency.io',
+            'platform' => 'Webflow',
+            'category' => 'Agency, Design',
+            'country' => 'FR',
+            'creation_date' => '2024-02-28'
+        ],
+        [
+            'name' => 'Weebly Blog',
+            'url' => 'weebly-blog.com',
+            'platform' => 'Weebly',
+            'category' => 'Blog, Personal',
+            'country' => 'DE',
+            'creation_date' => '2023-07-11'
+        ],
+        [
+            'name' => 'Namecheap Site',
+            'url' => 'namecheap-site.org',
+            'platform' => 'Namecheap',
+            'category' => 'Non-profit, Organization',
+            'country' => 'ES',
+            'creation_date' => '2023-09-30'
+        ],
+        [
+            'name' => 'Hostinger Education',
+            'url' => 'hostinger-education.com',
+            'platform' => 'Hostinger',
+            'category' => 'Education, Courses',
+            'country' => 'IN',
+            'creation_date' => '2024-03-15'
+        ],
+        [
+            'name' => 'HostGator Magazine',
+            'url' => 'hostgator-magazine.com',
+            'platform' => 'HostGator',
+            'category' => 'Magazine, News',
+            'country' => 'BR',
+            'creation_date' => '2023-10-05'
+        ],
+        [
+            'name' => 'Bluehost Tech',
+            'url' => 'bluehost-tech.com',
+            'platform' => 'Bluehost',
+            'category' => 'Technology, Software',
+            'country' => 'JP',
+            'creation_date' => '2024-01-25'
+        ]
+    ];
 
-try {
-    $pdo->beginTransaction();
-    $stmt = $pdo->prepare("INSERT INTO websites (name, url, platform, country, category, creation_date) VALUES (?, ?, ?, ?, ?, ?)");
-    foreach ($mockWebsites as $site) {
+    // Clear existing records if needed
+    // $pdo->exec("TRUNCATE TABLE websites");
+
+    foreach ($mockWebsites as $website) {
+        $stmt = $pdo->prepare("
+            INSERT INTO websites (
+                name, url, platform, category, country, creation_date
+            ) VALUES (
+                :name, :url, :platform, :category, :country, :creation_date
+            )
+        ");
+
         $stmt->execute([
-            $site["name"],
-            $site["url"],
-            $site["platform"],
-            $site["country"],
-            $site["category"],
-            $site["creation_date"]
+            ':name' => $website['name'],
+            ':url' => $website['url'],
+            ':platform' => $website['platform'],
+            ':category' => $website['category'],
+            ':country' => $website['country'],
+            ':creation_date' => $website['creation_date']
         ]);
+        echo "Inserted: " . $website['name'] . "\n";
     }
-    $pdo->commit();
-    echo json_encode(["success" => true, "message" => "Mock websites inserted."]);
-} catch (PDOException $e) {
-    $pdo->rollBack();
-    http_response_code(500);
-    echo json_encode(["error" => "Database error: " . $e->getMessage()]);
+    echo "Mock website data insertion complete.\n";
+} else {
+    echo "Mock website data insertion skipped (USE_MOCK_DATA is false).\n";
 } 

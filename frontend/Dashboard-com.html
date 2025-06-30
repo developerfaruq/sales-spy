@@ -37,6 +37,7 @@
       href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css"
     />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.5.0/echarts.min.js"></script>
+    <script src="js/backend-integration.js"></script>
     <style>
       :where([class^="ri-"])::before {
         content: "\f3c2";
@@ -542,7 +543,9 @@
               </div>
               <div class="flex mt-6">
                 <button
+                  id="search-button"
                   class="bg-primary text-white px-6 py-2 rounded-button flex items-center whitespace-nowrap mr-3"
+                  onclick="fetchWebsites(1)"
                 >
                   <div class="w-5 h-5 flex items-center justify-center mr-2">
                     <i class="ri-search-line"></i>
@@ -550,7 +553,9 @@
                   Search
                 </button>
                 <button
+                  id="reset-button"
                   class="bg-gray-100 text-gray-700 px-6 py-2 rounded-button whitespace-nowrap"
+                  onclick="resetFilters()"
                 >
                   Reset
                 </button>
@@ -565,7 +570,9 @@
               <div class="text-sm text-gray-600">Found 317,455 Stores</div>
               <div class="flex items-center">
                 <button
+                  id="export-button"
                   class="bg-gray-100 text-gray-700 px-3 py-1.5 rounded-button text-sm whitespace-nowrap mr-3"
+                  onclick="exportData()"
                 >
                   <div class="flex items-center">
                     <div class="w-4 h-4 flex items-center justify-center mr-1">
@@ -1910,6 +1917,149 @@
       };
 
       // --- END MOCK DATA SECTION ---
+      
+      // Function to fetch websites from the backend API
+      function fetchWebsites(currentPage = 1) {
+        const itemsPerPage = 10;
+        const resultsDiv = document.getElementById('results');
+        const paginationDiv = document.getElementById('pagination');
+        
+        // Get filter values
+        const platform = document.getElementById('platform-filter') ? document.getElementById('platform-filter').value : '';
+        const createdAfter = document.getElementById('date-from') ? document.getElementById('date-from').value : '';
+        const createdBefore = document.getElementById('date-to') ? document.getElementById('date-to').value : '';
+        const keyword = document.getElementById('search-keyword') ? document.getElementById('search-keyword').value : '';
+        
+        // Construct URL with filters and pagination
+        const url = `../api/filter_websites.php?page=${currentPage}&limit=${itemsPerPage}&platform=${platform}&created_after=${createdAfter}&created_before=${createdBefore}&keyword=${keyword}`;
+        
+        // Show loading indicator
+        resultsDiv.innerHTML = '<div class="flex justify-center p-8"><div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div></div>';
+        
+        fetch(url)
+          .then(response => {
+            if (!response.ok) {
+              if (response.status === 401) {
+                window.location.href = '../auth/login/index.php?redirect=' + encodeURIComponent(window.location.href);
+                throw new Error('Authentication required');
+              }
+              throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+          })
+          .then(data => {
+            resultsDiv.innerHTML = ''; // Clear previous results
+            paginationDiv.innerHTML = ''; // Clear previous pagination
+
+            if (data.websites && data.websites.length > 0) {
+              const table = document.createElement('table');
+              table.className = 'min-w-full divide-y divide-gray-200';
+              let tableHTML = `
+                <thead class="bg-gray-50">
+                  <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">URL</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Platform</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Country</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Creation Date</th>
+                  </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+              `;
+              data.websites.forEach(website => {
+                tableHTML += `
+                  <tr class="hover:bg-gray-50 result-row cursor-pointer" data-domain="${website.url}" data-id="${website.id}">
+                    <td class="px-6 py-4 whitespace-nowrap">
+                      <div class="flex items-center">
+                        <div class="w-8 h-8 flex items-center justify-center bg-blue-100 rounded-full mr-3">
+                          <i class="ri-global-line text-blue-500"></i>
+                        </div>
+                        <div class="text-sm font-medium text-gray-900">${website.name}</div>
+                      </div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${website.url}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${website.platform}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${website.category}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${website.country}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${website.creation_date}</td>
+                  </tr>
+                `;
+              });
+              tableHTML += `</tbody></table>`;
+              resultsDiv.innerHTML = tableHTML;
+
+              // Pagination controls
+              const pagination = data.pagination;
+              if (pagination.total_pages > 1) {
+                if (pagination.page > 1) {
+                  const prevButton = document.createElement('button');
+                  prevButton.textContent = 'Previous';
+                  prevButton.className = 'bg-gray-200 p-2 rounded mr-2';
+                  prevButton.onclick = () => fetchWebsites(pagination.page - 1);
+                  paginationDiv.appendChild(prevButton);
+                }
+
+                // Page numbers
+                for (let i = 1; i <= pagination.total_pages; i++) {
+                  const pageButton = document.createElement('button');
+                  pageButton.textContent = i;
+                  pageButton.className = `p-2 rounded ${i === pagination.page ? 'bg-blue-500 text-white' : 'bg-gray-200'} mr-2`;
+                  pageButton.onclick = () => fetchWebsites(i);
+                  paginationDiv.appendChild(pageButton);
+                }
+
+                // Next button
+                if (pagination.page < pagination.total_pages) {
+                  const nextButton = document.createElement('button');
+                  nextButton.textContent = 'Next';
+                  nextButton.className = 'bg-gray-200 p-2 rounded';
+                  nextButton.onclick = () => fetchWebsites(pagination.page + 1);
+                  paginationDiv.appendChild(nextButton);
+                }
+              }
+            } else {
+              resultsDiv.innerHTML = '<p class="text-gray-600 p-4">No websites found.</p>';
+            }
+          })
+          .catch(error => {
+            console.error('Error fetching websites:', error);
+            resultsDiv.innerHTML = '<p class="text-red-500 p-4">Failed to load websites. Please try again later.</p>';
+          });
+      }
+
+      // Export data function
+      function exportData() {
+        // Get current filter values
+        const platform = document.getElementById('platform-filter') ? document.getElementById('platform-filter').value : '';
+        const createdAfter = document.getElementById('date-from') ? document.getElementById('date-from').value : '';
+        const createdBefore = document.getElementById('date-to') ? document.getElementById('date-to').value : '';
+        const keyword = document.getElementById('search-keyword') ? document.getElementById('search-keyword').value : '';
+        
+        // Construct URL with filters
+        const url = `../api/export_websites.php?platform=${platform}&created_after=${createdAfter}&created_before=${createdBefore}&keyword=${keyword}`;
+        
+        // Open in a new window to trigger download
+        window.open(url, '_blank');
+      }
+      
+      // Reset filters function
+      function resetFilters() {
+        // Reset all filter inputs
+        if (document.getElementById('platform-filter')) document.getElementById('platform-filter').value = '';
+        if (document.getElementById('date-from')) document.getElementById('date-from').value = '';
+        if (document.getElementById('date-to')) document.getElementById('date-to').value = '';
+        if (document.getElementById('search-keyword')) document.getElementById('search-keyword').value = '';
+        
+        // Reload data
+        fetchWebsites(1);
+      }
+
+      // Initialize data loading when DOM is ready
+      document.addEventListener('DOMContentLoaded', function() {
+        // Load initial data
+        fetchWebsites(1);
+      });
 
       // Details panel logic, always show full data for clicked row
       document.addEventListener("DOMContentLoaded", function () {

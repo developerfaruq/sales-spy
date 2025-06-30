@@ -4,9 +4,15 @@ require_once '../includes/auth_check.php'; // Assuming this file exists for auth
 
 header('Content-Type: application/json');
 
+// Ensure session is started
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
 // Authentication Guard
 if (!is_logged_in()) {
-    echo json_encode(['error' => 'Unauthorized']);
+    header('HTTP/1.1 401 Unauthorized');
+    echo json_encode(['error' => 'Unauthorized access. Please log in.']);
     exit();
 }
 
@@ -172,8 +178,5 @@ try {
     echo json_encode(['error' => 'An error occurred while fetching data.']);
 }
 
-function is_logged_in() {
-    // This is a placeholder. Implement actual session-based authentication.
-    // For development, we'll assume true. In production, check $_SESSION['user_id'] etc.
-    return true; // For now, always true for development/testing
-} 
+// Authentication is now handled by includes/auth_check.php
+// No need for a local is_logged_in() function
