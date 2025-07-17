@@ -325,7 +325,7 @@ display: block;
                             </a>
                         </li>
                          <li class="mb-2">
-                <a href="../frontend/Dashboard-pay.html" class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-r-lg hover:text-primary transition-colors">
+                <a href="Dash-pay.php" class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-r-lg hover:text-primary transition-colors">
                   <div class="w-6 h-6 flex items-center justify-center mr-3"> <i class="ri-bank-card-line"></i></div>
                   <span class="sidebar-text">Payment</span>
                 </a>

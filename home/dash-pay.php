@@ -1,3 +1,116 @@
+<?php
+ require '../auth/auth_check.php';
+$user_id = $_SESSION['user_id'];
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['selected_plan'])) {
+    $selected = $_POST['selected_plan'];
+
+    // Plan mapping
+    $plans = [
+        'free' => ['plan_name' => 'free', 'credits_total' => 1000, 'leads_balance' => 1000, 'price' => 0],
+        'basic' => ['plan_name' => 'basic', 'credits_total' => 5000, 'leads_balance' => 5000, 'price' => 20],
+        'pro' => ['plan_name' => 'pro', 'credits_total' => 10000, 'leads_balance' => 10000, 'price' => 50],
+        'expertise' => ['plan_name' => 'enterprise', 'credits_total' => 10000000, 'leads_balance' => 10000000, 'price' => 150]
+    ];
+
+    if (!array_key_exists($selected, $plans)) {
+        die("Invalid plan selected.");
+    }
+
+    $plan = $plans[$selected];
+
+    try {
+        // Check if subscription already exists
+        $stmt = $pdo->prepare("SELECT id FROM subscriptions WHERE user_id = ?");
+        $stmt->execute([$user_id]);
+        $subscription = $stmt->fetch();
+
+        if ($subscription) {
+            // Update subscription
+            $update = $pdo->prepare("UPDATE subscriptions SET plan_name = ?, credits_remaining = ?, credits_total = ?, leads_balance = ?, start_date = NOW(), is_active = 1 WHERE user_id = ?");
+            $update->execute([
+                $plan['plan_name'],
+                $plan['credits_total'],
+                $plan['credits_total'],
+                $plan['leads_balance'],
+                $user_id
+            ]);
+        } else {
+            // Create new subscription
+            $insert = $pdo->prepare("INSERT INTO subscriptions (user_id, plan_name, credits_remaining, credits_total, leads_balance, start_date, is_active) VALUES (?, ?, ?, ?, ?, NOW(), 1)");
+            $insert->execute([
+                $user_id,
+                $plan['plan_name'],
+                $plan['credits_total'],
+                $plan['credits_total'],
+                $plan['leads_balance']
+            ]);
+        }
+
+        // Optional: redirect or show success message
+        header("Location: dashboard.php?payment=success&plan={$plan['plan_name']}");
+        exit;
+
+    } catch (PDOException $e) {
+        echo "Error: " . $e->getMessage();
+    }
+
+}
+// Profile picture handling
+try {
+    // Get user data
+    $stmt = $pdo->prepare("SELECT * FROM users WHERE id = ?");
+    $stmt->execute([$_SESSION['user_id']]);
+    $user = $stmt->fetch();
+
+    if (!$user) {
+        session_destroy();
+        header("Location: signup.html?form=login&status=invalid_user");
+        exit;
+    }
+
+    } catch (PDOException $e) {
+    error_log("Dashboard error: " . $e->getMessage());
+    // Continue with fallback values
+}
+
+// Profile picture handling
+if (!empty($user['profile_picture'])) {
+    $filename = str_replace('uploads/profile_pictures/', '', $user['profile_picture']);
+    $avatarUrl = '../uploads/profile_pictures/' . $filename;
+} else {
+    $avatarUrl = "https://ui-avatars.com/api/?name=" . 
+                 urlencode($user['full_name'] ?? 'User') . 
+                 "&background=1E3A8A&color=fff&length=1&size=128";
+}
+//credit balance for side bar
+$user = [];
+$stats = [
+    'credits_remaining' => 1250,
+    'credits_total' => 2000,
+    'credits_percentage' => 0,
+];
+
+// 1. Get user subscription stats (credits, plan, leads_balance)
+    $stmt = $pdo->prepare("SELECT plan_name, credits_remaining, credits_total, leads_balance FROM subscriptions WHERE user_id = ? AND is_active = 1");
+    $stmt->execute([$_SESSION['user_id']]);
+    $subscription = $stmt->fetch();
+
+    $stats['plan_name'] = ucfirst($subscription['plan_name'] ?? 'Free');
+    $stats['credits_remaining'] = $subscription['credits_remaining'] ?? 0;
+    $stats['credits_total'] = $subscription['credits_total'] ?? 1000;
+    $stats['leads_balance'] = $subscription['leads_balance'] ?? 0;
+    $stats['credits_percentage'] = ($stats['credits_total'] > 0)
+        ? ($stats['credits_remaining'] / $stats['credits_total']) * 100
+        : 0;
+
+// Fetch active sessions
+$stmt = $pdo->prepare("SELECT * FROM user_sessions WHERE user_id = ? ORDER BY last_active DESC");
+$stmt->execute([$_SESSION['user_id']]);
+$sessions = $stmt->fetchAll();
+
+?>
+
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -334,7 +447,7 @@
             <ul>
               <li class="mb-2">
                 <a
-                  href="Dashboard-home.html"
+                  href="index.php"
                    class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-r-lg hover:text-primary transition-colors"
                 >
                   <div class="w-6 h-6 flex items-center justify-center mr-3">
@@ -368,7 +481,7 @@
 
               <li class="mb-2">
                 <a
-                  href="Dashboard-pay.html"
+                  href="#"
                   class="flex items-center px-4 py-3 text-primary bg-blue-50 rounded-r-lg border-l-4 border-primary"
                 >
                   <div class="w-6 h-6 flex items-center justify-center mr-3">
@@ -380,7 +493,7 @@
 
               <li class="mb-2">
                 <a
-                  href="Dashboard-set.html"
+                  href="settings.php"
                   class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-r-lg hover:text-primary transition-colors"
                 >
                   <div class="w-6 h-6 flex items-center justify-center mr-3">
@@ -396,13 +509,13 @@
             <div id="upgrade-expanded" class="bg-gray-50 rounded-lg p-4 mb-3">
               <p class="text-sm text-gray-600 mb-2">Credits remaining</p>
               <div class="flex items-center justify-between">
-                <span class="font-semibold text-lg">1,250</span>
-                <span class="text-xs text-gray-500">of 2,000</span>
+                <span class="font-semibold text-lg"><?= number_format($stats['credits_remaining']) ?></span>
+                <span class="text-xs text-gray-500">of <?= number_format($stats['credits_total']) ?></span>
               </div>
               <div class="w-full bg-gray-200 rounded-full h-2 mt-2">
                 <div
                   class="bg-primary rounded-full h-2"
-                  style="width: 62.5%"
+                  style="width: <?= $stats['credits_percentage'] ?>%"
                 ></div>
               </div>
             </div>
@@ -484,7 +597,7 @@
         id="main-content"
         class="main-content-expanded flex-1 transition-all duration-700 ease-in-out"
       >
-        <!-- Header (copied from home) -->
+        <!-- Header  -->
         <header class="bg-white shadow-sm sticky top-0 z-10">
           <div class="flex items-center justify-between px-6 py-4">
             <div class="flex items-center">
@@ -504,7 +617,7 @@
                 >
                   <i class="ri-coin-line"></i>
                 </div>
-                <span class="text-sm font-medium">1,250 credits</span>
+                <span class="text-sm font-medium"><?= number_format($stats['credits_remaining']) ?> credits</span>
               </div>
               <a href="Dashboard-pay.html">
                 <button
@@ -519,7 +632,7 @@
                     class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden"
                   >
                     <img
-                      src="https://readdy.ai/api/search-image?query=professional%20headshot%20of%20a%20young%20business%20person%2C%20neutral%20expression%2C%20high%20quality%20portrait%2C%20business%20attire&width=200&height=200&seq=1&orientation=squarish"
+                      src="<?= htmlspecialchars($avatarUrl) ?>"
                       alt="User avatar"
                       class="w-full h-full object-cover"
                     />
