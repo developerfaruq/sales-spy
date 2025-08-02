@@ -244,9 +244,47 @@ display: block;
   z-index: 30;
   display: none;
 }
+  .popup-alert {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 9999;
+  background-color: #dce1e2ff;
+  color: black;
+  padding: 15px 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  font-weight: 500;
+  animation: fadeOut 0.5s ease-in-out forwards;
+  animation-delay: 5s; /* will fade after 5 seconds */
+}
+
+@keyframes fadeOut {
+  to {
+    opacity: 0;
+    transform: translateY(-10px);
+    pointer-events: none;
+  }
+}
 </style>
 </head>
 <body class="flex h-screen bg-gray-50">
+
+ <?php if (isset($_GET['status']) && $_GET['status'] === 'session_signed_out'): ?>
+  <div id="BackAlert" class="popup-alert">
+    session signed out
+  </div>
+<?php endif; ?>
+
+<script>
+  setTimeout(() => {
+    const alert = document.getElementById('BackAlert');
+    if (alert) {
+      alert.remove();
+    }
+  }, 6000); // remove after 6 seconds (matches fade delay + buffer)
+</script>
+
 <!-- Sidebar Backdrop for mobile -->
 <div class="sidebar-backdrop hidden" id="sidebar-backdrop"></div>
 <!-- Sidebar -->
@@ -737,12 +775,14 @@ document.addEventListener('DOMContentLoaded', function() {
       </div>
       <div class="mt-3 md:mt-0">
         <?php if ($session['session_id'] !== session_id()): ?>
-        <button type="button"
-                class="px-4 py-2 border border-gray-300 text-gray-700 rounded-button text-xs font-medium hover:bg-gray-50 transition-colors whitespace-nowrap"
-                onclick="signOutSession('<?= htmlspecialchars($session['session_id']) ?>', this)">
-          Sign Out
-        </button>
-        <?php else: ?>
+            <form method="POST" action="signout_session.php">
+              <input type="hidden" name="session_id" value="<?= htmlspecialchars($session['session_id']) ?>">
+              <button type="submit"
+                      class="px-4 py-2 border border-gray-300 text-gray-700 rounded-button text-xs font-medium hover:bg-gray-50 transition-colors whitespace-nowrap">
+                Sign Out
+              </button>
+            </form>
+          <?php else: ?>
         <span class="px-4 py-2 border border-gray-300 text-gray-500 rounded-button text-xs font-medium">Active</span>
         <?php endif; ?>
       </div>
@@ -750,52 +790,21 @@ document.addEventListener('DOMContentLoaded', function() {
     <?php endforeach; ?>
   </div>
 
-  <div class="mt-4">
+  <div class="mt-4"> <a href="signout_all.php">
     <button type="button"
             class="px-4 py-2 border border-gray-300 text-gray-700 rounded-button text-sm font-medium hover:bg-gray-50 transition-colors whitespace-nowrap"
-            onclick="signOutAll(this)">
+            >
       Sign Out From All Devices
-    </button>
+    </button></a>
   </div>
 </div>
 
 <script>
-function signOutSession(sessionId, btn) {
-  btn.disabled = true;
-  fetch('signout_session.php', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body: 'session_id=' + encodeURIComponent(sessionId)
-  })
-  .then(res => res.text())
-  .then(() => {
-    // Remove the session card
-    const card = btn.closest('.session-card');
-    if (card) card.remove();
-  })
-  .catch(() => {
-    alert('Failed to sign out session.');
-    btn.disabled = false;
-  });
-}
 
-function signOutAll(btn) {
-  btn.disabled = true;
-  fetch('signout_all.php', {
-    method: 'POST'
-  })
-  .then(res => res.text())
-  .then(() => {
-    // Redirect or clear all sessions visually
-    location.href = '<?= BASE_URL ?>signup.html?form=login&status=all_signed_out';
-  })
-  .catch(() => {
-    alert('Failed to sign out from all devices.');
-    btn.disabled = false;
-  });
-}
+
+
 </script>
-
+        
 </div>
 </section>
 <!-- Danger Zone Section -->

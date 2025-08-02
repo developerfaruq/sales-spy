@@ -9,7 +9,7 @@ if (!isset($_SESSION['admin_id']) && isset($_COOKIE['admin_remember'])) {
 
 // Redirect to login if still not authenticated
 if (!isset($_SESSION['admin_id'])) {
-    header("Location: admin-login.php");
+    header("Location: ../");
     exit;
 }
 

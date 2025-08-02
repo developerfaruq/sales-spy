@@ -53,6 +53,31 @@
       opacity: 1;
       transform: scale(1);
     }
+
+    .popup-alert {
+  position: fixed;
+  top: 20px;
+  
+  z-index: 9999;
+  background-color: #eed7c5ff;
+  color: black;
+  padding: 15px 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  font-weight: 500;
+  animation: fadeOut 0.5s ease-in-out forwards;
+  animation-delay: 5s; /* will fade after 5 seconds */
+}
+
+@keyframes fadeOut {
+  to {
+    opacity: 0;
+    transform: translateY(-10px);
+    pointer-events: none;
+  }
+}
+
+
     .glass-effect {
       background: rgba(255, 255, 255, 0.15);
       backdrop-filter: blur(12px);
@@ -167,6 +192,79 @@
   </style>
 </head>
 <body class="flex flex-col items-center justify-center p-4 md:p-8">
+  <!-- error handling modal -->
+<?php if (isset($_GET['status']) && $_GET['status'] === 'account_unlocked'): ?>
+  <div id="BackAlert" class="popup-alert">
+    Account unlocked please login again.
+  </div>
+<?php endif; ?>
+ <?php if (isset($_GET['status']) && $_GET['status'] === 'ip_blocked'): ?>
+  <div id="BackAlert" class="popup-alert">
+    🚫 Only <strong>2 accounts</strong> are allowed per device. Further registrations are blocked for security reasons, please contact support for help.
+  </div>
+<?php endif; ?>
+<?php if (isset($_GET['status']) && $_GET['status'] === 'duplicate_email_or_phone'): ?>
+  <div id="BackAlert" class="popup-alert">
+    Duplicate email or phone number.
+  </div>
+<?php endif; ?>
+<?php if (isset($_GET['status']) && $_GET['status'] === 'database_error'): ?>
+  <div id="BackAlert" class="popup-alert">
+    we are currently experiencing some issues and our team are actively working on it , for more enquiry contact support.
+  </div>
+<?php endif; ?>
+<?php if (isset($_GET['status']) && $_GET['status'] === 'invalid_email'): ?>
+  <div id="BackAlert" class="popup-alert">
+    Invalid email.
+  </div>
+<?php endif; ?>
+<?php if (isset($_GET['status']) && $_GET['status'] === 'account_disabled'): ?>
+  <div id="BackAlert" class="popup-alert">
+    Account disabled, please contact support.
+  </div>
+<?php endif; ?>
+<?php if (isset($_GET['status']) && $_GET['status'] === 'account_locked_pword'): ?>
+  <div id="BackAlert" class="popup-alert">
+    Account locked, please try again after 2 hours.
+  </div>
+<?php endif; ?>
+<?php if (isset($_GET['status']) && $_GET['status'] === 'invalid_credentials'): ?>
+  <div id="BackAlert" class="popup-alert">
+    Invalid password your account will be locked after 5 failed attempt.
+  </div>
+<?php endif; ?>
+<?php if (isset($_GET['status']) && $_GET['status'] === 'user_not_found'): ?>
+  <div id="BackAlert" class="popup-alert">
+    invalid email, please try another email.
+  </div>
+<?php endif; ?>
+<?php if (isset($_GET['status']) && $_GET['status'] === 'session_expired'): ?>
+  <div id="BackAlert" class="popup-alert">
+    session expired, please login.
+  </div>
+<?php endif; ?>
+
+<?php if (isset($_GET['status']) && $_GET['status'] === 'all_signed_out'): ?>
+  <div id="BackAlert" class="popup-alert">
+    All session signed out.
+  </div>
+<?php endif; ?>
+
+<?php if (isset($_GET['status']) && $_GET['status'] === 'session_revoked'): ?>
+  <div id="BackAlert" class="popup-alert">
+    you have been logged out.
+  </div>
+<?php endif; ?>
+<script>
+  setTimeout(() => {
+    const alert = document.getElementById('BackAlert');
+    if (alert) {
+      alert.remove();
+    }
+  }, 6000); // remove after 6 seconds (matches fade delay + buffer)
+</script>
+
+
   <div id="toast" class="fixed left-1/2 top-8 z-50 transform -translate-x-1/2 opacity-0 pointer-events-none transition-all duration-500 min-w-[260px] max-w-xs"></div>
   <div class="w-full max-w-4xl">
     <a href="index.html" class="inline-flex items-center text-gray-600 hover:text-primary transition-colors mb-6">
@@ -206,6 +304,8 @@
               </div>
             </form>
             <!-- Sign Up Form -->
+             
+
             <form action="auth/signup/" method="post" class="signup-form hidden-form px-1" id="signupForm">
               <div class="space-y-4">
                 <div class="input-group">

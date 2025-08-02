@@ -16,35 +16,49 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Validation: Check for empty fields
     if (empty($full_name) || empty($email) || empty($phone) || empty($password) || empty($confirm_password)) {
-        header('Location: ' . BASE_URL . 'signup.html?form=signup&status=empty_fields');
+        header('Location: ' . BASE_URL . 'signup.php?form=signup&status=empty_fields');
         exit;
     }
 
     // Validate email format
     if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        header('Location: ' . BASE_URL . 'signup.html?form=signup&status=invalid_email');
+        header('Location: ' . BASE_URL . 'signup.php?form=signup&status=invalid_email');
         exit;
     }
 
-    // Validate phone format (digits, optional + or -, 10-20 characters)
+    // Validate phone format
     if (!preg_match('/^[0-9+\-\s]{10,20}$/', $phone)) {
-        header('Location: ' . BASE_URL . 'signup.html?form=signup&status=invalid_phone');
+        header('Location: ' . BASE_URL . 'signup.php?form=signup&status=invalid_phone');
         exit;
     }
 
     // Validate password match
     if ($password !== $confirm_password) {
-        header('Location: ' . BASE_URL . 'signup.html?form=signup&status=password_mismatch');
+        header('Location: ' . BASE_URL . 'signup.php?form=signup&status=password_mismatch');
         exit;
     }
 
     // Validate password strength (minimum 8 characters)
     if (strlen($password) < 8) {
-        header('Location: ' . BASE_URL . 'signup.html?form=signup&status=weak_password');
+        header('Location: ' . BASE_URL . 'signup.php?form=signup&status=weak_password');
         exit;
     }
 
     try {
+        // Get user's IP address
+        $ip_address = $_SERVER['REMOTE_ADDR'];
+
+        // Check how many accounts this IP has already created
+        $ipCount = $pdo->prepare("SELECT COUNT(*) FROM users WHERE ip_address = ?");
+        $ipCount->execute([$ip_address]);
+        $existingAccounts = $ipCount->fetchColumn();
+
+        // Deny registration if more than 2 accounts already created from this IP
+        if ($existingAccounts >= 2) {
+            header('Location: ' . BASE_URL . 'signup.php?form=signup&status=ip_blocked');
+            exit;
+        }
+
         // Start transaction
         $pdo->beginTransaction();
 
@@ -53,30 +67,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt->execute([$email, $phone]);
         if ($stmt->fetch()) {
             $pdo->rollBack();
-            header('Location: ' . BASE_URL . 'signup.html?form=signup&status=duplicate_email_or_phone');
+            header('Location: ' . BASE_URL . 'signup.php?form=signup&status=duplicate_email_or_phone');
             exit;
         }
 
         // Hash password
         $hashed_password = password_hash($password, PASSWORD_BCRYPT);
 
-        // Insert user
-        $stmt = $pdo->prepare("INSERT INTO users (full_name, email, phone, password, role) VALUES (?, ?, ?, ?, 'user')");
-        $stmt->execute([$full_name, $email, $phone, $hashed_password]);
+        // Insert user with IP address and created_at
+        $stmt = $pdo->prepare("INSERT INTO users (full_name, email, phone, password, role, ip_address, created_at) VALUES (?, ?, ?, ?, 'user', ?, NOW())");
+        $stmt->execute([$full_name, $email, $phone, $hashed_password, $ip_address]);
         $user_id = $pdo->lastInsertId();
 
-        // After inserting into users table
-$user_id = $pdo->lastInsertId(); // Get new user ID
+        // Insert default free subscription
+        $insertSubscription = $pdo->prepare("
+            INSERT INTO subscriptions (user_id, plan_name, credits_remaining, credits_total, leads_balance, is_active)
+            VALUES (?, 'free', 1000, 1000, 1000, 1)
+        ");
+        $insertSubscription->execute([$user_id]);
 
-// Insert default free subscription
-$insertSubscription = $pdo->prepare("
-    INSERT INTO subscriptions (user_id, plan_name, credits_remaining, credits_total, leads_balance, is_active)
-    VALUES (?, 'free', 1000, 1000, 1000, 1)
-");
-$insertSubscription->execute([$user_id]);
-
-
-        // Generate and store API key (no expiration)
+        // Generate and store API key
         $api_key = generateApiKey();
         $stmt = $pdo->prepare("INSERT INTO api_keys (user_id, api_key, is_active, created_at) VALUES (?, ?, 1, NOW())");
         $stmt->execute([$user_id, $api_key]);
@@ -84,18 +94,18 @@ $insertSubscription->execute([$user_id]);
         // Commit transaction
         $pdo->commit();
 
-        // Redirect to login with success message and API key
-        header('Location: ' . BASE_URL . 'signup.html?form=login&status=signup_success');
+        // Redirect to login with success message
+        header('Location: ' . BASE_URL . 'signup.php?form=login&status=signup_success');
         exit;
     } catch (Exception $e) {
         // Rollback on error
         $pdo->rollBack();
-        header('Location: ' . BASE_URL . 'signup.html?form=signup&status=database_error');
+        header('Location: ' . BASE_URL . 'signup.php?form=signup&status=database_error');
         exit;
     }
 }
 
 // If not a POST request, redirect to signup page
-header('Location: ' . BASE_URL . 'signup.html?form=signup');
+header('Location: ' . BASE_URL . 'signup.php?form=signup');
 exit;
 ?>
