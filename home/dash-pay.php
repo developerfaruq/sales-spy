@@ -110,27 +110,19 @@ $stmt->execute([$_SESSION['user_id']]);
 $sessions = $stmt->fetchAll();
 
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
+
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Sales-Spy - Crypto Payment Dashboard</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap"
-      rel="stylesheet"
-    />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
-      rel="stylesheet"
-    />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css"
-    />
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" />
     <script src="https://cdn.tailwindcss.com/3.4.16"></script>
     <script>
       tailwind.config = {
@@ -157,62 +149,78 @@ $sessions = $stmt->fetchAll();
       :where([class^="ri-"])::before {
         content: "\f3c2";
       }
+
       body {
         font-family: "Inter", sans-serif;
-        background-color: #f9fafb; /* match home */
+        background-color: #f9fafb;
+        /* match home */
       }
+
       .glassmorphism {
         background: rgba(255, 255, 255, 0.8);
         backdrop-filter: blur(8px);
         border: 1px solid rgba(255, 255, 255, 0.3);
       }
+
       .sidebar-expanded {
         width: 240px;
         transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
       }
+
       .sidebar-collapsed {
         width: 80px;
         transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
       }
+
       .main-content-expanded {
         margin-left: 240px;
         transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
       }
+
       .main-content-collapsed {
         margin-left: 80px;
         transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
       }
+
       @media (max-width: 768px) {
+
         .main-content-expanded,
         .main-content-collapsed {
           margin-left: 0;
         }
       }
+
       .sidebar-item:hover {
         background-color: rgba(45, 127, 249, 0.1);
       }
+
       .plan-card {
         transition: all 0.3s ease;
       }
+
       .plan-card:hover {
         transform: translateY(-4px);
         box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
       }
+
       .plan-card.active {
         border-color: #2d7ff9;
         background-color: rgba(45, 127, 249, 0.05);
       }
+
       .toggle {
         position: relative;
         display: inline-block;
         width: 48px;
         height: 24px;
       }
+
       .toggle input {
         opacity: 0;
         width: 0;
         height: 0;
       }
+
       .slider {
         position: absolute;
         cursor: pointer;
@@ -224,6 +232,7 @@ $sessions = $stmt->fetchAll();
         transition: 0.4s;
         border-radius: 24px;
       }
+
       .slider:before {
         position: absolute;
         content: "";
@@ -235,12 +244,15 @@ $sessions = $stmt->fetchAll();
         transition: 0.4s;
         border-radius: 50%;
       }
-      input:checked + .slider {
+
+      input:checked+.slider {
         background-color: #2d7ff9;
       }
-      input:checked + .slider:before {
+
+      input:checked+.slider:before {
         transform: translateX(24px);
       }
+
       input[type="range"] {
         -webkit-appearance: none;
         appearance: none;
@@ -250,6 +262,7 @@ $sessions = $stmt->fetchAll();
         border-radius: 5px;
         outline: none;
       }
+
       input[type="range"]::-webkit-slider-thumb {
         -webkit-appearance: none;
         appearance: none;
@@ -259,6 +272,7 @@ $sessions = $stmt->fetchAll();
         cursor: pointer;
         border-radius: 50%;
       }
+
       input[type="range"]::-moz-range-thumb {
         width: 18px;
         height: 18px;
@@ -266,24 +280,29 @@ $sessions = $stmt->fetchAll();
         cursor: pointer;
         border-radius: 50%;
       }
+
       input[type="number"]::-webkit-inner-spin-button,
       input[type="number"]::-webkit-outer-spin-button {
         -webkit-appearance: none;
         margin: 0;
       }
+
       .custom-radio {
         display: flex;
         align-items: center;
       }
+
       .custom-radio input[type="radio"] {
         display: none;
       }
+
       .custom-radio label {
         position: relative;
         padding-left: 28px;
         cursor: pointer;
         display: inline-block;
       }
+
       .custom-radio label:before {
         content: "";
         position: absolute;
@@ -296,10 +315,12 @@ $sessions = $stmt->fetchAll();
         border-radius: 50%;
         background-color: #fff;
       }
-      .custom-radio input[type="radio"]:checked + label:before {
+
+      .custom-radio input[type="radio"]:checked+label:before {
         border-color: #2d7ff9;
       }
-      .custom-radio input[type="radio"]:checked + label:after {
+
+      .custom-radio input[type="radio"]:checked+label:after {
         content: "";
         position: absolute;
         left: 5px;
@@ -310,19 +331,23 @@ $sessions = $stmt->fetchAll();
         border-radius: 50%;
         background-color: #2d7ff9;
       }
+
       .custom-checkbox {
         display: flex;
         align-items: center;
       }
+
       .custom-checkbox input[type="checkbox"] {
         display: none;
       }
+
       .custom-checkbox label {
         position: relative;
         padding-left: 28px;
         cursor: pointer;
         display: inline-block;
       }
+
       .custom-checkbox label:before {
         content: "";
         position: absolute;
@@ -335,11 +360,13 @@ $sessions = $stmt->fetchAll();
         border-radius: 4px;
         background-color: #fff;
       }
-      .custom-checkbox input[type="checkbox"]:checked + label:before {
+
+      .custom-checkbox input[type="checkbox"]:checked+label:before {
         background-color: #2d7ff9;
         border-color: #2d7ff9;
       }
-      .custom-checkbox input[type="checkbox"]:checked + label:after {
+
+      .custom-checkbox input[type="checkbox"]:checked+label:after {
         content: "";
         position: absolute;
         left: 6px;
@@ -350,10 +377,12 @@ $sessions = $stmt->fetchAll();
         border: solid white;
         border-width: 0 2px 2px 0;
       }
+
       .tooltip {
         position: relative;
         display: inline-block;
       }
+
       .tooltip .tooltip-text {
         visibility: hidden;
         width: 200px;
@@ -370,27 +399,32 @@ $sessions = $stmt->fetchAll();
         opacity: 0;
         transition: opacity 0.3s;
       }
+
       .tooltip:hover .tooltip-text {
         visibility: visible;
         opacity: 1;
       }
+
       /* Fintech modal tweaks for mobile and clarity */
       @media (max-width: 480px) {
         .fintech-modal {
           padding: 1.25rem !important;
           border-radius: 0.75rem !important;
         }
+
         .fintech-modal .w-40,
         .fintech-modal .h-40 {
           width: 8rem !important;
           height: 8rem !important;
         }
+
         .fintech-modal .w-36,
         .fintech-modal .h-36 {
           width: 7rem !important;
           height: 7rem !important;
         }
       }
+
       @media (max-width: 767px) {
         .plan-card {
           min-width: 85vw;
@@ -398,112 +432,138 @@ $sessions = $stmt->fetchAll();
           flex: 0 0 auto;
           margin-right: 0.5rem;
         }
+
         .p-6 {
           padding: 1.25rem !important;
         }
+
         .max-w-7xl {
           max-width: 100vw !important;
         }
-        body, html {
+
+        body,
+        html {
           width: 100vw;
           overflow-x: hidden;
         }
       }
+
+      /* --- Card payment modal tweaks for mobile --- */
+      @media (max-width: 480px) {
+
+        .fintech-modal input,
+        .fintech-modal button {
+          font-size: 15px !important;
+        }
+
+        .fintech-modal .flex.gap-4 {
+          flex-direction: column;
+          gap: 0.5rem;
+        }
+      }
+
+      .qr-disabled {
+        pointer-events: none;
+        opacity: 0.5;
+        filter: grayscale(0.7);
+      }
+
+      .qr-enabled {
+        pointer-events: auto;
+        opacity: 1;
+        filter: none;
+      }
+
+      .plan-card.selected {
+        border-width: 2px;
+        border-color: #1E3A8A;
+        box-shadow: 0 0 0 2px #1E3A8A33;
+        background-color: #f0f6ff;
+      }
     </style>
   </head>
+
   <body>
     <div class="flex h-screen bg-gray-50">
       <!-- Sidebar -->
-      <div
-        id="sidebar"
-        class="sidebar-expanded fixed h-full bg-white shadow-lg z-20 transition-all duration-700 ease-in-out"
-      >
+      <div id="sidebar"
+        class="sidebar-expanded fixed h-full bg-white shadow-lg z-20 transition-all duration-700 ease-in-out">
         <div class="flex flex-col h-full">
           <!-- Logo -->
           <div class="p-4 border-b flex items-center justify-center relative">
-            <img
-              src="https://res.cloudinary.com/dtrn8j0sz/image/upload/v1749075914/SS_s4jkfw.jpg"
-              alt="Logo"
-              id="sidebar-logo-img"
-              class="w-8 h-8 mr-0 hidden"
-            />
-            <h1
-              id="sidebar-logo-text"
-              class="font-['Pacifico'] text-2xl text-primary"
-            >
+            <img src="https://res.cloudinary.com/dtrn8j0sz/image/upload/v1749075914/SS_s4jkfw.jpg" alt="Logo"
+              id="sidebar-logo-img" class="w-8 h-8 mr-0 hidden" />
+            <h1 id="sidebar-logo-text" class="font-['Pacifico'] text-2xl text-primary">
               Sales-Spy
             </h1>
             <!-- Mobile-only collapse button -->
-            <button
-              id="sidebar-mobile-close"
-              class="absolute right-2 top-2 p-2 rounded-full hover:bg-gray-100 md:hidden"
-              aria-label="Close sidebar"
-            >
+            <button id="sidebar-mobile-close"
+              class="absolute right-2 top-2 p-2 rounded-full hover:bg-gray-100 md:hidden" aria-label="Close sidebar">
               <i class="ri-close-line text-xl"></i>
             </button>
           </div>
           <!-- Navigation -->
-          <nav class="flex-1 overflow-y-auto py-4">
+            <nav class="flex-1 overflow-y-auto py-4">
             <ul>
               <li class="mb-2">
-                <a
-                  href="index.php"
-                   class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-r-lg hover:text-primary transition-colors"
-                >
-                  <div class="w-6 h-6 flex items-center justify-center mr-3">
-                    <i class="ri-dashboard-line"></i>
-                  </div>
-                  <span class="sidebar-text">Dashboard</span>
-                </a>
+              <a href="Dashboard-home.html"
+                class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-r-lg hover:text-primary transition-colors">
+                <div class="w-6 h-6 flex items-center justify-center mr-3">
+                <i class="ri-dashboard-line"></i>
+                </div>
+                <span class="sidebar-text">Dashboard</span>
+              </a>
               </li>
               <li class="mb-2">
-                <a
-                  href="Dashboard-com.html"
-                  class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-r-lg hover:text-primary transition-colors"
-                >
-                  <div class="w-6 h-6 flex items-center justify-center mr-3">
-                    <i class="ri-global-line"></i>
-                  </div>
-                  <span class="sidebar-text">Websites</span>
-                </a>
+              <a href="Dashboard-com.html"
+                class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-r-lg hover:text-primary transition-colors">
+                <div class="w-6 h-6 flex items-center justify-center mr-3">
+                <i class="ri-global-line"></i>
+                </div>
+                <span class="sidebar-text">Websites</span>
+              </a>
               </li>
               <li class="mb-2">
-                <a
-                  href="Dashboard-ecc.html"
-                  class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-r-lg hover:text-primary transition-colors"
-                >
-                  <div class="w-6 h-6 flex items-center justify-center mr-3">
-                    <i class="ri-shopping-cart-line"></i>
-                  </div>
-                  <span class="sidebar-text">E-commerce</span>
-                </a>
+              <a href="Dashboard-ecc.html"
+                class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-r-lg hover:text-primary transition-colors">
+                <div class="w-6 h-6 flex items-center justify-center mr-3">
+                <i class="ri-shopping-cart-line"></i>
+                </div>
+                <span class="sidebar-text">E-commerce</span>
+              </a>
               </li>
 
               <li class="mb-2">
-                <a
-                  href="#"
-                  class="flex items-center px-4 py-3 text-primary bg-blue-50 rounded-r-lg border-l-4 border-primary"
-                >
-                  <div class="w-6 h-6 flex items-center justify-center mr-3">
-                    <i class="ri-bank-card-line"></i>
-                  </div>
-                  <span class="sidebar-text">Payment</span>
-                </a>
+              <a href="Dashboard-pay.html"
+                class="flex items-center px-4 py-3 text-primary bg-blue-50 rounded-r-lg border-l-4 border-primary">
+                <div class="w-6 h-6 flex items-center justify-center mr-3">
+                <i class="ri-bank-card-line"></i>
+                </div>
+                <span class="sidebar-text">Payment</span>
+              </a>
               </li>
 
               <li class="mb-2">
-                <a
-                  href="settings.php"
-                  class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-r-lg hover:text-primary transition-colors"
-                >
-                  <div class="w-6 h-6 flex items-center justify-center mr-3">
-                    <i class="ri-settings-line"></i>
-                  </div>
-                  <span class="sidebar-text">Settings</span>
-                </a>
+              <a href="Dashboard-his.html"
+                class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-r-lg hover:text-primary transition-colors">
+                <div class="w-6 h-6 flex items-center justify-center mr-3">
+                <i class="ri-file-list-3-line"></i>
+                </div>
+                <span class="sidebar-text">Transaction History</span>
+              </a>
+              </li>
+
+              <li class="mb-2">
+              <a href="Dashboard-set.html"
+                class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-r-lg hover:text-primary transition-colors">
+                <div class="w-6 h-6 flex items-center justify-center mr-3">
+                <i class="ri-settings-line"></i>
+                </div>
+                <span class="sidebar-text">Settings</span>
+              </a>
               </li>
             </ul>
-          </nav>
+            </nav>
           <!-- Upgrade section -->
           <div id="upgrade-section" class="p-4 border-t">
             <div id="upgrade-expanded" class="bg-gray-50 rounded-lg p-4 mb-3">
@@ -540,6 +600,13 @@ $sessions = $stmt->fetchAll();
               </button>
             </a>
           </div>
+          <style>
+            @media (max-width: 768px) {
+              .sidebar-collapsed .sidebar-text-mobile {
+                display: none !important;
+              }
+            }
+          </style>
           <script>
             document.addEventListener("DOMContentLoaded", function () {
               const sidebar = document.getElementById("sidebar");
@@ -593,18 +660,12 @@ $sessions = $stmt->fetchAll();
         </div>
       </div>
       <!-- Main Content -->
-      <div
-        id="main-content"
-        class="main-content-expanded flex-1 transition-all duration-700 ease-in-out"
-      >
-        <!-- Header  -->
+      <div id="main-content" class="main-content-expanded flex-1 transition-all duration-700 ease-in-out">
+        <!-- Header (copied from home) -->
         <header class="bg-white shadow-sm sticky top-0 z-10">
           <div class="flex items-center justify-between px-6 py-4">
             <div class="flex items-center">
-              <button
-                id="sidebar-toggle"
-                class="p-2 rounded-full hover:bg-gray-100 mr-4"
-              >
+              <button id="sidebar-toggle" class="p-2 rounded-full hover:bg-gray-100 mr-4">
                 <div class="w-5 h-5 flex items-center justify-center">
                   <i class="ri-menu-line"></i>
                 </div>
@@ -612,30 +673,23 @@ $sessions = $stmt->fetchAll();
             </div>
             <div class="flex items-center space-x-4">
               <div class="flex items-center bg-gray-100 rounded-full px-3 py-1">
-                <div
-                  class="w-5 h-5 flex items-center justify-center mr-2 text-primary"
-                >
+                <div class="w-5 h-5 flex items-center justify-center mr-2 text-primary">
                   <i class="ri-coin-line"></i>
                 </div>
                 <span class="text-sm font-medium"><?= number_format($stats['credits_remaining']) ?> credits</span>
               </div>
               <a href="Dashboard-pay.html">
                 <button
-                  class="bg-primary text-white py-2 px-4 rounded-button whitespace-nowrap hover:bg-blue-600 transition-colors"
-                >
+                  class="bg-primary text-white py-2 px-4 rounded-button whitespace-nowrap hover:bg-blue-600 transition-colors">
                   <span>Upgrade</span>
                 </button>
               </a>
               <div class="relative">
                 <button class="flex items-center space-x-2">
-                  <div
-                    class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden"
-                  >
+                  <div class="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
                     <img
                       src="<?= htmlspecialchars($avatarUrl) ?>"
-                      alt="User avatar"
-                      class="w-full h-full object-cover"
-                    />
+                      alt="User avatar" class="w-full h-full object-cover" />
                   </div>
                 </button>
               </div>
@@ -646,43 +700,39 @@ $sessions = $stmt->fetchAll();
         <div class="p-6 max-w-7xl mx-auto">
           <div class="mb-6">
 
-            <h1 class="text-2xl font-bold text-primary mb-2" style="color: #1E3A8A;">Crypto Payment</h1>
+            <h1 class="text-2xl font-bold text-primary mb-2" style="color: #1E3A8A;">Payments</h1>
             <p class="text-gray-600">
-              Manage your <span class="font-bold " style="color: #1E3A8A;">subscription</span> plans and  <span class="font-bold " style="color: #1E3A8A;">payment</span>methods.
+              Manage your <span class="font-bold " style="color: #1E3A8A;">subscription</span> plans and <span
+                class="font-bold " style="color: #1E3A8A;">payment</span>methods.
             </p>
             <h1 class="text-2xl font-bold text-gray-900">
-              
+
             </h1>
             <p class="text-gray-500 mt-1">
-              
+
             </p>
           </div>
           <!-- Plan Selection Section -->
           <section class="mb-8">
             <div class="flex items-center justify-between mb-6 px-2 sm:px-0">
               <h2 class="text-xl font-semibold text-gray-900">Select a Plan</h2>
-               <!-- duration toggle section -->
+              <!-- duration toggle section -->
               <div class="flex items-center space-x-2">
                 <span class="text-sm text-gray-600">Monthly</span>
                 <label class="toggle">
                   <input type="checkbox" id="billing-toggle" />
                   <span class="slider"></span>
                 </label>
-                <span class="text-sm text-gray-600"
-                  >Yearly
-                  <span class="text-xs text-primary">(Save 20%)</span></span
-                >
+                <span class="text-sm text-gray-600">Yearly
+                  <span class="text-xs text-primary">(Save 20%)</span></span>
               </div>
             </div>
             <div
               class="flex gap-4 overflow-x-auto pb-2 -mx-2 px-2 md:grid md:grid-cols-3 md:gap-6 md:overflow-x-visible md:mx-0 md:px-0"
-              style="scrollbar-width: thin; -webkit-overflow-scrolling: touch;"
-            >
+              style="scrollbar-width: thin; -webkit-overflow-scrolling: touch;">
               <!-- Plan Cards (wrap in glassmorphism for home style) -->
-              <div
-                id="basic-plan"
-                class="plan-card glassmorphism bg-white rounded-lg border border-gray-200 p-6 cursor-pointer"
-              >
+              <div id="basic-plan"
+                class="plan-card glassmorphism bg-white rounded-lg border border-gray-200 p-6 cursor-pointer">
                 <div class="mb-4">
                   <h3 class="text-xl font-semibold text-gray-900">Basic</h3>
                   <p class="text-sm text-gray-500 mt-1">
@@ -698,59 +748,39 @@ $sessions = $stmt->fetchAll();
                 </div>
                 <ul class="space-y-3 mb-8">
                   <li class="flex items-start">
-                    <div
-                      class="w-5 h-5 flex items-center justify-center text-primary mt-0.5"
-                    >
+                    <div class="w-5 h-5 flex items-center justify-center text-primary mt-0.5">
                       <i class="ri-check-line"></i>
                     </div>
-                    <span class="text-sm text-gray-700 ml-2"
-                      >500 leads per month</span
-                    >
+                    <span class="text-sm text-gray-700 ml-2">500 leads per month</span>
                   </li>
                   <li class="flex items-start">
-                    <div
-                      class="w-5 h-5 flex items-center justify-center text-primary mt-0.5"
-                    >
+                    <div class="w-5 h-5 flex items-center justify-center text-primary mt-0.5">
                       <i class="ri-check-line"></i>
                     </div>
-                    <span class="text-sm text-gray-700 ml-2"
-                      >Basic filtering options</span
-                    >
+                    <span class="text-sm text-gray-700 ml-2">Basic filtering options</span>
                   </li>
                   <li class="flex items-start">
-                    <div
-                      class="w-5 h-5 flex items-center justify-center text-primary mt-0.5"
-                    >
+                    <div class="w-5 h-5 flex items-center justify-center text-primary mt-0.5">
                       <i class="ri-check-line"></i>
                     </div>
-                    <span class="text-sm text-gray-700 ml-2"
-                      >Email and phone support</span
-                    >
+                    <span class="text-sm text-gray-700 ml-2">Email and phone support</span>
                   </li>
                   <li class="flex items-start">
-                    <div
-                      class="w-5 h-5 flex items-center justify-center text-primary mt-0.5"
-                    >
+                    <div class="w-5 h-5 flex items-center justify-center text-primary mt-0.5">
                       <i class="ri-check-line"></i>
                     </div>
-                    <span class="text-sm text-gray-700 ml-2"
-                      >Weekly database updates</span
-                    >
+                    <span class="text-sm text-gray-700 ml-2">Weekly database updates</span>
                   </li>
                 </ul>
                 <button
-                  class="w-full py-3 text-sm font-medium text-primary border border-primary rounded-button hover:bg-primary/5 transition-colors whitespace-nowrap"
-                >
+                  class="w-full py-3 text-sm font-medium text-primary border border-primary rounded-button hover:bg-primary/5 transition-colors whitespace-nowrap plan-get-started"
+                  data-plan="basic-plan">
                   Get started
                 </button>
               </div>
-              <div
-                id="pro-plan"
-                class="plan-card active glassmorphism bg-white rounded-lg border-2 border-primary p-6 cursor-pointer relative"
-              >
-                <div
-                  class="absolute -top-3 right-4 bg-primary text-white text-xs font-medium px-3 py-1 rounded-full"
-                >
+              <div id="pro-plan"
+                class="plan-card active glassmorphism bg-white rounded-lg border-2 border-primary p-6 cursor-pointer relative">
+                <div class="absolute -top-3 right-4 bg-primary text-white text-xs font-medium px-3 py-1 rounded-full">
                   POPULAR
                 </div>
                 <div class="mb-4">
@@ -768,76 +798,50 @@ $sessions = $stmt->fetchAll();
                 </div>
                 <ul class="space-y-3 mb-8">
                   <li class="flex items-start">
-                    <div
-                      class="w-5 h-5 flex items-center justify-center text-primary mt-0.5"
-                    >
+                    <div class="w-5 h-5 flex items-center justify-center text-primary mt-0.5">
                       <i class="ri-check-line"></i>
                     </div>
-                    <span class="text-sm text-gray-700 ml-2"
-                      >2,000 leads per month</span
-                    >
+                    <span class="text-sm text-gray-700 ml-2">2,000 leads per month</span>
                   </li>
                   <li class="flex items-start">
-                    <div
-                      class="w-5 h-5 flex items-center justify-center text-primary mt-0.5"
-                    >
+                    <div class="w-5 h-5 flex items-center justify-center text-primary mt-0.5">
                       <i class="ri-check-line"></i>
                     </div>
-                    <span class="text-sm text-gray-700 ml-2"
-                      >Advanced filtering options</span
-                    >
+                    <span class="text-sm text-gray-700 ml-2">Advanced filtering options</span>
                   </li>
                   <li class="flex items-start">
-                    <div
-                      class="w-5 h-5 flex items-center justify-center text-primary mt-0.5"
-                    >
+                    <div class="w-5 h-5 flex items-center justify-center text-primary mt-0.5">
                       <i class="ri-check-line"></i>
                     </div>
-                    <span class="text-sm text-gray-700 ml-2"
-                      >Priority support</span
-                    >
+                    <span class="text-sm text-gray-700 ml-2">Priority support</span>
                   </li>
                   <li class="flex items-start">
-                    <div
-                      class="w-5 h-5 flex items-center justify-center text-primary mt-0.5"
-                    >
+                    <div class="w-5 h-5 flex items-center justify-center text-primary mt-0.5">
                       <i class="ri-check-line"></i>
                     </div>
-                    <span class="text-sm text-gray-700 ml-2"
-                      >Daily database updates</span
-                    >
+                    <span class="text-sm text-gray-700 ml-2">Daily database updates</span>
                   </li>
                   <li class="flex items-start">
-                    <div
-                      class="w-5 h-5 flex items-center justify-center text-primary mt-0.5"
-                    >
+                    <div class="w-5 h-5 flex items-center justify-center text-primary mt-0.5">
                       <i class="ri-check-line"></i>
                     </div>
-                    <span class="text-sm text-gray-700 ml-2"
-                      >CRM integration</span
-                    >
+                    <span class="text-sm text-gray-700 ml-2">CRM integration</span>
                   </li>
                   <li class="flex items-start">
-                    <div
-                      class="w-5 h-5 flex items-center justify-center text-primary mt-0.5"
-                    >
+                    <div class="w-5 h-5 flex items-center justify-center text-primary mt-0.5">
                       <i class="ri-check-line"></i>
                     </div>
-                    <span class="text-sm text-gray-700 ml-2"
-                      >Email sequence automation</span
-                    >
+                    <span class="text-sm text-gray-700 ml-2">Email sequence automation</span>
                   </li>
                 </ul>
                 <button
-                  class="w-full py-3 text-sm font-medium bg-primary text-white rounded-button hover:bg-primary/90 transition-colors whitespace-nowrap"
-                >
+                  class="w-full py-3 text-sm font-medium bg-primary text-white rounded-button hover:bg-primary/90 transition-colors whitespace-nowrap plan-get-started"
+                  data-plan="pro-plan">
                   Get started
                 </button>
               </div>
-              <div
-                id="enterprise-plan"
-                class="plan-card glassmorphism bg-white rounded-lg border border-gray-200 p-6 cursor-pointer"
-              >
+              <div id="enterprise-plan"
+                class="plan-card glassmorphism bg-white rounded-lg border border-gray-200 p-6 cursor-pointer">
                 <div class="mb-4">
                   <h3 class="text-xl font-semibold text-gray-900">
                     Enterprise
@@ -854,69 +858,45 @@ $sessions = $stmt->fetchAll();
                 </div>
                 <ul class="space-y-3 mb-8">
                   <li class="flex items-start">
-                    <div
-                      class="w-5 h-5 flex items-center justify-center text-primary mt-0.5"
-                    >
+                    <div class="w-5 h-5 flex items-center justify-center text-primary mt-0.5">
                       <i class="ri-check-line"></i>
                     </div>
-                    <span class="text-sm text-gray-700 ml-2"
-                      >Unlimited leads</span
-                    >
+                    <span class="text-sm text-gray-700 ml-2">Unlimited leads</span>
                   </li>
                   <li class="flex items-start">
-                    <div
-                      class="w-5 h-5 flex items-center justify-center text-primary mt-0.5"
-                    >
+                    <div class="w-5 h-5 flex items-center justify-center text-primary mt-0.5">
                       <i class="ri-check-line"></i>
                     </div>
-                    <span class="text-sm text-gray-700 ml-2"
-                      >Custom filtering options</span
-                    >
+                    <span class="text-sm text-gray-700 ml-2">Custom filtering options</span>
                   </li>
                   <li class="flex items-start">
-                    <div
-                      class="w-5 h-5 flex items-center justify-center text-primary mt-0.5"
-                    >
+                    <div class="w-5 h-5 flex items-center justify-center text-primary mt-0.5">
                       <i class="ri-check-line"></i>
                     </div>
-                    <span class="text-sm text-gray-700 ml-2"
-                      >Dedicated account manager</span
-                    >
+                    <span class="text-sm text-gray-700 ml-2">Dedicated account manager</span>
                   </li>
                   <li class="flex items-start">
-                    <div
-                      class="w-5 h-5 flex items-center justify-center text-primary mt-0.5"
-                    >
+                    <div class="w-5 h-5 flex items-center justify-center text-primary mt-0.5">
                       <i class="ri-check-line"></i>
                     </div>
-                    <span class="text-sm text-gray-700 ml-2"
-                      >Real-time database updates</span
-                    >
+                    <span class="text-sm text-gray-700 ml-2">Real-time database updates</span>
                   </li>
                   <li class="flex items-start">
-                    <div
-                      class="w-5 h-5 flex items-center justify-center text-primary mt-0.5"
-                    >
+                    <div class="w-5 h-5 flex items-center justify-center text-primary mt-0.5">
                       <i class="ri-check-line"></i>
                     </div>
-                    <span class="text-sm text-gray-700 ml-2"
-                      >Advanced API access</span
-                    >
+                    <span class="text-sm text-gray-700 ml-2">Advanced API access</span>
                   </li>
                   <li class="flex items-start">
-                    <div
-                      class="w-5 h-5 flex items-center justify-center text-primary mt-0.5"
-                    >
+                    <div class="w-5 h-5 flex items-center justify-center text-primary mt-0.5">
                       <i class="ri-check-line"></i>
                     </div>
-                    <span class="text-sm text-gray-700 ml-2"
-                      >Custom integration development</span
-                    >
+                    <span class="text-sm text-gray-700 ml-2">Custom integration development</span>
                   </li>
                 </ul>
                 <button
-                  class="w-full py-3 text-sm font-medium text-primary border border-primary rounded-button hover:bg-primary/5 transition-colors whitespace-nowrap"
-                >
+                  class="w-full py-3 text-sm font-medium text-primary border border-primary rounded-button hover:bg-primary/5 transition-colors whitespace-nowrap plan-get-started"
+                  data-plan="enterprise-plan">
                   Contact sales
                 </button>
               </div>
@@ -927,14 +907,10 @@ $sessions = $stmt->fetchAll();
             <h2 class="text-lg font-semibold text-gray-800 mb-4">
               Billing Summary
             </h2>
-            <div
-              class="glassmorphism bg-white rounded-lg border border-gray-200 p-6 relative"
-            >
-              <button
-                id="edit-plan-btn"
+            <div class="glassmorphism bg-white rounded-lg border border-gray-200 p-6 relative">
+              <button id="edit-plan-btn"
                 class="absolute top-6 right-6 text-sm font-medium text-primary hover:text-primary/80 flex items-center whitespace-nowrap"
-                type="button"
-              >
+                type="button">
                 <div class="w-4 h-4 flex items-center justify-center mr-1">
                   <i class="ri-edit-line"></i>
                 </div>
@@ -947,57 +923,47 @@ $sessions = $stmt->fetchAll();
                       Selected Plan
                     </h3>
                     <div class="flex items-center"></div>
-                      <div
-                        class="w-5 h-5 flex items-center justify-center text-primary mr-2"
-                      >
-                        <i class="ri-rocket-line"></i>
-                      </div>
-                      <span id="billing-plan-name" class="text-base font-medium text-gray-900">
-                        Pro Plan ($50/mo)
-                      </span>
+                    <div class="w-5 h-5 flex items-center justify-center text-primary mr-2">
+                      <i class="ri-rocket-line"></i>
                     </div>
-                  </div>
-                  <div>
-                    <h3 class="text-sm font-medium text-gray-500 mb-1">
-                      Payment Method
-                    </h3>
-                    <div class="flex items-center">
-                      <div
-                        class="w-5 h-5 flex items-center justify-center text-primary mr-2"
-                      >
-                        <i class="ri-bank-card-line"></i>
-                      </div>
-                      <span class="text-base font-medium text-gray-900"
-                        >TRC-20 USDT</span
-                      >
-                    </div>
+                    <span id="billing-plan-name" class="text-base font-medium text-gray-900">
+                      Pro Plan ($50/mo)
+                    </span>
                   </div>
                 </div>
-                <div class="space-y-4">
-                  <div>
-                    <h3 class="text-sm font-medium text-gray-500 mb-1">
-                      Billing Cycle
-                    </h3>
-                    <div class="flex items-center">
-                      <div
-                        class="w-5 h-5 flex items-center justify-center text-primary mr-2"
-                      >
-                        <i class="ri-calendar-line"></i>
-                      </div>
-                      <span id="billing-cycle" class="text-base font-medium text-gray-900">
-                        Monthly (Renews every 30 days)
-                      </span>
+                <div>
+                  <h3 class="text-sm font-medium text-gray-500 mb-1">
+                    Payment Method
+                  </h3>
+                  <div class="flex items-center">
+                    <div class="w-5 h-5 flex items-center justify-center text-primary mr-2">
+                      <i class="ri-bank-card-line"></i>
                     </div>
+                    <span class="text-base font-medium text-gray-900">TRC-20 USDT</span>
                   </div>
-                  <div>
-                    <h3 class="text-sm font-medium text-gray-500 mb-1">
-                      Next Payment Date
-                    </h3>
-                    <div class="flex items-center">
-                      <div
-                        class="w-5 h-5 flex items-center justify-center text-primary mr-2"
-                      >
-            </div>
+                </div>
+              </div>
+              <div class="space-y-4">
+                <div>
+                  <h3 class="text-sm font-medium text-gray-500 mb-1">
+                    Billing Cycle
+                  </h3>
+                  <div class="flex items-center">
+                    <div class="w-5 h-5 flex items-center justify-center text-primary mr-2">
+                      <i class="ri-calendar-line"></i>
+                    </div>
+                    <span id="billing-cycle" class="text-base font-medium text-gray-900">
+                      Monthly (Renews every 30 days)
+                    </span>
+                  </div>
+                </div>
+                <div>
+                  <h3 class="text-sm font-medium text-gray-500 mb-1">
+                    Next Payment Date
+                  </h3>
+                  <div class="flex items-center">
+                    <div class="w-5 h-5 flex items-center justify-center text-primary mr-2">
+                    </div>
           </section>
           <script>
             document.addEventListener("DOMContentLoaded", function () {
@@ -1118,281 +1084,1084 @@ $sessions = $stmt->fetchAll();
               updateBillingSummary();
             });
           </script>
-          <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <!-- Save Wallet Form -->
-            <section>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              <!-- Save Wallet Form -->
+              <section>
               <h2 class="text-lg font-semibold text-gray-800 mb-4">
                 TRC-20 USDT Payment Wallet
               </h2>
-              <div
-                class="glassmorphism bg-white rounded-lg border border-gray-200 p-6"
-              >
+              <div class="glassmorphism bg-white rounded-lg border border-gray-200 p-6">
                 <form id="wallet-form">
-                  <div class="space-y-5">
-                    <div>
-                      <label
-                        for="wallet-name"
-                        class="block text-sm font-medium text-gray-700 mb-1"
-                        >Wallet Name</label
-                      >
-                      <input
-                        type="text"
-                        id="wallet-name"
-                        class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 text-sm"
-                        placeholder="e.g. My TRC-20 USDT Wallet"
-                        value="TRC-20 USDT Wallet"
-                        readonly
-                      />
-                    </div>
-                    <div>
-                      <label
-                        for="blockchain"
-                        class="block text-sm font-medium text-gray-700 mb-1"
-                        >Blockchain</label
-                      >
-                      <input
-                        type="text"
-                        id="blockchain"
-                        class="w-full px-4 py-2.5 rounded-lg border border-gray-300 bg-gray-100 text-gray-700 text-sm"
-                        value="TRON (TRC-20)"
-                        readonly
-                      />
-                    </div>
-                    <div>
-                      <label
-                        class="block text-sm font-medium text-gray-700 mb-2"
-                        >Token Standard</label
-                      >
-                      <input
-                        type="text"
-                        class="w-full px-4 py-2.5 rounded-lg border border-gray-300 bg-gray-100 text-gray-700 text-sm"
-                        value="USDT (TRC-20)"
-                        readonly
-                      />
-                    </div>
-                    <div>
-                      <label
-                        for="wallet-address"
-                        class="block text-sm font-medium text-gray-700 mb-1"
-                        >Wallet Address</label
-                      >
-                      <div class="relative">
-                        <input
-                          type="text"
-                          id="wallet-address"
-                          class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 text-sm font-mono"
-                          placeholder="TVTkZq3ghDZgF8txTdDM3s8g76XM2pgiey"
-                          value="TVTkZq3ghDZgF8txTdDM3s8g76XM2pgiey"
-                          readonly
-                        />
-                        <div
-                          class="absolute right-3 top-1/2 transform -translate-y-1/2 tooltip"
-                        >
-                          <button
-                            type="button"
-                            class="w-5 h-5 flex items-center justify-center text-gray-400"
-                            title="Copy address"
-                            onclick="navigator.clipboard.writeText('TVTkZq3ghDZgF8txTdDM3s8g76XM2pgiey')"
-                            tabindex="-1"
-                          >
-                            <i class="ri-file-copy-line"></i>
-                          </button>
-                            <span class="tooltip-text text-xs" style="z-index: 1000;"
-                            >Copy Payment wallet address</span
-                            >
-                        </div>
-                      </div>
-                      <p class="text-xs text-gray-500 mt-1">
-                        This is the static TRC-20 USDT wallet address for payments.
-                      </p>
-                    </div>
-                    <div class="flex items-center justify-end">
-                      <button
-                        type="button"
-                        class="px-5 py-2.5 text-sm font-medium bg-primary text-white rounded-button hover:bg-primary/90 transition-colors flex items-center whitespace-nowrap"
-                        onclick="navigator.clipboard.writeText('TQJv1kQ2w1v8kQ2w1v8kQ2w1v8kQ2w1v8k')"
-                      >
-                        <div class="w-4 h-4 flex items-center justify-center mr-1">
-                          <i class="ri-file-copy-line"></i>
-                        </div>
-                        Copy Address
-                      </button>
-                    </div>
+                <div class="space-y-5">
+                  <div>
+                  <label for="wallet-name" class="block text-sm font-medium text-gray-700 mb-1">Wallet Name</label>
+                  <input type="text" id="wallet-name"
+                  class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 text-sm"
+                  placeholder="e.g. My TRC-20 USDT Wallet" value="TRC-20 USDT Wallet" readonly />
+                </div>
+                <div>
+                  <label for="blockchain" class="block text-sm font-medium text-gray-700 mb-1">Blockchain</label>
+                  <input type="text" id="blockchain"
+                  class="w-full px-4 py-2.5 rounded-lg border border-gray-300 bg-gray-100 text-gray-700 text-sm"
+                  value="TRON (TRC-20)" readonly />
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">Token Standard</label>
+                  <input type="text"
+                  class="w-full px-4 py-2.5 rounded-lg border border-gray-300 bg-gray-100 text-gray-700 text-sm"
+                  value="USDT (TRC-20)" readonly />
+                </div>
+                <div>
+                  <label for="wallet-address" class="block text-sm font-medium text-gray-700 mb-1">Wallet
+                  Address</label>
+                  <div class="relative">
+                  <input type="text" id="wallet-address"
+                    class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 text-sm font-mono"
+                    placeholder="TVTkZq3ghDZgF8txTdDM3s8g76XM2pgiey" value="TVTkZq3ghDZgF8txTdDM3s8g76XM2pgiey"
+                    readonly />
+                  <div class="absolute right-3 top-1/2 transform -translate-y-1/2 tooltip">
+                    <button type="button" class="w-5 h-5 flex items-center justify-center text-gray-400"
+                    title="Copy address"
+                    onclick="navigator.clipboard.writeText('TVTkZq3ghDZgF8txTdDM3s8g76XM2pgiey')" tabindex="-1">
+                    <i class="ri-file-copy-line"></i>
+                    </button>
+                    <span class="tooltip-text text-xs" style="z-index: 1000;">Copy Payment wallet address</span>
                   </div>
-                </form>
+                  </div>
+                  <p class="text-xs text-gray-500 mt-1">
+                  This is the static TRC-20 USDT wallet address for payments.
+                  </p>
+                </div>
+                <div class="flex items-center justify-end">
+                  <button type="button"
+                  class="px-5 py-2.5 text-sm font-medium bg-primary text-white rounded-button hover:bg-primary/90 transition-colors flex items-center whitespace-nowrap"
+                  onclick="navigator.clipboard.writeText('TQJv1kQ2w1v8kQ2w1v8kQ2w1v8kQ2w1v8k')">
+                  <div class="w-4 h-4 flex items-center justify-center mr-1">
+                    <i class="ri-file-copy-line"></i>
+                  </div>
+                  Copy Address
+                  </button>
+                </div>
+                </div>
+              </form>
               </div>
+
+              
+            <!-- Transaction History Section: Improved Layout & "View Full Transaction History" Button -->
+            <div class="mt-8">
+              <h2 class="text-lg font-semibold text-gray-800 mb-4">
+                Transaction History
+              </h2>
+              <div class="glassmorphism bg-white rounded-xl border border-gray-200 p-0 shadow-lg overflow-hidden">
+                <!-- Desktop Table Header -->
+                <div class="hidden sm:block bg-white border-b border-gray-200">
+                  <div class="grid grid-cols-6 gap-4 p-6 text-sm font-semibold text-gray-900">
+                    <div>Date & Time</div>
+                    <div>TXID</div>
+                    <div>Payment Type</div>
+                    <div>Amount</div>
+                    <div>Status</div>
+                    <div>Actions</div>
+                  </div>
+                </div>
+                <!-- Transaction Items (up to 3, always visible) -->
+                <div id="pay-tx-list" class="divide-y divide-gray-200"></div>
+                <!-- Mobile Card List -->
+                <div id="pay-tx-mobile-list" class="sm:hidden"></div>
+                <!-- Empty State -->
+                <div id="pay-tx-empty" class="flex flex-col items-center justify-center py-12 text-gray-500 hidden">
+                  <i class="ri-file-search-line text-5xl mb-4 text-gray-300"></i>
+                  <span class="text-lg font-medium">No transactions found</span>
+                </div>
+                <!-- View Full History Button -->
+                <div class="flex justify-end p-4 bg-gray-50 border-t">
+                  <a href="Dashboard-his.html">
+                    <button class="bg-primary text-white px-6 py-2 rounded-button hover:bg-blue-700 transition-all flex items-center gap-2">
+                      <i class="ri-file-list-3-line"></i>
+                      View Full Transaction History
+                    </button>
+                  </a>
+                </div>
+              </div>
+              <!-- Transaction Details Modal (matches Dashboard-his.html) -->
+              <div
+                id="pay-tx-modal"
+                class="hidden fixed inset-0 bg-gray-900/40 backdrop-blur-[3px] z-50 flex items-center justify-center p-4"
+              >
+                <div class="bg-white rounded-2xl max-w-md w-full p-6 fade-in shadow-2xl border border-gray-200">
+                  <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-xl font-semibold text-gray-900">Transaction Details</h3>
+                    <button
+                      onclick="document.getElementById('pay-tx-modal').classList.add('hidden')"
+                      class="bg-gray-100 hover:bg-gray-200 rounded-button p-2 transition-all !rounded-button"
+                    >
+                      <div class="w-5 h-5 flex items-center justify-center">
+                        <i class="ri-close-line"></i>
+                      </div>
+                    </button>
+                  </div>
+                  <div id="pay-tx-modal-content" class="space-y-4"></div>
+                  <div class="flex gap-3 mt-6">
+                    <button
+                      class="flex-1 bg-primary hover:bg-primary/80 text-white px-4 py-3 rounded-button font-medium transition-all whitespace-nowrap !rounded-button"
+                    >
+                      Download Receipt
+                    </button>
+                    <button
+                      onclick="document.getElementById('pay-tx-modal').classList.add('hidden')"
+                      class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-900 px-4 py-3 rounded-button font-medium transition-all whitespace-nowrap !rounded-button"
+                    >
+                      Close
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <script>
+                // Demo transaction data (same as Dashboard-his.html, up to 3 rows)
+                const payTxs = [
+                  {
+                    id: "TXN-2024-001847",
+                    date: "Dec 28, 2024",
+                    time: "14:32 UTC",
+                    type: "Credit Card",
+                    amount: 149.99,
+                    status: "Success",
+                    orderId: "ORD-2024-5847",
+                    paymentId: "PAY-7834-9281-4756",
+                    description: "Premium Plan Subscription",
+                    cardLast4: "****4532",
+                  },
+                  {
+                    id: "TXN-2024-001832",
+                    date: "Dec 25, 2024",
+                    time: "09:15 UTC",
+                    type: "Bitcoin",
+                    amount: 89.50,
+                    status: "Pending",
+                    orderId: "ORD-2024-5832",
+                    paymentId: "BTC-8394-2847-1923",
+                    description: "Standard Plan Subscription",
+                    walletAddress: "1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa",
+                  },
+                  {
+                    id: "TXN-2024-001819",
+                    date: "Dec 22, 2024",
+                    time: "16:48 UTC",
+                    type: "Credit Card",
+                    amount: 299.99,
+                    status: "Success",
+                    orderId: "ORD-2024-5819",
+                    paymentId: "PAY-9472-3851-6294",
+                    description: "Enterprise Plan Subscription",
+                    cardLast4: "****7891",
+                  },
+                ];
+
+                // Payment type mapping
+                function mapPayType(type) {
+                  if (!type) return "";
+                  const t = type.toLowerCase();
+                  if (t.includes("credit")) return "Credit Card";
+                  if (t.includes("bitcoin") || t.includes("ethereum")) return "Cryptocurrency";
+                  if (t.includes("crypto")) return "Cryptocurrency";
+                  return type;
+                }
+
+                // Render transactions (desktop)
+                function renderPayTxs(list) {
+                  const container = document.getElementById("pay-tx-list");
+                  if (!container) return;
+                  container.innerHTML = "";
+                  if (!list.length) {
+                    document.getElementById("pay-tx-empty").classList.remove("hidden");
+                    return;
+                  }
+                  document.getElementById("pay-tx-empty").classList.add("hidden");
+                  list.forEach((tx) => {
+                    let icon = "";
+                    let iconColor = "";
+                    if (mapPayType(tx.type) === "Credit Card") {
+                      icon = "ri-bank-card-line";
+                      iconColor = "text-blue-600";
+                    } else if (tx.type.toLowerCase().includes("bitcoin")) {
+                      icon = "ri-bit-coin-line";
+                      iconColor = "text-orange-500";
+                    } else if (tx.type.toLowerCase().includes("ethereum")) {
+                      icon = "ri-ethereum-line";
+                      iconColor = "text-purple-600";
+                    } else {
+                      icon = "ri-bank-card-line";
+                      iconColor = "text-gray-400";
+                    }
+                    let statusBg = "";
+                    let statusIcon = "";
+                    if (tx.status === "Success") {
+                      statusBg = "bg-green-100 text-green-800";
+                      statusIcon = "ri-check-line";
+                    } else if (tx.status === "Pending") {
+                      statusBg = "bg-yellow-100 text-yellow-800";
+                      statusIcon = "ri-time-line";
+                    } else {
+                      statusBg = "bg-red-100 text-red-800";
+                      statusIcon = "ri-close-line";
+                    }
+                    const row = document.createElement("div");
+                    row.className = "hidden sm:grid sm:grid-cols-6 gap-4 p-6 items-center";
+                    row.innerHTML = `
+                      <div class="flex flex-col gap-1 text-gray-900">
+                        <div class="font-medium text-xs">${tx.date}</div>
+                        <div class="text-[11px] text-gray-500">${tx.time}</div>
+                      </div>
+                      <div class="font-mono text-[11px] text-gray-700 truncate">${tx.id}</div>
+                      <div class="flex items-center gap-1">
+                        <div class="w-5 h-5 flex items-center justify-center">
+                          <i class="${icon} ${iconColor}"></i>
+                        </div>
+                        <span class="text-xs text-gray-900">${mapPayType(tx.type).replace("Credit Card", "Card").replace("Cryptocurrency", "Crypto")}</span>
+                      </div>
+                      <div class="font-semibold text-xs text-gray-900">$${tx.amount.toFixed(2)}</div>
+                      <div>
+                        <span class="px-2 py-0.5 rounded-full text-[11px] font-medium flex items-center gap-1 w-fit ${statusBg}">
+                          <div class="w-3 h-3 flex items-center justify-center">
+                            <i class="${statusIcon} ri-xs"></i>
+                          </div>
+                          ${tx.status === "Success" ? "Paid" : tx.status === "Pending" ? "Wait" : "Fail"}
+                        </span>
+                      </div>
+                      <div>
+                        <button
+                          class="rounded-button px-2 py-1 hover:bg-gray-100 transition-all whitespace-nowrap !rounded-button text-gray-900 text-xs"
+                          onclick="showPayTxDetails('${tx.id}')"
+                          title="Details"
+                        >
+                          <div class="w-4 h-4 flex items-center justify-center">
+                            <i class="ri-eye-line"></i>
+                          </div>
+                        </button>
+                      </div>
+                    `;
+                    container.appendChild(row);
+                  });
+                }
+
+                // Render transactions (mobile)
+                function renderPayTxsMobile(list) {
+                  const container = document.getElementById("pay-tx-mobile-list");
+                  if (!container) return;
+                  container.innerHTML = "";
+                  if (!list.length) return;
+                  list.forEach((tx) => {
+                    let icon = "";
+                    let iconColor = "";
+                    if (mapPayType(tx.type) === "Credit Card") {
+                      icon = "ri-bank-card-line";
+                      iconColor = "text-blue-600";
+                    } else if (tx.type.toLowerCase().includes("bitcoin")) {
+                      icon = "ri-bit-coin-line";
+                      iconColor = "text-orange-500";
+                    } else if (tx.type.toLowerCase().includes("ethereum")) {
+                      icon = "ri-ethereum-line";
+                      iconColor = "text-purple-600";
+                    } else {
+                      icon = "ri-bank-card-line";
+                      iconColor = "text-gray-400";
+                    }
+                    let statusBg = "";
+                    let statusIcon = "";
+                    if (tx.status === "Success") {
+                      statusBg = "bg-green-100 text-green-800";
+                      statusIcon = "ri-check-line";
+                    } else if (tx.status === "Pending") {
+                      statusBg = "bg-yellow-100 text-yellow-800";
+                      statusIcon = "ri-time-line";
+                    } else {
+                      statusBg = "bg-red-100 text-red-800";
+                      statusIcon = "ri-close-line";
+                    }
+                    const card = document.createElement("div");
+                    card.className = "sm:hidden glassmorphism rounded-2xl m-4 p-6 bg-white/95 shadow";
+                    card.innerHTML = `
+                      <div class="flex justify-between items-start mb-4">
+                        <div>
+                          <div class="font-semibold text-gray-900 text-lg">$${tx.amount.toFixed(2)}</div>
+                          <div class="text-sm text-gray-600">${tx.date} • ${tx.time}</div>
+                        </div>
+                        <span class="px-3 py-1 rounded-full text-xs font-medium flex items-center gap-1 ${statusBg}">
+                          <div class="w-3 h-3 flex items-center justify-center">
+                            <i class="${statusIcon} ri-xs"></i>
+                          </div>
+                          ${tx.status}
+                        </span>
+                      </div>
+                      <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                          <div class="w-6 h-6 flex items-center justify-center">
+                            <i class="${icon} ${iconColor}"></i>
+                          </div>
+                          <span class="text-gray-900">${mapPayType(tx.type)}</span>
+                        </div>
+                        <button
+                          class="glassmorphism rounded-button px-4 py-2 hover:bg-gray-100 transition-all whitespace-nowrap !rounded-button text-gray-900"
+                          onclick="showPayTxDetails('${tx.id}')"
+                        >
+                          View Details
+                        </button>
+                      </div>
+                      <div class="mt-3 pt-3 border-t border-gray-200">
+                        <div class="text-xs text-gray-700 font-mono">${tx.id}</div>
+                      </div>
+                    `;
+                    container.appendChild(card);
+                  });
+                }
+
+                // Modal details logic (matches Dashboard-his.html)
+                function showPayTxDetails(txId) {
+                  const tx = payTxs.find((t) => t.id === txId);
+                  if (!tx) return;
+                  let statusClass = "";
+                  let statusIcon = "";
+                  let statusColor = "";
+                  if (tx.status === "Success") {
+                    statusClass = "status-success";
+                    statusIcon = "ri-check-line";
+                    statusColor = "green";
+                  } else if (tx.status === "Pending") {
+                    statusClass = "status-pending";
+                    statusIcon = "ri-time-line";
+                    statusColor = "yellow";
+                  } else {
+                    statusClass = "status-failed";
+                    statusIcon = "ri-close-line";
+                    statusColor = "red";
+                  }
+                  document.getElementById("pay-tx-modal-content").innerHTML = `
+                    <div class="space-y-4">
+                      <div class="flex justify-between items-center">
+                        <span class="text-gray-800">Transaction ID</span>
+                        <span class="text-gray-500 font-mono text-sm">${tx.id}</span>
+                      </div>
+                      <div class="flex justify-between items-center">
+                        <span class="text-gray-800">Date & Time</span>
+                        <span class="text-gray-500">${tx.date} • ${tx.time}</span>
+                      </div>
+                      <div class="flex justify-between items-center">
+                        <span class="text-gray-800">Payment Type</span>
+                        <span class="text-gray-500">${tx.type}</span>
+                      </div>
+                      <div class="flex justify-between items-center">
+                        <span class="text-gray-800">Amount</span>
+                        <span class="text-gray-500 font-semibold text-lg">$${tx.amount.toFixed(2)}</span>
+                      </div>
+                      <div class="flex justify-between items-center">
+                        <span class="text-gray-800">Status</span>
+                        <span class="${statusClass} px-3 py-1 rounded-full text-xs font-medium flex items-center gap-1 w-fit bg-${statusColor}-100 text-${statusColor}-800">
+                          <div class="w-3 h-3 flex items-center justify-center">
+                            <i class="${statusIcon} ri-xs"></i>
+                          </div>
+                          ${tx.status}
+                        </span>
+                      </div>
+                      <div class="flex justify-between items-center">
+                        <span class="text-gray-800">Order ID</span>
+                        <span class="text-gray-500 font-mono text-sm">${tx.orderId}</span>
+                      </div>
+                      <div class="flex justify-between items-center">
+                        <span class="text-gray-800">Payment ID</span>
+                        <span class="text-white font-mono text-sm">${tx.paymentId}</span>
+                      </div>
+                      <div class="flex justify-between items-center">
+                        <span class="text-gray-800">Description</span>
+                        <span class="text-gray-500">${tx.description}</span>
+                      </div>
+                      ${
+                        tx.cardLast4
+                          ? `<div class="flex justify-between items-center">
+                              <span class="text-gray-800">Card</span>
+                              <span class="text-gray-500 font-mono">${tx.cardLast4}</span>
+                            </div>`
+                          : ""
+                      }
+                      ${
+                        tx.walletAddress
+                          ? `<div class="flex justify-between items-start">
+                              <span class="text-gray-800">Wallet</span>
+                              <span class="text-gray-500 font-mono text-xs break-all text-right max-w-48">${tx.walletAddress}</span>
+                            </div>`
+                          : ""
+                      }
+                    </div>
+                  `;
+                  document.getElementById("pay-tx-modal").classList.remove("hidden");
+                }
+
+                // Initial render
+                renderPayTxs(payTxs);
+                renderPayTxsMobile(payTxs);
+              </script>
+            </div>
             </section>
+
+            
+
             <!-- Right Column -->
             <div class="space-y-8">
               <!-- Subscriptions Control Panel -->
               <section>
-                <h2 class="text-lg font-semibold text-gray-800 mb-4">
-                  Subscription Settings
-                </h2>
-                <div
-                  class="glassmorphism bg-white rounded-lg border border-gray-200 p-6"
-                >
-                  <div class="space-y-5">
-                    <div class="flex items-center justify-between">
-                      <div>
-                        <h3 class="text-sm font-medium text-gray-800">
-                          Auto Renew Subscription
-                        </h3>
-                        <p class="text-xs text-gray-500 mt-0.5">
-                          Automatically renew your subscription when it expires
-                        </p>
-                      </div>
-                      <label class="toggle">
-                        <input type="checkbox" id="auto-renew" checked />
-                        <span class="slider"></span>
-                      </label>
-                    </div>
-                    <div class="flex items-center justify-between">
-                      <div>
-                        <h3 class="text-sm font-medium text-gray-800">
-                          Receive Email Invoices
-                        </h3>
-                        <p class="text-xs text-gray-500 mt-0.5">
-                          Get invoice copies to your email after each payment
-                        </p>
-                      </div>
-                      <label class="toggle">
-                        <input type="checkbox" id="email-invoices" checked />
-                        <span class="slider"></span>
-                      </label>
-                    </div>
-                    <div class="flex items-center justify-between">
-                      <div>
-                        <h3 class="text-sm font-medium text-gray-800">
-                          Enable Alerts for Failed Payments
-                        </h3>
-                        <p class="text-xs text-gray-500 mt-0.5">
-                          Get notified when a payment fails to process
-                        </p>
-                      </div>
-                      <label class="toggle">
-                        <input type="checkbox" id="payment-alerts" checked />
-                        <span class="slider"></span>
-                      </label>
-                    </div>
+              <h2 class="text-lg font-semibold text-gray-800 mb-4">
+                Subscription Settings
+              </h2>
+              <div class="glassmorphism bg-white rounded-lg border border-gray-200 p-6">
+                <div class="space-y-5">
+                <div class="flex items-center justify-between">
+                  <div>
+                  <h3 class="text-sm font-medium text-gray-800">
+                    Auto Renew Subscription
+                  </h3>
+                  <p class="text-xs text-gray-500 mt-0.5">
+                    Automatically renew your subscription when it expires
+                  </p>
                   </div>
+                  <label class="toggle">
+                  <input type="checkbox" id="auto-renew" checked />
+                  <span class="slider"></span>
+                  </label>
                 </div>
+                <div class="flex items-center justify-between">
+                  <div>
+                  <h3 class="text-sm font-medium text-gray-800">
+                    Receive Email Invoices
+                  </h3>
+                  <p class="text-xs text-gray-500 mt-0.5">
+                    Get invoice copies to your email after each payment
+                  </p>
+                  </div>
+                  <label class="toggle">
+                  <input type="checkbox" id="email-invoices" checked />
+                  <span class="slider"></span>
+                  </label>
+                </div>
+                <div class="flex items-center justify-between">
+                  <div>
+                  <h3 class="text-sm font-medium text-gray-800">
+                    Enable Alerts for Failed Payments
+                  </h3>
+                  <p class="text-xs text-gray-500 mt-0.5">
+                    Get notified when a payment fails to process
+                  </p>
+                  </div>
+                  <label class="toggle">
+                  <input type="checkbox" id="payment-alerts" checked />
+                  <span class="slider"></span>
+                  </label>
+                </div>
+                </div>
+              </div>
               </section>
               <!-- QR Code Payment Support -->
               <section>
-                <h2 class="text-lg font-semibold text-gray-800 mb-4">
-                  Quick Connect
-                </h2>
-                <div
-                  class="glassmorphism bg-white rounded-lg border border-gray-200 p-6"
-                >
-                  <div class="flex flex-col items-center">
-                    <!-- QR Payment Plan Selection -->
-                    <div class="mb-6 w-full">
-                      <label class="block text-sm font-medium text-gray-700 mb-2">
-                        Select Plan for QR Payment
-                      </label>
-                      <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-                        <button
-                          type="button"
-                          class="qr-plan-btn border border-gray-300 rounded-lg px-4 py-3 flex flex-col items-center hover:border-primary focus:outline-none transition-all"
-                          data-plan="basic"
-                        >
-                          <span class="font-semibold text-gray-900 mb-1">Basic</span>
-                          <span class="text-xs text-gray-500">USDT 115/mo</span>
-                        </button>
-                        <button
-                          type="button"
-                          class="qr-plan-btn border border-gray-300 rounded-lg px-4 py-3 flex flex-col items-center hover:border-primary focus:outline-none transition-all"
-                          data-plan="pro"
-                        >
-                          <span class="font-semibold text-gray-900 mb-1">Pro</span>
-                          <span class="text-xs text-gray-500">USDT 225/mo</span>
-                        </button>
-                        <button
-                          type="button"
-                          class="qr-plan-btn border border-gray-300 rounded-lg px-4 py-3 flex flex-col items-center hover:border-primary focus:outline-none transition-all"
-                          data-plan="enterprise"
-                        >
-                          <span class="font-semibold text-gray-900 mb-1">Enterprise</span>
-                          <span class="text-xs text-gray-500">Custom</span>
-                        </button>
-                      </div>
-                    </div>
-                    <div
-                      class="w-48 h-48 bg-gray-100 rounded-lg flex items-center justify-center mb-4 relative"
-                    >
-                      <img
-                        src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=TRC20%20USDT%20Wallet%20Address%3A%20TVTkZq3ghDZgF8txTdDM3s8g76XM2pgiey"
-                        alt="QR Code"
-                        class="w-40 h-40 object-contain"
-                      />
-                      <div
-                        class="absolute inset-0 flex items-center justify-center bg-white/80 rounded-lg hidden"
-                        id="qr-loading"
-                      >
-                        <div
-                          class="w-8 h-8 flex items-center justify-center text-primary animate-spin"
-                        >
-                          <i class="ri-loader-4-line ri-2x"></i>
-                        </div>
-                      </div>
-                    </div>
-                    <h3 class="text-sm font-medium text-gray-800 mb-1">
-                      Scan to Connect Wallet
-                    </h3>
-                    <p class="text-xs text-gray-500 text-center mb-4">
-                      Use your mobile wallet app to scan this QR code and
-                      connect instantly
-                    </p>
-                    <!-- QR Payment Plan Summary -->
-                    <div class="mb-3 w-full">
-                      <label class="block text-xs text-gray-500 mb-1">Selected Plan</label>
-                      <span class="block font-mono text-xs text-gray-800" id="qr-selected-plan">
-                        None
-                      </span>
-                    </div>
-                    <div class="mb-3 w-full">
-                      <label class="block text-xs text-gray-500 mb-1">Amount (USDT)</label>
-                      <span class="block font-mono text-lg text-gray-900 font-bold" id="qr-amount">
-                        0
-                      </span>
-                    </div>
-                    <div class="mb-3 w-full">
-                      <label class="block text-xs text-gray-500 mb-1">Order ID</label>
-                      <span class="block font-mono text-xs text-primary font-semibold" id="qr-order-id">
-                        ORD-QR-0
-                      </span>
-                    </div>
-                    <form id="qr-txid-form" class="w-full mt-2">
-                      <label for="qr-txid" class="block text-xs text-gray-500 mb-1">Paste your Transaction ID (TXID)</label>
-                      <input
-                        type="text"
-                        id="qr-txid"
-                        name="qr-txid"
-                        class="w-full px-3 py-2 rounded-lg border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 text-sm mb-3 font-mono"
-                        placeholder="Paste your TXID here"
-                        required
-                        autocomplete="off"
-                      />
-                      <button
-                        type="submit"
-                        class="w-full py-3 text-sm font-semibold bg-primary text-white rounded-button hover:bg-primary/90 transition-colors mb-2"
-                      >
-                        I’ve Sent the Payment
-                      </button>
-                    </form>
-                    <div id="qr-txid-success" class="hidden mt-2 text-green-600 text-center text-sm font-medium">
-                      Thank you! Your payment is being verified.
-                    </div>
+              <h2 class="text-lg font-semibold text-gray-800 mb-4">
+                Quick Connect
+              </h2>
+              <div id="qr-section" class="glassmorphism bg-white rounded-lg border border-gray-200 p-6 qr-disabled">
+                <div class="flex flex-col items-center">
+                <!-- QR Payment Plan Selection -->
+                <div class="mb-6 w-full">
+                  <label class="block text-sm font-medium text-gray-700 mb-2">
+                  Select Plan for QR Payment
+                  </label>
+                  <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                  <button type="button"
+                    class="qr-plan-btn border border-gray-300 rounded-lg px-4 py-3 flex flex-col items-center hover:border-primary focus:outline-none transition-all"
+                    data-plan="basic" disabled>
+                    <span class="font-semibold text-gray-900 mb-1">Basic</span>
+                    <span class="text-xs text-gray-500">USDT 20/mo</span>
+                  </button>
+                  <button type="button"
+                    class="qr-plan-btn border border-gray-300 rounded-lg px-4 py-3 flex flex-col items-center hover:border-primary focus:outline-none transition-all"
+                    data-plan="pro" disabled>
+                    <span class="font-semibold text-gray-900 mb-1">Pro</span>
+                    <span class="text-xs text-gray-500">USDT 50/mo</span>
+                  </button>
+                  <button type="button"
+                    class="qr-plan-btn border border-gray-300 rounded-lg px-4 py-3 flex flex-col items-center hover:border-primary focus:outline-none transition-all"
+                    data-plan="enterprise" disabled>
+                    <span class="font-semibold text-gray-900 mb-1">Enterprise</span>
+                    <span class="text-xs text-gray-500">USDT 100/mo</span>
+                  </button>
                   </div>
                 </div>
+                <div class="w-48 h-48 bg-gray-100 rounded-lg flex items-center justify-center mb-4 relative">
+                  <img id="qr-img"
+                  src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=TRC20%20USDT%20Wallet%20Address%3A%20TVTkZq3ghDZgF8txTdDM3s8g76XM2pgiey"
+                  alt="QR Code" class="w-40 h-40 object-contain" />
+                  <div class="absolute inset-0 flex items-center justify-center bg-white/80 rounded-lg hidden"
+                  id="qr-loading">
+                  <div class="w-8 h-8 flex items-center justify-center text-primary animate-spin">
+                    <i class="ri-loader-4-line ri-2x"></i>
+                  </div>
+                  </div>
+                </div>
+                <h3 class="text-sm font-medium text-gray-800 mb-1">
+                  Scan to Connect Wallet
+                </h3>
+                <p class="text-xs text-gray-500 text-center mb-4">
+                  Use your mobile wallet app to scan this QR code and
+                  connect instantly
+                </p>
+                <!-- QR Payment Plan Summary -->
+                <div class="mb-3 w-full">
+                  <label class="block text-xs text-gray-500 mb-1">Selected Plan</label>
+                  <span class="block font-mono text-xs text-gray-800" id="qr-selected-plan">
+                  None
+                  </span>
+                </div>
+                <div class="mb-3 w-full">
+                  <label class="block text-xs text-gray-500 mb-1">Amount (USDT)</label>
+                  <span class="block font-mono text-lg text-gray-900 font-bold" id="qr-amount">
+                  0
+                  </span>
+                </div>
+                <div class="mb-3 w-full">
+                  <label class="block text-xs text-gray-500 mb-1">Order ID</label>
+                  <span class="block font-mono text-xs text-primary font-semibold" id="qr-order-id">
+                  ORD-QR-0
+                  </span>
+                </div>
+                <form id="qr-txid-form" class="w-full mt-2">
+                  <label for="qr-txid" class="block text-xs text-gray-500 mb-1">Paste your Transaction ID
+                  (TXID)</label>
+                  <input type="text" id="qr-txid" name="qr-txid"
+                  class="w-full px-3 py-2 rounded-lg border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 text-sm mb-3 font-mono"
+                  placeholder="Paste your TXID here" required autocomplete="off" disabled />
+                  <button type="submit" id="qr-txid-btn"
+                  class="w-full py-3 text-sm font-semibold bg-primary text-white rounded-button hover:bg-primary/90 transition-colors mb-2"
+                  disabled>
+                  I've Sent the Payment
+                  </button>
+                </form>
+                <div id="qr-txid-success" class="hidden mt-2 text-green-600 text-center text-sm font-medium">
+                  Thank you! Your payment is being verified.
+                </div>
+                </div>
+              </div>
               </section>
+
+             
             </div>
           </div>
         </div>
       </div>
     </div>
+
+    <!-- Dual Payment Modal (Crypto & Card) -->
+    <div id="dual-payment-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+      style="display:none;">
+      <div class="bg-white rounded-xl p-4 max-w-sm w-full mx-2 relative shadow-xl fintech-modal">
+      <button class="absolute top-3 right-3 text-gray-400 hover:text-gray-600" id="dual-modal-close">
+        <i class="ri-close-line ri-lg"></i>
+      </button>
+      <h3 class="text-lg font-semibold text-gray-900 mb-3 text-center">Choose Payment Method</h3>
+      <div class="flex gap-2 mb-4">
+        <button id="dual-tab-crypto"
+        class="flex-1 py-2 rounded-lg border border-primary bg-primary text-white font-medium transition-colors">Crypto</button>
+        <button id="dual-tab-card"
+        class="flex-1 py-2 rounded-lg border border-gray-300 text-gray-400 font-medium transition-colors opacity-50 cursor-not-allowed relative group"
+        disabled>
+        Card
+        <div
+          class="absolute right-[-2rem] bottom-[-3.5rem] z- flex items-center px-3 py-2 rounded-xl shadow-lg glass-effect-card-toast border border-primary bg-primary/80 text-base font-bold whitespace-nowrap opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-all duration-200"
+          style="color: #1E293B;">
+          Coming Soon!
+        </div>
+        <style>
+          .glass-effect-card-toast {
+          background: rgba(66, 82, 223, 0.85);
+          border-radius: 16px;
+          border: 2px solid #1E3A8A;
+          color: #1E293B;
+          font-weight: 600;
+          box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+          }
+          @media (max-width: 480px) {
+          #dual-tab-card .absolute.glass-effect-card-toast {
+            right: -2rem !important;
+            bottom: -3.5rem !important;
+            width: 30vw !important;
+            font-size: 0.95rem !important;
+            text-align: center !important;
+            color: #1a202c !important;
+            backdrop-filter: blur(5px) !important;
+          }
+          .fintech-modal {
+            backdrop-filter: blur(5px) !important;
+            background: rgba(255, 255, 255, 0.85) !important;
+            color: #1a202c !important;
+          }
+          #dual-tab-card .absolute.glass-effect-card-toast {
+            background: rgba(73, 104, 241, 0.85) !important;
+            color: #0b0d0f !important;
+          }
+          }
+        </style>
+        </button>
+      </div>
+      <!-- Crypto Payment Panel -->
+      <div id="dual-crypto-panel">
+        <div class="flex flex-col items-center mb-3">
+        <div class="w-28 h-28 bg-gray-100 rounded-lg flex items-center justify-center mb-2 border border-gray-200">
+          <img id="dual-crypto-qr"
+          src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=TRC20%20USDT%20Wallet%20Address%3A%20TVTkZq3ghDZgF8txTdDM3s8g76XM2pgiey"
+          alt="TRC-20 Wallet QR" class="w-24 h-24 object-contain" />
+        </div>
+        <div class="w-full">
+          <div class="mb-1">
+          <span class="block text-xs text-gray-500">Order ID</span>
+          <span class="block font-mono text-xs text-primary font-semibold" id="dual-crypto-orderid"></span>
+          </div>
+          <div class="mb-1">
+          <span class="block text-xs text-gray-500">Amount (USDT)</span>
+          <span class="block font-mono text-base text-gray-900 font-bold" id="dual-crypto-amount"></span>
+          </div>
+          <div class="mb-1">
+          <span class="block text-xs text-gray-500">TRC-20 Wallet Address</span>
+          <span class="block font-mono text-xs text-gray-800"
+            id="dual-crypto-wallet">TVTkZq3ghDZgF8txTdDM3s8g76XM2pgiey</span>
+          </div>
+        </div>
+        </div>
+        <form id="dual-crypto-form" class="mt-1">
+        <label for="dual-crypto-txid" class="block text-xs text-gray-500 mb-1">Paste your Transaction ID
+          (TXID)</label>
+        <input type="text" id="dual-crypto-txid" name="dual-crypto-txid"
+          class="w-full px-3 py-2 rounded-lg border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 text-sm mb-2 font-mono"
+          placeholder="Paste your TXID here" required autocomplete="off" />
+          <button type="button" id="dual-crypto-btn"
+          class="w-full py-2 text-sm font-semibold bg-primary text-white rounded-button hover:bg-primary/90 transition-colors mb-1">
+          I've Sent the Payment
+          </button>
+          </form>
+          <!-- Loading Modal -->
+          <div id="modal-loading" class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50" style="display:none;">
+          <div class="bg-white rounded-xl p-4 max-w-xs w-full mx-2 relative shadow-xl fintech-modal flex flex-col items-center">
+          <div class="w-10 h-10 flex items-center justify-center mb-2">
+            <i class="ri-loader-4-line text-2xl text-primary animate-spin"></i>
+          </div>
+          <span class="text-sm text-gray-700 font-medium">Processing...</span>
+          </div>
+          </div>
+          <!-- Proof of Payment Modal -->
+          <div id="proof-modal" class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50" style="display:none;">
+          <div class="bg-white rounded-xl p-4 max-w-xs w-full mx-2 relative shadow-xl fintech-modal">
+          <button class="absolute top-2 right-2 text-gray-400 hover:text-gray-600" id="proof-modal-close" type="button">
+            <i class="ri-close-line ri-lg"></i>
+          </button>
+          <h4 class="text-base font-semibold text-gray-900 mb-2 text-center">Upload Proof of Payment</h4>
+          <form id="proof-upload-form" class="flex flex-col items-center space-y-3">
+            <input type="file" id="proof-file" accept="image/*,application/pdf" class="block w-full text-xs text-gray-600 mb-1" required />
+            <span id="proof-file-name" class="text-xs text-gray-500"></span>
+            <button type="submit" id="finish-payment-btn"
+            class="w-full py-1 text-xs font-semibold bg-primary text-white rounded-button hover:bg-primary/90 transition-colors">
+            Finish payment
+            </button>
+          </form>
+          </div>
+          </div>
+          <!-- Payment Complete Modal -->
+          <div id="payment-complete-modal" class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50" style="display:none;">
+          <div class="bg-white rounded-xl p-4 max-w-xs w-full mx-2 relative shadow-xl fintech-modal text-center">
+          <div class="w-10 h-10 mx-auto mb-2 flex items-center justify-center rounded-full bg-green-100">
+          <i class="ri-checkbox-circle-line text-2xl text-green-600"></i>
+          </div>
+          <h4 class="text-base font-semibold text-gray-900 mb-1">Payment Completed</h4>
+          <p class="text-xs text-gray-700 mb-1">Your payment is completed and will be reviewed within 24 hours.</p>
+          <button type="button" id="payment-complete-close"
+          class="mt-1 px-3 py-1 text-xs font-medium bg-primary text-white rounded-button hover:bg-primary/90 transition-colors">
+          Close
+          </button>
+          </div>
+          </div>
+          <script>
+          (function () {
+          // Elements
+          const cryptoForm = document.getElementById("dual-crypto-form");
+          const cryptoBtn = document.getElementById("dual-crypto-btn");
+          const proofModal = document.getElementById("proof-modal");
+          const proofModalClose = document.getElementById("proof-modal-close");
+          const proofUploadForm = document.getElementById("proof-upload-form");
+          const proofFile = document.getElementById("proof-file");
+          const proofFileName = document.getElementById("proof-file-name");
+          const finishPaymentBtn = document.getElementById("finish-payment-btn");
+          const paymentCompleteModal = document.getElementById("payment-complete-modal");
+          const paymentCompleteClose = document.getElementById("payment-complete-close");
+          const dualPaymentModal = document.getElementById("dual-payment-modal");
+          const modalLoading = document.getElementById("modal-loading");
+          if (!cryptoForm) return;
+
+          // Utility: show/hide loading modal with delay
+          function showLoading(duration, callback) {
+          modalLoading.style.display = "flex";
+          setTimeout(() => {
+            modalLoading.style.display = "none";
+            if (callback) callback();
+          }, duration);
+          }
+
+          // Show proof modal on button click, with loading
+          cryptoBtn.addEventListener("click", function (e) {
+          e.preventDefault();
+          showLoading(900, () => {
+            proofModal.style.display = "flex";
+          });
+          });
+
+          // Close proof modal
+          if (proofModalClose) {
+          proofModalClose.onclick = function () {
+            proofModal.style.display = "none";
+          };
+          }
+          // Dismiss proof modal on background click
+          proofModal.onclick = function (e) {
+          if (e.target === proofModal) proofModal.style.display = "none";
+          };
+
+          // Show selected file name
+          if (proofFile) {
+          proofFile.addEventListener("change", function () {
+            proofFileName.textContent = proofFile.files.length ? proofFile.files[0].name : "";
+          });
+          }
+
+          // Handle proof upload form submit, with loading
+          if (proofUploadForm) {
+          proofUploadForm.addEventListener("submit", function (e) {
+            e.preventDefault();
+            proofModal.style.display = "none";
+            showLoading(1200, () => {
+            paymentCompleteModal.style.display = "flex";
+            });
+          });
+          }
+
+          // Close payment complete modal
+          if (paymentCompleteClose) {
+          paymentCompleteClose.onclick = function () {
+            paymentCompleteModal.style.display = "none";
+            if (dualPaymentModal) dualPaymentModal.style.display = "none";
+          };
+          }
+          // Dismiss payment complete modal on background click
+          paymentCompleteModal.onclick = function (e) {
+          if (e.target === paymentCompleteModal) paymentCompleteModal.style.display = "none";
+          if (dualPaymentModal) dualPaymentModal.style.display = "none";
+          };
+          })();
+          </script>
+        </form>
+        <div id="dual-crypto-success" class="hidden mt-1 text-green-600 text-center text-xs font-medium">
+        Thank you! Your payment is being verified.
+        </div>
+      </div>
+      <!-- Card Payment Panel -->
+      <div id="dual-card-panel" class="hidden">
+        <form id="dual-card-form" class="space-y-2">
+        <div>
+          <label for="dual-card-number" class="block text-xs text-gray-500 mb-1">Card Number</label>
+          <input type="text" id="dual-card-number" maxlength="19" inputmode="numeric"
+          class="w-full px-3 py-2 rounded-lg border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 text-sm font-mono"
+          placeholder="1234 5678 9012 3456" required autocomplete="cc-number" />
+        </div>
+        <div class="flex gap-1">
+          <div class="flex-1">
+          <label for="dual-card-exp" class="block text-xs text-gray-500 mb-1">Expiry</label>
+          <input type="text" id="dual-card-exp" maxlength="5" inputmode="numeric"
+            class="w-full px-3 py-2 rounded-lg border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 text-sm font-mono"
+            placeholder="MM/YY" required autocomplete="cc-exp" />
+          </div>
+          <div class="flex-1">
+          <label for="dual-card-cvc" class="block text-xs text-gray-500 mb-1">CVC</label>
+          <input type="text" id="dual-card-cvc" maxlength="4" inputmode="numeric"
+            class="w-full px-3 py-2 rounded-lg border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 text-sm font-mono"
+            placeholder="CVC" required autocomplete="cc-csc" />
+          </div>
+        </div>
+        <div>
+          <label for="dual-card-name" class="block text-xs text-gray-500 mb-1">Cardholder Name</label>
+          <input type="text" id="dual-card-name"
+          class="w-full px-3 py-2 rounded-lg border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 text-sm"
+          placeholder="Name on card" required autocomplete="cc-name" />
+        </div>
+        <button type="submit" id="dual-card-btn"
+          class="w-full py-2 text-sm font-semibold bg-primary text-white rounded-button hover:bg-primary/90 transition-colors mb-1">
+          Pay Now
+        </button>
+        </form>
+        <div id="dual-card-success" class="hidden mt-1 text-green-600 text-center text-xs font-medium">
+        Payment successful! Thank you.
+        </div>
+      </div>
+      </div>
+    </div>
+
+    
+    <script>
+      (function () {
+        // Modal elements
+        const modal = document.getElementById("dual-payment-modal");
+        const closeBtn = document.getElementById("dual-modal-close");
+        const tabCrypto = document.getElementById("dual-tab-crypto");
+        const tabCard = document.getElementById("dual-tab-card");
+        const cryptoPanel = document.getElementById("dual-crypto-panel");
+        const cardPanel = document.getElementById("dual-card-panel");
+        // Crypto fields
+        const cryptoOrderId = document.getElementById("dual-crypto-orderid");
+        const cryptoAmount = document.getElementById("dual-crypto-amount");
+        const cryptoWallet = document.getElementById("dual-crypto-wallet");
+        const cryptoQr = document.getElementById("dual-crypto-qr");
+        const cryptoForm = document.getElementById("dual-crypto-form");
+        const cryptoBtn = document.getElementById("dual-crypto-btn");
+        const cryptoSuccess = document.getElementById("dual-crypto-success");
+        const cryptoTxid = document.getElementById("dual-crypto-txid");
+        // Card fields
+        const cardForm = document.getElementById("dual-card-form");
+        const cardBtn = document.getElementById("dual-card-btn");
+        const cardSuccess = document.getElementById("dual-card-success");
+
+        // Error message elements
+        let cryptoTxidError = document.createElement("div");
+        cryptoTxidError.className = "text-xs text-red-600 mb-2 font-medium";
+        cryptoTxidError.style.display = "none";
+        cryptoTxid && cryptoTxid.parentNode.insertBefore(cryptoTxidError, cryptoTxid.nextSibling);
+
+        // Hint message
+        let cryptoTxidHint = document.createElement("div");
+        cryptoTxidHint.className = "text-xs text-gray-500 mb-2";
+        cryptoTxidHint.textContent = "TRON TXID is 64 hexadecimal characters, sometimes starts with 0x.";
+        cryptoTxid && cryptoTxid.parentNode.insertBefore(cryptoTxidHint, cryptoTxid);
+
+        // Show modal function (call this externally with plan info)
+        window.showDualPaymentModal = function ({ orderId, amount, wallet }) {
+          // Set crypto info
+          cryptoOrderId.textContent = orderId || "";
+          cryptoAmount.textContent = amount || "";
+          cryptoWallet.textContent = wallet || "TVTkZq3ghDZgF8txTdDM3s8g76XM2pgiey";
+          cryptoQr.src = "https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=" +
+            encodeURIComponent("TRC20 USDT Wallet Address: " + (wallet || "TVTkZq3ghDZgF8txTdDM3s8g76XM2pgiey"));
+          // Reset forms
+          cryptoForm.reset();
+          cardForm.reset();
+          cryptoSuccess.classList.add("hidden");
+          cardSuccess.classList.add("hidden");
+          cryptoBtn.disabled = true; // Disable by default until input
+          cardBtn.disabled = true;
+          if (cryptoTxid) {
+            cryptoTxid.classList.remove("border-red-500", "ring-2", "ring-red-500/20");
+            cryptoTxidError.style.display = "none";
+          }
+          // Show crypto tab by default
+          tabCrypto.classList.add("bg-primary", "text-white", "border-primary");
+          tabCrypto.classList.remove("bg-white", "text-primary", "border-gray-300");
+          tabCard.classList.remove("bg-primary", "text-white", "border-primary");
+          tabCard.classList.add("bg-white", "text-primary", "border-gray-300");
+          cryptoPanel.classList.remove("hidden");
+          cardPanel.classList.add("hidden");
+          // Show modal
+          modal.style.display = "flex";
+        };
+
+        // Tab switching
+        tabCrypto.onclick = function () {
+          tabCrypto.classList.add("bg-primary", "text-white", "border-primary");
+          tabCrypto.classList.remove("bg-white", "text-primary", "border-gray-300");
+          tabCard.classList.remove("bg-primary", "text-white", "border-primary");
+          tabCard.classList.add("bg-white", "text-primary", "border-gray-300");
+          cryptoPanel.classList.remove("hidden");
+          cardPanel.classList.add("hidden");
+        };
+        tabCard.onclick = function () {
+          tabCard.classList.add("bg-primary", "text-white", "border-primary");
+          tabCard.classList.remove("bg-white", "text-primary", "border-gray-300");
+          tabCrypto.classList.remove("bg-primary", "text-white", "border-primary");
+          tabCrypto.classList.add("bg-white", "text-primary", "border-gray-300");
+          cardPanel.classList.remove("hidden");
+          cryptoPanel.classList.add("hidden");
+        };
+
+        // Close modal
+        closeBtn.onclick = function () {
+          modal.style.display = "none";
+        };
+        // Dismiss modal on background click
+        modal.onclick = function (e) {
+          if (e.target === modal) modal.style.display = "none";
+        };
+
+        // Crypto TXID validation
+        if (cryptoTxid) {
+          cryptoTxid.addEventListener("input", function () {
+            const value = this.value.trim();
+            // TRON TXID: usually 64 hex chars, can start with 0x or not
+            const valid = /^([0-9a-fA-F]{64}|0x[0-9a-fA-F]{64})$/.test(value);
+            if (!value) {
+              cryptoTxidError.textContent = "Transaction ID (TXID) is required.";
+              cryptoTxidError.style.display = "block";
+              this.classList.remove("border-green-500", "ring-2", "ring-green-500/20");
+              this.classList.add("border-red-500", "ring-2", "ring-red-500/20");
+              cryptoBtn.disabled = true;
+            } else if (!valid) {
+              cryptoTxidError.textContent = "Invalid TXID format. Must be 64 hexadecimal characters (optionally starting with 0x).";
+              cryptoTxidError.style.display = "block";
+              this.classList.remove("border-green-500", "ring-2", "ring-green-500/20");
+              this.classList.add("border-red-500", "ring-2", "ring-red-500/20");
+              cryptoBtn.disabled = true;
+            } else {
+              cryptoTxidError.style.display = "none";
+              this.classList.remove("border-red-500", "ring-2", "ring-red-500/20");
+              this.classList.add("border-green-500", "ring-2", "ring-green-500/20");
+              cryptoBtn.disabled = false;
+            }
+          });
+        }
+
+        // Crypto form logic
+        cryptoForm.onsubmit = function (e) {
+          e.preventDefault();
+          if (cryptoTxid) {
+            const value = cryptoTxid.value.trim();
+            const valid = /^([0-9a-fA-F]{64}|0x[0-9a-fA-F]{64})$/.test(value);
+            if (!value) {
+              cryptoTxidError.textContent = "Transaction ID (TXID) is required.";
+              cryptoTxidError.style.display = "block";
+              cryptoTxid.classList.add("border-red-500", "ring-2", "ring-red-500/20");
+              cryptoTxid.focus();
+              cryptoBtn.disabled = true;
+              return;
+            }
+            if (!valid) {
+              cryptoTxidError.textContent = "Invalid TXID format. Must be 64 hexadecimal characters (optionally starting with 0x).";
+              cryptoTxidError.style.display = "block";
+              cryptoTxid.classList.add("border-red-500", "ring-2", "ring-red-500/20");
+              cryptoTxid.focus();
+              cryptoBtn.disabled = true;
+              return;
+            }
+            cryptoTxidError.style.display = "none";
+          }
+          cryptoBtn.disabled = true;
+          cryptoSuccess.classList.remove("hidden");
+          setTimeout(() => { modal.style.display = "none"; }, 1800);
+        };
+
+        // Card validation error messages and hints
+        function addCardValidation(input, hintText, errorText, validator) {
+          let hint = document.createElement("div");
+          hint.className = "text-xs text-gray-500 mb-1";
+          hint.textContent = hintText;
+          input.parentNode.insertBefore(hint, input);
+
+          let error = document.createElement("div");
+          error.className = "text-xs text-red-600 mb-2 font-medium";
+          error.style.display = "none";
+          input.parentNode.insertBefore(error, input.nextSibling);
+
+          input.addEventListener("input", function () {
+            const value = input.value.trim();
+            if (!value) {
+              error.textContent = errorText.required;
+              error.style.display = "block";
+              input.classList.remove("border-green-500", "ring-2", "ring-green-500/20");
+              input.classList.add("border-red-500", "ring-2", "ring-red-500/20");
+            } else if (!validator(value)) {
+              error.textContent = errorText.invalid;
+              error.style.display = "block";
+              input.classList.remove("border-green-500", "ring-2", "ring-green-500/20");
+              input.classList.add("border-red-500", "ring-2", "ring-red-500/20");
+            } else {
+              error.style.display = "none";
+              input.classList.remove("border-red-500", "ring-2", "ring-red-500/20");
+              input.classList.add("border-green-500", "ring-2", "ring-green-500/20");
+            }
+            cardBtn.disabled = !validateCardForm();
+          });
+        }
+
+        function validateCardForm() {
+          // Card number: 16 digits, allow spaces
+          const cardNumber = document.getElementById("dual-card-number");
+          const exp = document.getElementById("dual-card-exp");
+          const cvc = document.getElementById("dual-card-cvc");
+          const name = document.getElementById("dual-card-name");
+          const cardNumberValid = /^\d{4} ?\d{4} ?\d{4} ?\d{4}$/.test(cardNumber.value.trim());
+          const expValid = /^(0[1-9]|1[0-2])\/\d{2}$/.test(exp.value.trim());
+          const cvcValid = /^\d{3,4}$/.test(cvc.value.trim());
+          const nameValid = name.value.trim().length > 0;
+          return cardNumberValid && expValid && cvcValid && nameValid;
+        }
+
+        // Card number
+        addCardValidation(
+          document.getElementById("dual-card-number"),
+          "Enter 16-digit card number (spaces allowed).",
+          {
+            required: "Card number is required.",
+            invalid: "Invalid card number format. Must be 16 digits."
+          },
+          v => /^\d{4} ?\d{4} ?\d{4} ?\d{4}$/.test(v)
+        );
+        // Expiry
+        addCardValidation(
+          document.getElementById("dual-card-exp"),
+          "Format: MM/YY (e.g. 09/26).",
+          {
+            required: "Expiry date is required.",
+            invalid: "Invalid expiry format. Use MM/YY."
+          },
+          v => /^(0[1-9]|1[0-2])\/\d{2}$/.test(v)
+        );
+        // CVC
+        addCardValidation(
+          document.getElementById("dual-card-cvc"),
+          "3 or 4 digit code from your card.",
+          {
+            required: "CVC is required.",
+            invalid: "Invalid CVC. Must be 3 or 4 digits."
+          },
+          v => /^\d{3,4}$/.test(v)
+        );
+        // Name
+        addCardValidation(
+          document.getElementById("dual-card-name"),
+          "Enter the name as shown on your card.",
+          {
+            required: "Cardholder name is required.",
+            invalid: "Name must be at least 1 character."
+          },
+          v => v.length > 0
+        );
+
+        // Card form logic (demo only, no real payment)
+        cardForm.onsubmit = function (e) {
+          e.preventDefault();
+          if (!validateCardForm()) {
+            cardBtn.disabled = true;
+            return;
+          }
+          cardBtn.disabled = true;
+          cardSuccess.classList.remove("hidden");
+          setTimeout(() => { modal.style.display = "none"; }, 1800);
+        };
+
+        // Enable crypto button only if valid input
+        if (cryptoTxid) {
+          cryptoTxid.addEventListener("input", function () {
+            const value = this.value.trim();
+            const valid = /^([0-9a-fA-F]{64}|0x[0-9a-fA-F]{64})$/.test(value);
+            cryptoBtn.disabled = !valid;
+          });
+        }
+      })();
+    </script>
     <script>
       document.addEventListener("DOMContentLoaded", function () {
         // Sidebar toggle
@@ -1457,192 +2226,143 @@ $sessions = $stmt->fetchAll();
       });
     </script>
     <script id="plan-selection-script">
-  document.addEventListener("DOMContentLoaded", function () {
-    const planCards = document.querySelectorAll(".plan-card");
-    const billingToggle = document.getElementById("billing-toggle");
-    // Static TRC-20 wallet address for demo
-    const TRC20_ADDRESS = "TVTkZq3ghDZgF8txTdDM3s8g76XM2pgiey";
+      document.addEventListener("DOMContentLoaded", function () {
+        const planGetStartedBtns = document.querySelectorAll(".plan-get-started");
+        const planCards = document.querySelectorAll(".plan-card");
+        const billingToggle = document.getElementById("billing-toggle");
+        const TRC20_ADDRESS = "TVTkZq3ghDZgF8txTdDM3s8g76XM2pgiey";
+        const planDisplayNames = {
+          "basic-plan": "Basic",
+          "pro-plan": "Pro",
+          "enterprise-plan": "Enterprise"
+        };
+        const planAmounts = {
+          "basic-plan": 20,
+          "pro-plan": 50,
+          "enterprise-plan": 100
+        };
 
-    // Store original monthly prices for each plan
-    const planPrices = {
-      "basic-plan": 20,
-      "pro-plan": 50,
-      "enterprise-plan": 100, // Custom
-    };
+        // QR section elements
+        const qrSection = document.getElementById("qr-section");
+        const qrSelectedPlan = document.getElementById("qr-selected-plan");
+        const qrAmount = document.getElementById("qr-amount");
+        const qrOrderId = document.getElementById("qr-order-id");
+        const qrTxidInput = document.getElementById("qr-txid");
+        const qrTxidBtn = document.getElementById("qr-txid-btn");
+        const qrImg = document.getElementById("qr-img");
 
-    // Helper to update displayed prices
-    function updatePlanPrices(isYearly) {
-      planCards.forEach((card) => {
-        const id = card.id;
-        const priceSpan = card.querySelector(".text-3xl.font-bold");
-        const perSpan = card.querySelector(".text-gray-500.ml-1");
-        if (!priceSpan) return;
-        if (planPrices[id] === null) {
-          priceSpan.textContent = "Custom";
-          if (perSpan) perSpan.textContent = "";
-        } else if (isYearly) {
-          // 20% off for yearly, 12 months
-          const yearly = (planPrices[id] * 12 * 0.8).toFixed(2);
-          priceSpan.textContent = `$${yearly}`;
-          if (perSpan) perSpan.textContent = "/yr";
-        } else {
-          priceSpan.textContent = `$${planPrices[id]}`;
-          if (perSpan) perSpan.textContent = "/mo";
+        // Helper: generate order ID
+        function generateOrderId() {
+          return "ORD-" + Date.now() + "-" + Math.floor(Math.random() * 10000);
         }
-      });
-    }
 
-    // Utility: generate a simple unique order ID
-    function generateOrderId() {
-      return "ORD-" + Date.now() + "-" + Math.floor(Math.random() * 10000);
-    }
+        // Helper: get price for plan (monthly/yearly)
+        function getPlanPrice(planId, isYearly) {
+          const base = planAmounts[planId];
+          if (base == null) return { price: "Custom", suffix: "" };
+          if (isYearly) {
+            const yearly = (base * 12 * 0.8).toFixed(2);
+            return { price: yearly, suffix: "/yr" };
+          }
+          return { price: base, suffix: "/mo" };
+        }
 
-    planCards.forEach((card) => {
-      card.addEventListener("click", function () {
-        planCards.forEach((c) => {
-          c.classList.remove("active");
-          c.classList.remove("border-2");
-          c.classList.add("border");
+        // Helper: enable QR section and update info
+        function enableQrSection(planId, orderId, isYearly) {
+          qrSection.classList.remove("qr-disabled");
+          qrSection.classList.add("qr-enabled");
+          qrTxidInput.disabled = false;
+          qrTxidBtn.disabled = false;
+          qrSelectedPlan.textContent = planDisplayNames[planId] || "Custom";
+          const priceObj = getPlanPrice(planId, isYearly);
+          qrAmount.textContent = priceObj.price === "Custom" ? "Custom" : priceObj.price;
+          qrOrderId.textContent = orderId;
+          qrImg.src = "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=" +
+            encodeURIComponent("TRC20 USDT Wallet Address: " + TRC20_ADDRESS);
+        }
+
+        // Helper: disable QR section
+        function disableQrSection() {
+          qrSection.classList.remove("qr-enabled");
+          qrSection.classList.add("qr-disabled");
+          qrTxidInput.disabled = true;
+          qrTxidBtn.disabled = true;
+          qrSelectedPlan.textContent = "None";
+          qrAmount.textContent = "0";
+          qrOrderId.textContent = "ORD-QR-0";
+          // Remove plan highlight
+          planCards.forEach(card => card.classList.remove("selected"));
+        }
+
+        // Initially disable QR section
+        disableQrSection();
+
+        // Plan selection logic
+        planGetStartedBtns.forEach(btn => {
+          btn.addEventListener("click", function (e) {
+            e.stopPropagation();
+            const planId = btn.closest(".plan-card").id;
+            const isYearly = billingToggle && billingToggle.checked;
+            const orderId = generateOrderId();
+
+            // Highlight selected plan card
+            planCards.forEach(card => card.classList.remove("selected"));
+            btn.closest(".plan-card").classList.add("selected");
+
+            // Enable and update QR section
+            enableQrSection(planId, orderId, isYearly);
+
+            // Show the dual payment modal
+            let amount = getPlanPrice(planId, isYearly).price;
+            // If price is "Custom", set to empty string
+            if (amount === "Custom") amount = "";
+            window.showDualPaymentModal({
+              orderId: orderId,
+              amount: amount,
+              wallet: TRC20_ADDRESS
+            });
+          });
         });
-        this.classList.add("active");
-        this.classList.remove("border");
-        this.classList.add("border-2", "border-primary");
-        showCheckoutModal(this);
+
+        // If user toggles billing, update prices on cards and QR section if active
+        function updatePlanPrices(isYearly) {
+          planCards.forEach((card) => {
+            const id = card.id;
+            const priceSpan = card.querySelector(".text-3xl.font-bold");
+            const perSpan = card.querySelector(".text-gray-500.ml-1");
+            if (!priceSpan) return;
+            if (planAmounts[id] == null) {
+              priceSpan.textContent = "Custom";
+              if (perSpan) perSpan.textContent = "";
+            } else if (isYearly) {
+              const yearly = (planAmounts[id] * 12 * 0.8).toFixed(2);
+              priceSpan.textContent = `$${yearly}`;
+              if (perSpan) perSpan.textContent = "/yr";
+            } else {
+              priceSpan.textContent = `$${planAmounts[id]}`;
+              if (perSpan) perSpan.textContent = "/mo";
+            }
+          });
+          // If QR section is enabled, update its price
+          if (qrSection.classList.contains("qr-enabled")) {
+            const selectedCard = Array.from(planCards).find(card => card.classList.contains("selected"));
+            if (selectedCard) {
+              const planId = selectedCard.id;
+              const orderId = qrOrderId.textContent;
+              enableQrSection(planId, orderId, isYearly);
+            }
+          }
+        }
+
+        // Listen for billing toggle changes
+        if (billingToggle) {
+          billingToggle.addEventListener("change", function () {
+            updatePlanPrices(this.checked);
+          });
+          updatePlanPrices(billingToggle.checked);
+        }
       });
-    });
-
-    function showCheckoutModal(selectedCard) {
-      // Remove existing modal if any
-      const existingModal = document.getElementById("checkout-modal");
-      if (existingModal) existingModal.remove();
-
-      const orderId = generateOrderId();
-
-      // Get price from selected plan card
-      let price = "0.00";
-      const priceEl = selectedCard.querySelector(".text-3xl.font-bold");
-      if (priceEl) {
-        // Remove $ and /mo or /yr if present
-        price = priceEl.textContent.replace(/[^0-9.]/g, "");
-      }
-
-      const modal = document.createElement("div");
-      modal.id = "checkout-modal";
-      modal.className =
-        "fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50";
-
-      const modalContent = document.createElement("div");
-      modalContent.className =
-        "bg-white rounded-xl p-6 max-w-md w-full mx-4 relative shadow-xl fintech-modal";
-
-      const closeButton = document.createElement("button");
-      closeButton.className =
-        "absolute top-4 right-4 text-gray-400 hover:text-gray-600";
-      closeButton.innerHTML = '<i class="ri-close-line ri-lg"></i>';
-      closeButton.onclick = () => modal.remove();
-
-      modalContent.innerHTML = `
-        <h3 class="text-xl font-semibold text-gray-900 mb-2 text-center">TRC-20 USDT Payment</h3>
-        <p class="text-gray-500 text-center mb-6">Please send the exact amount to the wallet below. Your order will be processed after confirmation.</p>
-        <div class="flex flex-col items-center mb-4">
-          <div class="w-40 h-40 bg-gray-100 rounded-lg flex items-center justify-center mb-3 border border-gray-200">
-            <img
-              src="https://api.qrserver.com/v1/create-qr-code/?data=${encodeURIComponent(
-                TRC20_ADDRESS
-              )}&size=160x160"
-              alt="TRC-20 Wallet QR"
-              class="w-36 h-36 object-contain"
-            />
-          </div>
-          <div class="w-full">
-            <div class="mb-2">
-              <span class="block text-xs text-gray-500">Order ID</span>
-              <span class="block font-mono text-sm text-primary font-semibold">${orderId}</span>
-            </div>
-            <div class="mb-2">
-              <span class="block text-xs text-gray-500">Amount (USDT)</span>
-              <span class="block font-mono text-lg text-gray-900 font-bold">${price}</span>
-            </div>
-            <div class="mb-2">
-              <span class="block text-xs text-gray-500">TRC-20 Wallet Address</span>
-              <div class="flex items-center gap-2">
-                <span class="block font-mono text-xs text-gray-800 truncate" id="trc20-address">${TRC20_ADDRESS}</span>
-                <button type="button" class="text-primary hover:text-blue-700" title="Copy" onclick="navigator.clipboard.writeText('${TRC20_ADDRESS}')">
-                  <i class="ri-file-copy-line"></i>
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-        <form id="txid-form" class="mt-4">
-          <label for="txid" class="block text-xs text-gray-500 mb-1">Paste your Transaction ID (TXID)</label>
-          <input
-            type="text"
-            id="txid"
-            name="txid"
-            class="w-full px-3 py-2 rounded-lg border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 text-sm mb-3 font-mono"
-            placeholder="Paste your TXID here"
-            required
-            autocomplete="off"
-          />
-          <button
-            type="submit"
-            class="w-full py-3 text-sm font-semibold bg-primary text-white rounded-button hover:bg-primary/90 transition-colors mb-2"
-          >
-            I’ve Sent the Payment
-          </button>
-        </form>
-        <div id="txid-success" class="hidden mt-2 text-green-600 text-center text-sm font-medium">
-          Thank you! Your payment is being verified.
-        </div>
-      `;
-
-      modalContent.appendChild(closeButton);
-      modal.appendChild(modalContent);
-      document.body.appendChild(modal);
-
-      // TXID form handling
-      const txidForm = modalContent.querySelector("#txid-form");
-      const txidInput = modalContent.querySelector("#txid");
-      const txidSuccess = modalContent.querySelector("#txid-success");
-      txidForm.addEventListener("submit", function (e) {
-        e.preventDefault();
-        txidForm.classList.add("pointer-events-none", "opacity-60");
-        txidSuccess.classList.remove("hidden");
-        setTimeout(() => {
-          modal.remove();
-        }, 2500);
-      });
-    }
-
-    // Duration toggle logic
-    billingToggle.addEventListener("change", function () {
-      updatePlanPrices(this.checked);
-    });
-
-    // Set initial prices
-    updatePlanPrices(billingToggle.checked);
-  });
-</script>
-    <style>
-      /* Fintech modal tweaks for mobile and clarity */
-      @media (max-width: 480px) {
-        .fintech-modal {
-          padding: 1.25rem !important;
-          border-radius: 0.75rem !important;
-        }
-        .fintech-modal .w-40,
-        .fintech-modal .h-40 {
-          width: 8rem !important;
-          height: 8rem !important;
-        }
-        .fintech-modal .w-36,
-        .fintech-modal .h-36 {
-          width: 7rem !important;
-          height: 7rem !important;
-        }
-      }
-    </style>
+    </script>
     <script id="wallet-form-script">
       document.addEventListener("DOMContentLoaded", function () {
         const walletForm = document.getElementById("wallet-form");
@@ -1731,13 +2451,12 @@ $sessions = $stmt->fetchAll();
           notification.className = `fixed top-4 right-4 bg-${color}-50 border border-${color}-200 text-${color}-800 px-4 py-3 rounded-lg shadow-lg flex items-center z-50`;
           notification.innerHTML = `
     <div class="w-5 h-5 flex items-center justify-center text-${color}-500 mr-2">
-      <i class="ri-${
-        type === "success"
-          ? "check"
-          : type === "info"
-          ? "information"
-          : "error-warning"
-      }-line"></i>
+      <i class="ri-${type === "success"
+              ? "check"
+              : type === "info"
+                ? "information"
+                : "error-warning"
+            }-line"></i>
     </div>
     <span class="text-sm font-medium">${message}</span>
   `;
@@ -1785,67 +2504,68 @@ $sessions = $stmt->fetchAll();
       });
     </script>
     <script id="qr-payment-section-script">
-  document.addEventListener("DOMContentLoaded", function () {
-    // Plan data for QR payment
-    const qrPlans = {
-      basic: { name: "Basic", price: 20 },
-      pro: { name: "Pro", price: 50 },
-      enterprise: { name: "Enterprise", price: 100 }
-    };
-    const qrPlanBtns = document.querySelectorAll(".qr-plan-btn");
-    const qrSelectedPlan = document.getElementById("qr-selected-plan");
-    const qrAmount = document.getElementById("qr-amount");
-    const qrOrderId = document.getElementById("qr-order-id");
-    const qrTxidForm = document.getElementById("qr-txid-form");
-    const qrTxidSuccess = document.getElementById("qr-txid-success");
+      document.addEventListener("DOMContentLoaded", function () {
+        // Plan data for QR payment
+        const qrPlans = {
+          basic: { name: "Basic", price: 20 },
+          pro: { name: "Pro", price: 50 },
+          enterprise: { name: "Enterprise", price: 100 }
+        };
+        const qrPlanBtns = document.querySelectorAll(".qr-plan-btn");
+        const qrSelectedPlan = document.getElementById("qr-selected-plan");
+        const qrAmount = document.getElementById("qr-amount");
+        const qrOrderId = document.getElementById("qr-order-id");
+        const qrTxidForm = document.getElementById("qr-txid-form");
+        const qrTxidSuccess = document.getElementById("qr-txid-success");
 
-    let currentPlan = null;
+        let currentPlan = null;
 
-    // Helper to generate a unique order ID
-    function generateOrderId() {
-      return "ORD-QR-" + Date.now() + "-" + Math.floor(Math.random() * 10000);
-    }
+        // Helper to generate a unique order ID
+        function generateOrderId() {
+          return "ORD-QR-" + Date.now() + "-" + Math.floor(Math.random() * 10000);
+        }
 
-    // Update the QR payment panel UI
-    function updateQRPaymentPanel(planKey) {
-      if (!qrPlans[planKey]) {
-        qrSelectedPlan.textContent = "None";
-        qrAmount.textContent = "0";
-        qrOrderId.textContent = "ORD-QR-0";
-        return;
-      }
-      qrSelectedPlan.textContent = qrPlans[planKey].name;
-      qrAmount.textContent = qrPlans[planKey].price !== null ? qrPlans[planKey].price : "Custom";
-      qrOrderId.textContent = generateOrderId();
-    }
+        // Update the QR payment panel UI
+        function updateQRPaymentPanel(planKey) {
+          if (!qrPlans[planKey]) {
+            qrSelectedPlan.textContent = "None";
+            qrAmount.textContent = "0";
+            qrOrderId.textContent = "ORD-QR-0";
+            return;
+          }
+          qrSelectedPlan.textContent = qrPlans[planKey].name;
+          qrAmount.textContent = qrPlans[planKey].price !== null ? qrPlans[planKey].price : "Custom";
+          qrOrderId.textContent = generateOrderId();
+        }
 
-    // Plan button selection logic
-    qrPlanBtns.forEach((btn) => {
-      btn.addEventListener("click", function () {
-        qrPlanBtns.forEach((b) => b.classList.remove("border-primary", "ring-2", "ring-primary/20"));
-        this.classList.add("border-primary", "ring-2", "ring-primary/20");
-        currentPlan = this.getAttribute("data-plan");
-        updateQRPaymentPanel(currentPlan);
+        // Plan button selection logic
+        qrPlanBtns.forEach((btn) => {
+          btn.addEventListener("click", function () {
+            qrPlanBtns.forEach((b) => b.classList.remove("border-primary", "ring-2", "ring-primary/20"));
+            this.classList.add("border-primary", "ring-2", "ring-primary/20");
+            currentPlan = this.getAttribute("data-plan");
+            updateQRPaymentPanel(currentPlan);
+          });
+        });
+
+        // Set default state (no plan selected)
+        updateQRPaymentPanel(null);
+
+        // TXID form logic
+        if (qrTxidForm && qrTxidSuccess) {
+          qrTxidForm.addEventListener("submit", function (e) {
+            e.preventDefault();
+            qrTxidForm.classList.add("pointer-events-none", "opacity-60");
+            qrTxidSuccess.classList.remove("hidden");
+            setTimeout(() => {
+              qrTxidForm.reset();
+              qrTxidForm.classList.remove("pointer-events-none", "opacity-60");
+              qrTxidSuccess.classList.add("hidden");
+            }, 2500);
+          });
+        }
       });
-    });
+    </script>
+  </body>
 
-    // Set default state (no plan selected)
-    updateQRPaymentPanel(null);
-
-    // TXID form logic
-    if (qrTxidForm && qrTxidSuccess) {
-      qrTxidForm.addEventListener("submit", function (e) {
-        e.preventDefault();
-        qrTxidForm.classList.add("pointer-events-none", "opacity-60");
-        qrTxidSuccess.classList.remove("hidden");
-        setTimeout(() => {
-          qrTxidForm.reset();
-          qrTxidForm.classList.remove("pointer-events-none", "opacity-60");
-          qrTxidSuccess.classList.add("hidden");
-        }, 2500);
-      });
-    }
-  });
-</script>
-</body>
 </html>
