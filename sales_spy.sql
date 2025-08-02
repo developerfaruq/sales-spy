@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jun 22, 2025 at 11:19 AM
+-- Generation Time: Aug 02, 2025 at 03:52 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -24,6 +24,49 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `access_requests`
+--
+
+CREATE TABLE `access_requests` (
+  `id` int(11) NOT NULL,
+  `name` varchar(100) DEFAULT NULL,
+  `email` varchar(100) DEFAULT NULL,
+  `reason` text DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `access_requests`
+--
+
+INSERT INTO `access_requests` (`id`, `name`, `email`, `reason`, `created_at`) VALUES
+(1, 'hammad.shahir@gmail.com', 'emmanuelfaruq002@gmail.com', 'hhhhhhhhhhhhhhhhhhhhhh', '2025-07-16 21:30:08'),
+(2, 'hammad.shahir@gmail.com', 'emmanuelfaruq002@gmail.com', 'hhhhhhhhhhhhhhhhhhhhhh', '2025-07-16 21:30:31');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `admins`
+--
+
+CREATE TABLE `admins` (
+  `id` int(11) NOT NULL,
+  `name` varchar(100) NOT NULL,
+  `email` varchar(100) NOT NULL,
+  `password` varchar(255) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `admins`
+--
+
+INSERT INTO `admins` (`id`, `name`, `email`, `password`, `created_at`) VALUES
+(1, 'de faruq', 'admin@gmail.com', '$2y$10$ZKuNdje2n00XrOLJERSTiuYljmfN3bIYm0jsfBC3ZzC94C2AALBUa', '2025-07-16 18:36:03');
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `api_keys`
 --
 
@@ -40,7 +83,8 @@ CREATE TABLE `api_keys` (
 --
 
 INSERT INTO `api_keys` (`id`, `user_id`, `api_key`, `is_active`, `created_at`) VALUES
-(1, 10, 'ddae3ab5ccf1133e8e964f69d9f8e915cf773d216eeec2e5eb245e319b0ef507', 1, '2025-06-13 16:00:54');
+(11, 22, 'd6b21256230f621af463029876771a9225ed8416989bb8381ee569fe057af03a', 1, '2025-07-23 13:11:19'),
+(14, 25, 'c8909fd36f74f42b82f494cebe526c640a1479ed4b463e875f0e83b4ea63c725', 1, '2025-07-23 16:09:49');
 
 -- --------------------------------------------------------
 
@@ -53,6 +97,22 @@ CREATE TABLE `campaigns` (
   `user_id` int(11) NOT NULL,
   `name` varchar(100) NOT NULL,
   `status` enum('active','inactive','paused') DEFAULT 'active',
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `crypto_transactions`
+--
+
+CREATE TABLE `crypto_transactions` (
+  `id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `plan_name` varchar(50) DEFAULT NULL,
+  `amount` decimal(10,2) DEFAULT NULL,
+  `txid` varchar(100) DEFAULT NULL,
+  `status` enum('Pending','Approved','Rejected') DEFAULT 'Pending',
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -85,6 +145,36 @@ CREATE TABLE `leads` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `login_history`
+--
+
+CREATE TABLE `login_history` (
+  `id` int(11) NOT NULL,
+  `user_id` int(11) DEFAULT NULL,
+  `email` varchar(255) DEFAULT NULL,
+  `status` enum('success','failed','locked','disabled') NOT NULL,
+  `ip_address` varchar(45) DEFAULT NULL,
+  `country` varchar(100) DEFAULT NULL,
+  `region` varchar(100) DEFAULT NULL,
+  `city` varchar(100) DEFAULT NULL,
+  `latitude` varchar(50) DEFAULT NULL,
+  `longitude` varchar(50) DEFAULT NULL,
+  `browser` varchar(100) DEFAULT NULL,
+  `platform` varchar(100) DEFAULT NULL,
+  `device` varchar(100) DEFAULT NULL,
+  `timestamp` datetime DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `login_history`
+--
+
+INSERT INTO `login_history` (`id`, `user_id`, `email`, `status`, `ip_address`, `country`, `region`, `city`, `latitude`, `longitude`, `browser`, `platform`, `device`, `timestamp`) VALUES
+(1, 25, NULL, 'success', '::1', '', '', '', '', '', 'Chrome', 'Windows', 'Desktop', '2025-07-31 00:05:20');
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `password_reset_attempts`
 --
 
@@ -113,6 +203,22 @@ CREATE TABLE `search_logs` (
   `user_id` int(11) DEFAULT NULL,
   `filters_used` text DEFAULT NULL,
   `search_time` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `security_logs`
+--
+
+CREATE TABLE `security_logs` (
+  `id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `event_type` varchar(50) NOT NULL,
+  `ip_address` varchar(45) DEFAULT NULL,
+  `user_agent` text DEFAULT NULL,
+  `details` text DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -162,7 +268,32 @@ CREATE TABLE `subscriptions` (
   `credits_total` int(11) NOT NULL DEFAULT 2000,
   `start_date` timestamp NOT NULL DEFAULT current_timestamp(),
   `end_date` timestamp NULL DEFAULT NULL,
-  `is_active` tinyint(1) DEFAULT 1
+  `is_active` tinyint(1) DEFAULT 1,
+  `leads_balance` int(11) DEFAULT 1000,
+  `status` enum('active','expired','cancelled') DEFAULT 'active'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `subscriptions`
+--
+
+INSERT INTO `subscriptions` (`id`, `user_id`, `plan_name`, `credits_remaining`, `credits_total`, `start_date`, `end_date`, `is_active`, `leads_balance`, `status`) VALUES
+(10, 22, 'free', 1000, 1000, '2025-07-23 13:11:19', NULL, 1, 1000, 'active'),
+(13, 25, 'free', 1000, 1000, '2025-07-23 16:09:49', NULL, 1, 1000, 'active');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `txid_requests`
+--
+
+CREATE TABLE `txid_requests` (
+  `id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `txid` varchar(255) NOT NULL,
+  `plan_id` int(11) DEFAULT NULL,
+  `status` enum('pending','approved','declined') DEFAULT 'pending',
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -184,18 +315,66 @@ CREATE TABLE `users` (
   `failed_attempts` int(11) DEFAULT 0,
   `last_failed_attempt` datetime DEFAULT NULL,
   `avatar_url` varchar(255) DEFAULT NULL,
-  `credits` int(11) DEFAULT 1250,
-  `profile_picture` varchar(255) DEFAULT NULL
+  `credits` int(11) NOT NULL DEFAULT 1250,
+  `profile_picture` varchar(255) DEFAULT NULL,
+  `twofa_secret` varchar(255) DEFAULT NULL,
+  `twofa_enabled` tinyint(1) DEFAULT 0,
+  `twofa_backup_codes` text DEFAULT NULL,
+  `ip_address` varchar(45) DEFAULT NULL,
+  `city` varchar(100) DEFAULT NULL,
+  `is_disabled` tinyint(1) DEFAULT 0,
+  `account_status` enum('active','locked','disabled') DEFAULT 'active',
+  `unlock_time` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `users`
 --
 
-INSERT INTO `users` (`id`, `full_name`, `email`, `phone`, `password`, `role`, `created_at`, `reset_token`, `reset_token_expiry`, `failed_attempts`, `last_failed_attempt`, `avatar_url`, `credits`, `profile_picture`) VALUES
-(8, 'FARUQ ODEWUNMI', 'dev@gmail.com', '0816 1271354', '$2y$10$yb3uUuZpU5FMKPF/4babQ.kggCDwqLPbUOhyk.xNuWDveiMUdSSMm', 'user', '2025-06-11 21:20:16', NULL, NULL, 0, NULL, NULL, 125, 'uploads/profile_pictures/profile_8_1750095476.jpg'),
-(9, 'faru', 'developerfaruq@gmail.com', '08116533380', '$2y$10$46jru8Jh04uDv8lcFtUsAuZT5l5tqSIC9RLHk9rBePenzgEH5L31.', 'user', '2025-06-13 15:54:03', NULL, NULL, 0, NULL, NULL, 1250, NULL),
-(10, 'faru', 'deve@gmail.com', '08161271350', '$2y$10$sujhFmBxzcqNfzG9tJsEJed4W3YkakeIlsIZKHyKPT.39ysNmEe0W', 'user', '2025-06-13 16:00:54', NULL, NULL, 0, NULL, NULL, 1250, NULL);
+INSERT INTO `users` (`id`, `full_name`, `email`, `phone`, `password`, `role`, `created_at`, `reset_token`, `reset_token_expiry`, `failed_attempts`, `last_failed_attempt`, `avatar_url`, `credits`, `profile_picture`, `twofa_secret`, `twofa_enabled`, `twofa_backup_codes`, `ip_address`, `city`, `is_disabled`, `account_status`, `unlock_time`) VALUES
+(22, 'faru', 'emm@gmail.com', '08116533387', '$2y$10$Ya39CvXgc9jOxEOpi1u93O/.sgMGN5Wpq7N3Uljm7B4lnp2ucvjWO', 'user', '2025-07-23 13:11:19', NULL, NULL, 0, NULL, NULL, 1250, NULL, NULL, 0, NULL, '::1', NULL, 0, 'active', NULL),
+(25, 'faru', 'ada@gmail.com', '08116533380', '$2y$10$TvHtm4OzVMdy2D48CT9ziuiTRnI/bQ6/9/IygaBbFSGAeAtAAaary', 'user', '2025-07-23 16:09:49', NULL, NULL, 0, NULL, NULL, 1250, 'uploads/profile_pictures/profile_25_1753288173.jpg', NULL, 0, NULL, '::1', NULL, 0, 'active', NULL);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `user_2fa`
+--
+
+CREATE TABLE `user_2fa` (
+  `user_id` int(11) NOT NULL,
+  `secret` varchar(32) DEFAULT NULL,
+  `backup_codes` text DEFAULT NULL,
+  `method` enum('none','app','sms','email') DEFAULT 'none',
+  `phone` varchar(20) DEFAULT NULL,
+  `enabled` tinyint(1) DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `user_sessions`
+--
+
+CREATE TABLE `user_sessions` (
+  `id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `session_id` varchar(255) NOT NULL,
+  `user_agent` text DEFAULT NULL,
+  `ip_address` varchar(45) DEFAULT NULL,
+  `last_active` datetime DEFAULT NULL,
+  `created_at` datetime DEFAULT current_timestamp(),
+  `city` varchar(100) DEFAULT NULL,
+  `country` varchar(100) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `user_sessions`
+--
+
+INSERT INTO `user_sessions` (`id`, `user_id`, `session_id`, `user_agent`, `ip_address`, `last_active`, `created_at`, `city`, `country`) VALUES
+(26, 25, 'obs8e71ibvc1d0e0ev6iju732k', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0', '127.0.0.1', '2025-08-02 14:07:01', '2025-08-02 14:06:50', 'Unknown', 'Unknown'),
+(27, 25, 'l1gubhn2kesspol6a4su11f6ok', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36', '::1', '2025-08-02 14:48:10', '2025-08-02 14:28:57', 'Unknown', 'Unknown');
 
 -- --------------------------------------------------------
 
@@ -212,9 +391,36 @@ CREATE TABLE `user_stats` (
   `last_activity` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `user_tokens`
+--
+
+CREATE TABLE `user_tokens` (
+  `id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `token_hash` varchar(255) NOT NULL,
+  `expires_at` datetime NOT NULL,
+  `created_at` datetime DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
 --
 -- Indexes for dumped tables
 --
+
+--
+-- Indexes for table `access_requests`
+--
+ALTER TABLE `access_requests`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `admins`
+--
+ALTER TABLE `admins`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `email` (`email`);
 
 --
 -- Indexes for table `api_keys`
@@ -228,6 +434,13 @@ ALTER TABLE `api_keys`
 -- Indexes for table `campaigns`
 --
 ALTER TABLE `campaigns`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `user_id` (`user_id`);
+
+--
+-- Indexes for table `crypto_transactions`
+--
+ALTER TABLE `crypto_transactions`
   ADD PRIMARY KEY (`id`),
   ADD KEY `user_id` (`user_id`);
 
@@ -247,6 +460,13 @@ ALTER TABLE `leads`
   ADD KEY `store_id` (`store_id`);
 
 --
+-- Indexes for table `login_history`
+--
+ALTER TABLE `login_history`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `user_id` (`user_id`);
+
+--
 -- Indexes for table `password_reset_attempts`
 --
 ALTER TABLE `password_reset_attempts`
@@ -256,6 +476,13 @@ ALTER TABLE `password_reset_attempts`
 -- Indexes for table `search_logs`
 --
 ALTER TABLE `search_logs`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `user_id` (`user_id`);
+
+--
+-- Indexes for table `security_logs`
+--
+ALTER TABLE `security_logs`
   ADD PRIMARY KEY (`id`),
   ADD KEY `user_id` (`user_id`);
 
@@ -273,11 +500,29 @@ ALTER TABLE `subscriptions`
   ADD KEY `user_id` (`user_id`);
 
 --
+-- Indexes for table `txid_requests`
+--
+ALTER TABLE `txid_requests`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Indexes for table `users`
 --
 ALTER TABLE `users`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `email` (`email`);
+
+--
+-- Indexes for table `user_2fa`
+--
+ALTER TABLE `user_2fa`
+  ADD PRIMARY KEY (`user_id`);
+
+--
+-- Indexes for table `user_sessions`
+--
+ALTER TABLE `user_sessions`
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indexes for table `user_stats`
@@ -287,19 +532,43 @@ ALTER TABLE `user_stats`
   ADD KEY `user_id` (`user_id`);
 
 --
+-- Indexes for table `user_tokens`
+--
+ALTER TABLE `user_tokens`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- AUTO_INCREMENT for dumped tables
 --
+
+--
+-- AUTO_INCREMENT for table `access_requests`
+--
+ALTER TABLE `access_requests`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT for table `admins`
+--
+ALTER TABLE `admins`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `api_keys`
 --
 ALTER TABLE `api_keys`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
 -- AUTO_INCREMENT for table `campaigns`
 --
 ALTER TABLE `campaigns`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `crypto_transactions`
+--
+ALTER TABLE `crypto_transactions`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
@@ -315,6 +584,12 @@ ALTER TABLE `leads`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT for table `login_history`
+--
+ALTER TABLE `login_history`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
 -- AUTO_INCREMENT for table `password_reset_attempts`
 --
 ALTER TABLE `password_reset_attempts`
@@ -327,6 +602,12 @@ ALTER TABLE `search_logs`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT for table `security_logs`
+--
+ALTER TABLE `security_logs`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT for table `stores`
 --
 ALTER TABLE `stores`
@@ -336,18 +617,36 @@ ALTER TABLE `stores`
 -- AUTO_INCREMENT for table `subscriptions`
 --
 ALTER TABLE `subscriptions`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+
+--
+-- AUTO_INCREMENT for table `txid_requests`
+--
+ALTER TABLE `txid_requests`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
+
+--
+-- AUTO_INCREMENT for table `user_sessions`
+--
+ALTER TABLE `user_sessions`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
 
 --
 -- AUTO_INCREMENT for table `user_stats`
 --
 ALTER TABLE `user_stats`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `user_tokens`
+--
+ALTER TABLE `user_tokens`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
@@ -367,6 +666,12 @@ ALTER TABLE `campaigns`
   ADD CONSTRAINT `campaigns_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
 
 --
+-- Constraints for table `crypto_transactions`
+--
+ALTER TABLE `crypto_transactions`
+  ADD CONSTRAINT `crypto_transactions_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
+
+--
 -- Constraints for table `exports`
 --
 ALTER TABLE `exports`
@@ -380,16 +685,34 @@ ALTER TABLE `leads`
   ADD CONSTRAINT `leads_ibfk_2` FOREIGN KEY (`store_id`) REFERENCES `stores` (`id`);
 
 --
+-- Constraints for table `login_history`
+--
+ALTER TABLE `login_history`
+  ADD CONSTRAINT `login_history_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL;
+
+--
 -- Constraints for table `search_logs`
 --
 ALTER TABLE `search_logs`
   ADD CONSTRAINT `search_logs_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
 
 --
+-- Constraints for table `security_logs`
+--
+ALTER TABLE `security_logs`
+  ADD CONSTRAINT `security_logs_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
+
+--
 -- Constraints for table `subscriptions`
 --
 ALTER TABLE `subscriptions`
   ADD CONSTRAINT `subscriptions_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `user_2fa`
+--
+ALTER TABLE `user_2fa`
+  ADD CONSTRAINT `user_2fa_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `user_stats`
