@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Dashboard - Subscriptions</title>
+    <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.5.0/echarts.min.js"></script>
+    <style>
+      :where([class^="ri-"])::before {
+        content: "\f3c2";
+      }
+
+      body {
+        font-family: "Inter", sans-serif;
+        background-color: #f8f9fb;
+      }
+
+      .sidebar-transition {
+        transition: width 0.3s ease, transform 0.3s ease;
+      }
+
+      input[type="number"]::-webkit-inner-spin-button,
+      input[type="number"]::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+      }
+
+      .custom-switch {
+        position: relative;
+        display: inline-block;
+        width: 44px;
+        height: 24px;
+      }
+
+      .custom-switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+      }
+
+      .switch-slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #e2e8f0;
+        transition: 0.4s;
+        border-radius: 24px;
+      }
+
+      .switch-slider:before {
+        position: absolute;
+        content: "";
+        height: 18px;
+        width: 18px;
+        left: 3px;
+        bottom: 3px;
+        background-color: white;
+        transition: 0.4s;
+        border-radius: 50%;
+      }
+
+      input:checked+.switch-slider {
+        background-color: #3366ff;
+      }
+
+      input:checked+.switch-slider:before {
+        transform: translateX(20px);
+      }
+
+      .custom-checkbox {
+        position: relative;
+        display: inline-block;
+        width: 18px;
+        height: 18px;
+      }
+
+      .custom-checkbox input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+      }
+
+      .checkbox-mark {
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 18px;
+        width: 18px;
+        background-color: #fff;
+        border: 1px solid #d1d5db;
+        border-radius: 4px;
+      }
+
+      .custom-checkbox input:checked~.checkbox-mark {
+        background-color: #3366ff;
+        border-color: #3366ff;
+      }
+
+      .checkbox-mark:after {
+        content: "";
+        position: absolute;
+        display: none;
+      }
+
+      .custom-checkbox input:checked~.checkbox-mark:after {
+        display: block;
+      }
+
+      .custom-checkbox .checkbox-mark:after {
+        left: 6px;
+        top: 2px;
+        width: 5px;
+        height: 10px;
+        border: solid white;
+        border-width: 0 2px 2px 0;
+        transform: rotate(45deg);
+      }
+
+      .custom-radio {
+        position: relative;
+        display: inline-block;
+        width: 18px;
+        height: 18px;
+      }
+
+      .custom-radio input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+      }
+
+      .radio-mark {
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 18px;
+        width: 18px;
+        background-color: #fff;
+        border: 1px solid #d1d5db;
+        border-radius: 50%;
+      }
+
+      .custom-radio input:checked~.radio-mark {
+        background-color: #fff;
+        border-color: #3366ff;
+      }
+
+      .radio-mark:after {
+        content: "";
+        position: absolute;
+        display: none;
+      }
+
+      .custom-radio input:checked~.radio-mark:after {
+        display: block;
+      }
+
+      .custom-radio .radio-mark:after {
+        top: 4px;
+        left: 4px;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #3366ff;
+      }
+
+      .pagination-item {
+        width: 36px;
+        height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 8px;
+        cursor: pointer;
+      }
+
+      .pagination-item.active {
+        background-color: #3366ff;
+        color: white;
+      }
+
+      .custom-select {
+        position: relative;
+        display: inline-block;
+      }
+
+      .custom-select-trigger {
+        padding: 8px 12px;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        background-color: white;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        min-width: 120px;
+      }
+
+      .custom-select-options {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background-color: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        margin-top: 4px;
+        z-index: 10;
+        display: none;
+        max-height: 200px;
+        overflow-y: auto;
+      }
+
+      .custom-select-option {
+        padding: 8px 12px;
+        cursor: pointer;
+      }
+
+      .custom-select-option:hover {
+        background-color: #f1f5f9;
+      }
+
+      .custom-select.open .custom-select-options {
+        display: block;
+      }
+
+      .modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0, 0, 0, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 50;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.3s ease, visibility 0.3s ease;
+      }
+
+      .modal.active {
+        opacity: 1;
+        visibility: visible;
+      }
+
+      .modal-content {
+        background-color: white;
+        border-radius: 12px;
+        padding: 24px;
+        width: 100%;
+        max-width: 500px;
+        transform: translateY(20px);
+        transition: transform 0.3s ease;
+      }
+
+      .modal.active .modal-content {
+        transform: translateY(0);
+      }
+    </style>
+  </head>
+
+  <body class="min-h-screen">
+      <!-- Header and Sidebar (optional for standalone) -->
+         <header class="bg-white shadow-sm fixed top-0 left-0 right-0 z-30">
+      <div class="flex items-center justify-between px-4 h-16">
+        <div class="flex items-center">
+          <button id="sidebar-toggle"
+            class="w-10 h-10 flex items-center justify-center text-gray-500 hover:text-primary mr-2">
+            <i class="ri-menu-line ri-lg"></i>
+          </button>
+          <div class="font-['Pacifico'] text-xl text-primary">Sales-Spy</div>
+          <span class="ml-4 text-lg font-medium hidden md:block">Admin Dashboard</span>
+        </div>
+        <div class="flex items-center space-x-4">
+          <div class="relative">
+            <button id="notification-btn"
+              class="w-10 h-10 flex items-center justify-center text-gray-500 hover:text-primary relative">
+              <i class="ri-notification-3-line ri-lg"></i>
+              <span class="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full"></span>
+            </button>
+          </div>
+          <div class="relative">
+            <button id="user-menu-btn" class="flex items-center">
+              <div class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center">
+                <span class="text-sm font-medium">JD</span>
+              </div>
+              <span class="ml-2 text-sm font-medium hidden md:block">John Doe</span>
+              <i class="ri-arrow-down-s-line ml-1 text-gray-500"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </header>
+    <!-- Sidebar -->
+    <aside id="sidebar"
+      class="fixed top-16 left-0 bottom-0 w-64 bg-white shadow-sm z-20 sidebar-transition transform md:translate-x-0 -translate-x-full">
+      <div class="h-full flex flex-col">
+        <div class="p-4 border-b">
+          <div class="flex items-center">
+            <div class="w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center">
+              <span class="text-sm font-medium">JD</span>
+            </div>
+            <div class="ml-3">
+              <p class="text-sm font-medium">John Doe</p>
+              <p class="text-xs text-gray-500">Super Admin</p>
+            </div>
+          </div>
+        </div>
+        <nav class="flex-1 p-4 overflow-y-auto">
+          <ul class="space-y-1">
+            <li>
+              <button data-tab="users"
+                class="nav-link w-full flex items-center px-3 py-2 text-sm font-medium rounded-md text-primary bg-blue-50">
+                <div class="w-5 h-5 flex items-center justify-center mr-3">
+                  <i class="ri-user-line"></i>
+                </div>
+                <span>Users</span>
+              </button>
+            </li>
+            <li>
+              <button data-tab="subscriptions"
+                class="nav-link w-full flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-600 hover:text-primary hover:bg-blue-50">
+                <div class="w-5 h-5 flex items-center justify-center mr-3">
+                  <i class="ri-vip-crown-line"></i>
+                </div>
+                <span>Subscriptions</span>
+              </button>
+            </li>
+            <li>
+              <button data-tab="wallets"
+                class="nav-link w-full flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-600 hover:text-primary hover:bg-blue-50">
+                <div class="w-5 h-5 flex items-center justify-center mr-3">
+                  <i class="ri-wallet-3-line"></i>
+                </div>
+                <span>Wallets</span>
+              </button>
+            </li>
+            <li>
+              <button data-tab="payments"
+                class="nav-link w-full flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-600 hover:text-primary hover:bg-blue-50">
+                <div class="w-5 h-5 flex items-center justify-center mr-3">
+                  <i class="ri-exchange-dollar-line"></i>
+                </div>
+                <span>Payments</span>
+              </button>
+            </li>
+
+            <li>
+              <button data-tab="pending"
+              class="nav-link w-full flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-600 hover:text-primary hover:bg-blue-50">
+              <div class="w-5 h-5 flex items-center justify-center mr-3">
+                <i class="ri-time-line"></i>
+              </div>
+              <span>Pending Payments</span>
+              </button>
+            </li>
+            <li>
+              <button data-tab="settings"
+                class="nav-link w-full flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-600 hover:text-primary hover:bg-blue-50">
+                <div class="w-5 h-5 flex items-center justify-center mr-3">
+                  <i class="ri-settings-3-line"></i>
+                </div>
+                <span>Settings</span>
+              </button>
+            </li>
+          </ul>
+        </nav>
+        <div class="p-4 border-t">
+          <button id="logout-btn"
+            class="w-full flex items-center px-3 py-2 text-sm font-medium rounded-md text-red-600 hover:bg-red-50">
+            <div class="w-5 h-5 flex items-center justify-center mr-3">
+              <i class="ri-logout-box-line"></i>
+            </div>
+            <span>Logout</span>
+          </button>
+        </div>
+        <!-- Logout Confirmation Modal -->
+        <div id="logout-modal" class="modal">
+          <div class="modal-content max-w-sm">
+            <div class="flex items-center mb-4">
+              <div class="w-12 h-12 rounded-full bg-red-100 text-red-600 flex items-center justify-center mr-4">
+                <i class="ri-logout-box-line ri-lg"></i>
+              </div>
+              <h3 class="text-lg font-medium text-gray-800">
+                Are you sure you want to logout?
+              </h3>
+            </div>
+            <div class="flex items-center justify-end space-x-3">
+              <button id="cancel-logout"
+                class="px-4 py-2 border border-gray-200 text-gray-600 rounded-button whitespace-nowrap hover:bg-gray-50">
+                Cancel
+              </button>
+              <button id="confirm-logout"
+                class="px-4 py-2 bg-red-600 text-white rounded-button whitespace-nowrap hover:bg-red-700">
+                Logout
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </aside>
+    <main class="pt-16 md:pl-64 transition-all duration-300">
+      <!-- Subscriptions Tab -->
+      <div id="subscriptions-tab" class="tab-content p-4 md:p-6">
+        <div class="mb-6">
+          <h1 class="text-2xl font-semibold text-gray-800">
+            Subscription Management
+          </h1>
+          <p class="text-sm text-gray-500 mt-1">
+            Manage user subscriptions and plans
+          </p>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+          <div class="bg-white rounded-lg shadow-sm p-4">
+            <div class="flex items-center">
+              <div
+                class="w-12 h-12 rounded-full bg-blue-100 text-primary flex items-center justify-center"
+              >
+                <i class="ri-user-line ri-lg"></i>
+              </div>
+              <div class="ml-4">
+                <p class="text-sm text-gray-500">Total Users</p>
+                <p class="text-2xl font-semibold" id="subs-total-users">
+                  1,254
+                </p>
+              </div>
+            </div>
+          </div>
+          <div class="bg-white rounded-lg shadow-sm p-4">
+            <div class="flex items-center">
+              <div
+                class="w-12 h-12 rounded-full bg-green-100 text-green-600 flex items-center justify-center"
+              >
+                <i class="ri-vip-crown-line ri-lg"></i>
+              </div>
+              <div class="ml-4">
+                <p class="text-sm text-gray-500">Active Subscriptions</p>
+                <p class="text-2xl font-semibold" id="subs-active-count">876</p>
+              </div>
+            </div>
+          </div>
+          <div class="bg-white rounded-lg shadow-sm p-4">
+            <div class="flex items-center">
+              <div
+                class="w-12 h-12 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center"
+              >
+                <i class="ri-money-dollar-circle-line ri-lg"></i>
+              </div>
+              <div class="ml-4">
+                <p class="text-sm text-gray-500">Monthly Revenue</p>
+                <p class="text-2xl font-semibold" id="subs-monthly-revenue">
+                  $45,890
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+          <div class="bg-white rounded-lg shadow-sm p-4 md:col-span-2">
+            <div class="flex items-center justify-between mb-4">
+              <h2 class="text-lg font-medium text-gray-800">
+                Subscription Distribution
+              </h2>
+              <div class="custom-select" id="chart-period-select">
+                <div class="custom-select-trigger">
+                  <span>This Month</span>
+                  <i class="ri-arrow-down-s-line ml-2"></i>
+                </div>
+                <div class="custom-select-options">
+                  <div class="custom-select-option" data-value="week">
+                    This Week
+                  </div>
+                  <div class="custom-select-option" data-value="month">
+                    This Month
+                  </div>
+                  <div class="custom-select-option" data-value="quarter">
+                    This Quarter
+                  </div>
+                  <div class="custom-select-option" data-value="year">
+                    This Year
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div id="subscription-chart" class="w-full h-64"></div>
+          </div>
+          <div class="bg-white rounded-lg shadow-sm p-4">
+            <h2 class="text-lg font-medium text-gray-800 mb-4">
+              Plan Distribution
+            </h2>
+            <div id="plan-distribution-chart" class="w-full h-64"></div>
+          </div>
+        </div>
+        <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+          <div class="p-4 border-b">
+            <div
+              class="flex flex-col md:flex-row md:items-center md:justify-between gap-4"
+            >
+              <h2 class="text-lg font-medium text-gray-800">
+                Active Subscriptions
+              </h2>
+              <div class="flex flex-wrap items-center gap-3">
+                <div class="custom-select" id="subscription-plan-filter">
+                  <div class="custom-select-trigger">
+                    <span>All Plans</span>
+                    <i class="ri-arrow-down-s-line ml-2"></i>
+                  </div>
+                  <div class="custom-select-options">
+                    <div class="custom-select-option" data-value="all">
+                      All Plans
+                    </div>
+                    <div class="custom-select-option" data-value="basic">
+                      Basic
+                    </div>
+                    <div class="custom-select-option" data-value="pro">Pro</div>
+                    <div class="custom-select-option" data-value="enterprise">
+                      Enterprise
+                    </div>
+                  </div>
+                </div>
+                <div class="custom-select" id="subscription-status-filter">
+                  <div class="custom-select-trigger">
+                    <span>All Status</span>
+                    <i class="ri-arrow-down-s-line ml-2"></i>
+                  </div>
+                  <div class="custom-select-options">
+                    <div class="custom-select-option" data-value="all">
+                      All Status
+                    </div>
+                    <div class="custom-select-option" data-value="active">
+                      Active
+                    </div>
+                    <div class="custom-select-option" data-value="trial">
+                      Trial
+                    </div>
+                    <div class="custom-select-option" data-value="expired">
+                      Expired
+                    </div>
+                  </div>
+                </div>
+                <button
+                  class="px-4 py-2 bg-primary text-white rounded-button whitespace-nowrap flex items-center"
+                >
+                  <i class="ri-add-line mr-2"></i>
+                  New Subscription
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full">
+              <thead>
+                <tr class="bg-gray-50">
+                  <th
+                    class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    User
+                  </th>
+                  <th
+                    class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Plan
+                  </th>
+                  <th
+                    class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Status
+                  </th>
+                  <th
+                    class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Start Date
+                  </th>
+                  <th
+                    class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    End Date
+                  </th>
+                  <th
+                    class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Auto Renew
+                  </th>
+                  <th
+                    class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Actions
+                  </th>
+                </tr>
+              </thead>
+              <tbody
+                class="divide-y divide-gray-200"
+                id="subscriptions-table-body"
+              >
+                <!-- Filled by JS -->
+              </tbody>
+            </table>
+          </div>
+          <div class="px-4 py-3 flex items-center justify-between border-t">
+            <div class="flex items-center text-sm text-gray-500">
+              <span>Showing</span>
+              <div
+                class="custom-select mx-2"
+                id="subscription-page-size-select"
+              >
+                <div class="custom-select-trigger">
+                  <span>10</span>
+                  <i class="ri-arrow-down-s-line ml-1"></i>
+                </div>
+                <div class="custom-select-options">
+                  <div class="custom-select-option" data-value="10">10</div>
+                  <div class="custom-select-option" data-value="20">20</div>
+                  <div class="custom-select-option" data-value="50">50</div>
+                </div>
+              </div>
+              <span id="subscriptions-total-count">of 45 subscriptions</span>
+            </div>
+            <div
+              class="flex items-center space-x-1"
+              id="subscriptions-pagination"
+            >
+              <button
+                class="pagination-item text-gray-500 hover:bg-gray-100"
+                id="subscriptions-prev-page"
+              >
+                <i class="ri-arrow-left-s-line"></i>
+              </button>
+              <!-- Page numbers will be injected here -->
+              <button
+                class="pagination-item text-gray-600 hover:bg-gray-100 subscriptions-page-btn"
+                data-page="1"
+              >
+                1
+              </button>
+              <button
+                class="pagination-item text-gray-600 hover:bg-gray-100 subscriptions-page-btn"
+                data-page="2"
+              >
+                2
+              </button>
+              <button
+                class="pagination-item text-gray-600 hover:bg-gray-100 subscriptions-page-btn"
+                data-page="3"
+              >
+                3
+              </button>
+              <button
+                class="pagination-item text-gray-600 hover:bg-gray-100 subscriptions-page-btn"
+                data-page="4"
+              >
+                4
+              </button>
+              <button
+                class="pagination-item text-gray-600 hover:bg-gray-100 subscriptions-page-btn"
+                data-page="5"
+              >
+                5
+              </button>
+              <button
+                class="pagination-item text-gray-500 hover:bg-gray-100"
+                id="subscriptions-next-page"
+              >
+                <i class="ri-arrow-right-s-line"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Modals for Subscriptions -->
+      <div id="subscription-history-modal" class="modal">
+        <!-- ...modal code... -->
+      </div>
+      <div id="pause-subscription-modal" class="modal">
+        <!-- ...modal code... -->
+      </div>
+      <div id="cancel-subscription-modal" class="modal">
+        <!-- ...modal code... -->
+      </div>
+    </main>
+    <script>
+      // ...existing Subscriptions tab JS from Admin.html...
+    </script>
+    <script>
+      // ...charts script if needed...
+    </script>
+  </body>
+</html>
