@@ -1,13 +1,5 @@
 <?php
-require '../config/db.php';
-session_start();
-
-// Check if user is logged in
-if (!isset($_SESSION['user_id'])) {
-    header("Location: " . BASE_URL . "signup.html?form=login&status=session_expired");
-    exit;
-}
-
+require '../auth/auth_check.php';
 // Initialize response array
 $response = [
     'success' => false,

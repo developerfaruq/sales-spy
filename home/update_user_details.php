@@ -1,15 +1,5 @@
 <?php
-require '../config/db.php';
-session_start();
-
-// Check if user is logged in
-if (!isset($_SESSION['user_id'])) {
-    echo json_encode([
-        'success' => false,
-        'message' => 'User not logged in'
-    ]);
-    exit;
-}
+require '../auth/auth_check.php';
 
 // Initialize response array
 $response = [

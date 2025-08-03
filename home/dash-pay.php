@@ -1,7 +1,7 @@
 <?php
  require '../auth/auth_check.php';
 $user_id = $_SESSION['user_id'];
-
+/*
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['selected_plan'])) {
     $selected = $_POST['selected_plan'];
 
@@ -55,7 +55,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['selected_plan'])) {
         echo "Error: " . $e->getMessage();
     }
 
-}
+}*/
 // Profile picture handling
 try {
     // Get user data
@@ -506,7 +506,7 @@ $sessions = $stmt->fetchAll();
             <nav class="flex-1 overflow-y-auto py-4">
             <ul>
               <li class="mb-2">
-              <a href="Dashboard-home.html"
+              <a href="index.php"
                 class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-r-lg hover:text-primary transition-colors">
                 <div class="w-6 h-6 flex items-center justify-center mr-3">
                 <i class="ri-dashboard-line"></i>
@@ -554,7 +554,7 @@ $sessions = $stmt->fetchAll();
               </li>
 
               <li class="mb-2">
-              <a href="Dashboard-set.html"
+              <a href="settings.php"
                 class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-r-lg hover:text-primary transition-colors">
                 <div class="w-6 h-6 flex items-center justify-center mr-3">
                 <i class="ri-settings-line"></i>
@@ -579,7 +579,7 @@ $sessions = $stmt->fetchAll();
                 ></div>
               </div>
             </div>
-            <a href="Dashboard-pay.html">
+            <a href="dash-pay.php">
               <button
                 id="upgrade-btn-expanded"
                 class="w-full bg-primary text-white py-2 px-4 rounded-button flex items-center justify-center whitespace-nowrap hover:bg-blue-600 transition-colors"
@@ -698,392 +698,86 @@ $sessions = $stmt->fetchAll();
         </header>
         <!-- Main Dashboard Content -->
         <div class="p-6 max-w-7xl mx-auto">
-          <div class="mb-6">
-
-            <h1 class="text-2xl font-bold text-primary mb-2" style="color: #1E3A8A;">Payments</h1>
-            <p class="text-gray-600">
-              Manage your <span class="font-bold " style="color: #1E3A8A;">subscription</span> plans and <span
-                class="font-bold " style="color: #1E3A8A;">payment</span>methods.
-            </p>
-            <h1 class="text-2xl font-bold text-gray-900">
-
-            </h1>
-            <p class="text-gray-500 mt-1">
-
-            </p>
-          </div>
-          <!-- Plan Selection Section -->
-          <section class="mb-8">
-            <div class="flex items-center justify-between mb-6 px-2 sm:px-0">
-              <h2 class="text-xl font-semibold text-gray-900">Select a Plan</h2>
-              <!-- duration toggle section -->
-              <div class="flex items-center space-x-2">
-                <span class="text-sm text-gray-600">Monthly</span>
-                <label class="toggle">
-                  <input type="checkbox" id="billing-toggle" />
-                  <span class="slider"></span>
-                </label>
-                <span class="text-sm text-gray-600">Yearly
-                  <span class="text-xs text-primary">(Save 20%)</span></span>
-              </div>
+          
+<div class="mb-6">
+    <h1 class="text-2xl font-bold text-primary mb-2" style="color: #1E3A8A;">Payments</h1>
+    <p class="text-gray-600">
+        Manage your <span class="font-bold" style="color: #1E3A8A;">subscription</span> plans and <span class="font-bold" style="color: #1E3A8A;">payment</span> methods.
+    </p>
+</div>
+<!-- Plan Selection Section -->
+<section class="mb-8">
+    <div class="flex items-center justify-between mb-6 px-2 sm:px-0">
+        <h2 class="text-xl font-semibold text-gray-900">Select a Plan</h2>
+        <div class="flex items-center space-x-2">
+            <span class="text-sm text-gray-600">Monthly</span>
+            <label class="toggle">
+                <input type="checkbox" id="billing-toggle" />
+                <span class="slider"></span>
+            </label>
+            <span class="text-sm text-gray-600">Yearly <span class="text-xs text-primary">(Save 20%)</span></span>
+        </div>
+    </div>
+    <div id="plan-container" class="flex gap-4 overflow-x-auto pb-2 -mx-2 px-2 md:grid md:grid-cols-3 md:gap-6 md:overflow-x-visible md:mx-0 md:px-0" style="scrollbar-width: thin; -webkit-overflow-scrolling: touch;">
+        <!-- Plan cards will be dynamically inserted here -->
+    </div>
+</section>
+<!-- Billing Summary Panel -->
+<section class="mb-8">
+    <h2 class="text-lg font-semibold text-gray-800 mb-4">Billing Summary</h2>
+    <div class="glassmorphism bg-white rounded-lg border border-gray-200 p-6 relative">
+        <button id="edit-plan-btn" class="absolute top-6 right-6 text-sm font-medium text-primary hover:text-primary/80 flex items-center whitespace-nowrap" type="button">
+            <div class="w-4 h-4 flex items-center justify-center mr-1">
+                <i class="ri-edit-line"></i>
             </div>
-            <div
-              class="flex gap-4 overflow-x-auto pb-2 -mx-2 px-2 md:grid md:grid-cols-3 md:gap-6 md:overflow-x-visible md:mx-0 md:px-0"
-              style="scrollbar-width: thin; -webkit-overflow-scrolling: touch;">
-              <!-- Plan Cards (wrap in glassmorphism for home style) -->
-              <div id="basic-plan"
-                class="plan-card glassmorphism bg-white rounded-lg border border-gray-200 p-6 cursor-pointer">
-                <div class="mb-4">
-                  <h3 class="text-xl font-semibold text-gray-900">Basic</h3>
-                  <p class="text-sm text-gray-500 mt-1">
-                    Perfect for small businesses just getting started with lead
-                    generation
-                  </p>
+            Edit Plan
+        </button>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="space-y-4">
+                <div>
+                    <h3 class="text-sm font-medium text-gray-500 mb-1">Selected Plan</h3>
+                    <div class="flex items-center">
+                        <div class="w-5 h-5 flex items-center justify-center text-primary mr-2">
+                            <i class="ri-rocket-line"></i>
+                        </div>
+                        <span id="billing-plan-name" class="text-base font-medium text-gray-900">Pro Plan ($50/mo)</span>
+                    </div>
                 </div>
-                <div class="mb-6">
-                  <div class="flex items-baseline">
-                    <span class="text-3xl font-bold text-gray-900">$115</span>
-                    <span class="text-gray-500 ml-1">/mo</span>
-                  </div>
+                <div>
+                    <h3 class="text-sm font-medium text-gray-500 mb-1">Payment Method</h3>
+                    <div class="flex items-center">
+                        <div class="w-5 h-5 flex items-center justify-center text-primary mr-2">
+                            <i class="ri-bank-card-line"></i>
+                        </div>
+                        <span class="text-base font-medium text-gray-900">TRC-20 USDT</span>
+                    </div>
                 </div>
-                <ul class="space-y-3 mb-8">
-                  <li class="flex items-start">
-                    <div class="w-5 h-5 flex items-center justify-center text-primary mt-0.5">
-                      <i class="ri-check-line"></i>
-                    </div>
-                    <span class="text-sm text-gray-700 ml-2">500 leads per month</span>
-                  </li>
-                  <li class="flex items-start">
-                    <div class="w-5 h-5 flex items-center justify-center text-primary mt-0.5">
-                      <i class="ri-check-line"></i>
-                    </div>
-                    <span class="text-sm text-gray-700 ml-2">Basic filtering options</span>
-                  </li>
-                  <li class="flex items-start">
-                    <div class="w-5 h-5 flex items-center justify-center text-primary mt-0.5">
-                      <i class="ri-check-line"></i>
-                    </div>
-                    <span class="text-sm text-gray-700 ml-2">Email and phone support</span>
-                  </li>
-                  <li class="flex items-start">
-                    <div class="w-5 h-5 flex items-center justify-center text-primary mt-0.5">
-                      <i class="ri-check-line"></i>
-                    </div>
-                    <span class="text-sm text-gray-700 ml-2">Weekly database updates</span>
-                  </li>
-                </ul>
-                <button
-                  class="w-full py-3 text-sm font-medium text-primary border border-primary rounded-button hover:bg-primary/5 transition-colors whitespace-nowrap plan-get-started"
-                  data-plan="basic-plan">
-                  Get started
-                </button>
-              </div>
-              <div id="pro-plan"
-                class="plan-card active glassmorphism bg-white rounded-lg border-2 border-primary p-6 cursor-pointer relative">
-                <div class="absolute -top-3 right-4 bg-primary text-white text-xs font-medium px-3 py-1 rounded-full">
-                  POPULAR
-                </div>
-                <div class="mb-4">
-                  <h3 class="text-xl font-semibold text-gray-900">Pro</h3>
-                  <p class="text-sm text-gray-500 mt-1">
-                    Ideal for growing businesses with serious lead generation
-                    needs
-                  </p>
-                </div>
-                <div class="mb-6">
-                  <div class="flex items-baseline">
-                    <span class="text-3xl font-bold text-gray-900">$225</span>
-                    <span class="text-gray-500 ml-1">/mo</span>
-                  </div>
-                </div>
-                <ul class="space-y-3 mb-8">
-                  <li class="flex items-start">
-                    <div class="w-5 h-5 flex items-center justify-center text-primary mt-0.5">
-                      <i class="ri-check-line"></i>
-                    </div>
-                    <span class="text-sm text-gray-700 ml-2">2,000 leads per month</span>
-                  </li>
-                  <li class="flex items-start">
-                    <div class="w-5 h-5 flex items-center justify-center text-primary mt-0.5">
-                      <i class="ri-check-line"></i>
-                    </div>
-                    <span class="text-sm text-gray-700 ml-2">Advanced filtering options</span>
-                  </li>
-                  <li class="flex items-start">
-                    <div class="w-5 h-5 flex items-center justify-center text-primary mt-0.5">
-                      <i class="ri-check-line"></i>
-                    </div>
-                    <span class="text-sm text-gray-700 ml-2">Priority support</span>
-                  </li>
-                  <li class="flex items-start">
-                    <div class="w-5 h-5 flex items-center justify-center text-primary mt-0.5">
-                      <i class="ri-check-line"></i>
-                    </div>
-                    <span class="text-sm text-gray-700 ml-2">Daily database updates</span>
-                  </li>
-                  <li class="flex items-start">
-                    <div class="w-5 h-5 flex items-center justify-center text-primary mt-0.5">
-                      <i class="ri-check-line"></i>
-                    </div>
-                    <span class="text-sm text-gray-700 ml-2">CRM integration</span>
-                  </li>
-                  <li class="flex items-start">
-                    <div class="w-5 h-5 flex items-center justify-center text-primary mt-0.5">
-                      <i class="ri-check-line"></i>
-                    </div>
-                    <span class="text-sm text-gray-700 ml-2">Email sequence automation</span>
-                  </li>
-                </ul>
-                <button
-                  class="w-full py-3 text-sm font-medium bg-primary text-white rounded-button hover:bg-primary/90 transition-colors whitespace-nowrap plan-get-started"
-                  data-plan="pro-plan">
-                  Get started
-                </button>
-              </div>
-              <div id="enterprise-plan"
-                class="plan-card glassmorphism bg-white rounded-lg border border-gray-200 p-6 cursor-pointer">
-                <div class="mb-4">
-                  <h3 class="text-xl font-semibold text-gray-900">
-                    Enterprise
-                  </h3>
-                  <p class="text-sm text-gray-500 mt-1">
-                    For large organizations with custom lead generation
-                    requirements
-                  </p>
-                </div>
-                <div class="mb-6">
-                  <div class="flex items-baseline">
-                    <span class="text-3xl font-bold text-gray-900">Custom</span>
-                  </div>
-                </div>
-                <ul class="space-y-3 mb-8">
-                  <li class="flex items-start">
-                    <div class="w-5 h-5 flex items-center justify-center text-primary mt-0.5">
-                      <i class="ri-check-line"></i>
-                    </div>
-                    <span class="text-sm text-gray-700 ml-2">Unlimited leads</span>
-                  </li>
-                  <li class="flex items-start">
-                    <div class="w-5 h-5 flex items-center justify-center text-primary mt-0.5">
-                      <i class="ri-check-line"></i>
-                    </div>
-                    <span class="text-sm text-gray-700 ml-2">Custom filtering options</span>
-                  </li>
-                  <li class="flex items-start">
-                    <div class="w-5 h-5 flex items-center justify-center text-primary mt-0.5">
-                      <i class="ri-check-line"></i>
-                    </div>
-                    <span class="text-sm text-gray-700 ml-2">Dedicated account manager</span>
-                  </li>
-                  <li class="flex items-start">
-                    <div class="w-5 h-5 flex items-center justify-center text-primary mt-0.5">
-                      <i class="ri-check-line"></i>
-                    </div>
-                    <span class="text-sm text-gray-700 ml-2">Real-time database updates</span>
-                  </li>
-                  <li class="flex items-start">
-                    <div class="w-5 h-5 flex items-center justify-center text-primary mt-0.5">
-                      <i class="ri-check-line"></i>
-                    </div>
-                    <span class="text-sm text-gray-700 ml-2">Advanced API access</span>
-                  </li>
-                  <li class="flex items-start">
-                    <div class="w-5 h-5 flex items-center justify-center text-primary mt-0.5">
-                      <i class="ri-check-line"></i>
-                    </div>
-                    <span class="text-sm text-gray-700 ml-2">Custom integration development</span>
-                  </li>
-                </ul>
-                <button
-                  class="w-full py-3 text-sm font-medium text-primary border border-primary rounded-button hover:bg-primary/5 transition-colors whitespace-nowrap plan-get-started"
-                  data-plan="enterprise-plan">
-                  Contact sales
-                </button>
-              </div>
             </div>
-          </section>
-          <!-- Billing Summary Panel -->
-          <section class="mb-8">
-            <h2 class="text-lg font-semibold text-gray-800 mb-4">
-              Billing Summary
-            </h2>
-            <div class="glassmorphism bg-white rounded-lg border border-gray-200 p-6 relative">
-              <button id="edit-plan-btn"
-                class="absolute top-6 right-6 text-sm font-medium text-primary hover:text-primary/80 flex items-center whitespace-nowrap"
-                type="button">
-                <div class="w-4 h-4 flex items-center justify-center mr-1">
-                  <i class="ri-edit-line"></i>
-                </div>
-                Edit Plan
-              </button>
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="space-y-4">
-                  <div>
-                    <h3 class="text-sm font-medium text-gray-500 mb-1">
-                      Selected Plan
-                    </h3>
-                    <div class="flex items-center"></div>
-                    <div class="w-5 h-5 flex items-center justify-center text-primary mr-2">
-                      <i class="ri-rocket-line"></i>
+            <div class="space-y-4">
+                <div>
+                    <h3 class="text-sm font-medium text-gray-500 mb-1">Billing Cycle</h3>
+                    <div class="flex items-center">
+                        <div class="w-5 h-5 flex items-center justify-center text-primary mr-2">
+                            <i class="ri-calendar-line"></i>
+                        </div>
+                        <span id="billing-cycle" class="text-base font-medium text-gray-900">Monthly (Renews every 30 days)</span>
                     </div>
-                    <span id="billing-plan-name" class="text-base font-medium text-gray-900">
-                      Pro Plan ($50/mo)
-                    </span>
-                  </div>
                 </div>
                 <div>
-                  <h3 class="text-sm font-medium text-gray-500 mb-1">
-                    Payment Method
-                  </h3>
-                  <div class="flex items-center">
-                    <div class="w-5 h-5 flex items-center justify-center text-primary mr-2">
-                      <i class="ri-bank-card-line"></i>
+                    <h3 class="text-sm font-medium text-gray-500 mb-1">Next Payment Date</h3>
+                    <div class="flex items-center">
+                        <div class="w-5 h-5 flex items-center justify-center text-primary mr-2">
+                            <i class="ri-calendar-line"></i>
+                        </div>
+                        <span id="billing-next-date" class="text-base font-medium text-gray-900"></span>
                     </div>
-                    <span class="text-base font-medium text-gray-900">TRC-20 USDT</span>
-                  </div>
                 </div>
-              </div>
-              <div class="space-y-4">
-                <div>
-                  <h3 class="text-sm font-medium text-gray-500 mb-1">
-                    Billing Cycle
-                  </h3>
-                  <div class="flex items-center">
-                    <div class="w-5 h-5 flex items-center justify-center text-primary mr-2">
-                      <i class="ri-calendar-line"></i>
-                    </div>
-                    <span id="billing-cycle" class="text-base font-medium text-gray-900">
-                      Monthly (Renews every 30 days)
-                    </span>
-                  </div>
-                </div>
-                <div>
-                  <h3 class="text-sm font-medium text-gray-500 mb-1">
-                    Next Payment Date
-                  </h3>
-                  <div class="flex items-center">
-                    <div class="w-5 h-5 flex items-center justify-center text-primary mr-2">
-                    </div>
-          </section>
-          <script>
-            document.addEventListener("DOMContentLoaded", function () {
-              // Plan info
-              const planData = {
-                "basic-plan": {
-                  name: "Basic Plan",
-                  price: 20,
-                },
-                "pro-plan": {
-                  name: "Pro Plan",
-                  price: 50,
-                },
-                "enterprise-plan": {
-                  name: "Enterprise Plan",
-                  price: null, // Custom
-                },
-              };
+            </div>
+        </div>
+    </div>
+</section>
 
-              // Elements
-              const billingPlanName = document.getElementById("billing-plan-name");
-              const billingCycle = document.getElementById("billing-cycle");
-              const billingNextDate = document.getElementById("billing-next-date");
-              const billingToggle = document.getElementById("billing-toggle");
-              const planCards = document.querySelectorAll(".plan-card");
-              const editPlanBtn = document.getElementById("edit-plan-btn");
 
-              // Helper: get selected plan card
-              function getSelectedPlanCard() {
-                return document.querySelector(".plan-card.active");
-              }
-
-              // Helper: get selected plan id
-              function getSelectedPlanId() {
-                const card = getSelectedPlanCard();
-                return card ? card.id : "pro-plan";
-              }
-
-              // Helper: get plan price (monthly or yearly)
-              function getPlanPrice(planId, isYearly) {
-                const plan = planData[planId];
-                if (!plan) return { price: "Custom", suffix: "" };
-                if (plan.price === null) return { price: "Custom", suffix: "" };
-                if (isYearly) {
-                  // 20% off for yearly, 12 months
-                  const yearly = (plan.price * 12 * 0.8).toFixed(2);
-                  return { price: `$${yearly}`, suffix: "/yr" };
-                } else {
-                  return { price: `$${plan.price}`, suffix: "/mo" };
-                }
-              }
-
-              // Helper: get billing cycle text
-              function getBillingCycleText(isYearly) {
-                return isYearly
-                  ? "Yearly (Renews every 12 months)"
-                  : "Monthly (Renews every 30 days)";
-              }
-
-              // Helper: get next payment date
-              function getNextPaymentDate(isYearly) {
-                const now = new Date();
-                if (isYearly) {
-                  now.setFullYear(now.getFullYear() + 1);
-                } else {
-                  now.setDate(now.getDate() + 30);
-                }
-                return now.toLocaleDateString(undefined, {
-                  year: "numeric",
-                  month: "long",
-                  day: "numeric",
-                });
-              }
-
-              // Update billing summary UI
-              function updateBillingSummary() {
-                const planId = getSelectedPlanId();
-                const isYearly = billingToggle && billingToggle.checked;
-                const plan = planData[planId];
-                const { price, suffix } = getPlanPrice(planId, isYearly);
-
-                if (billingPlanName) {
-                  if (plan && plan.price !== null) {
-                    billingPlanName.textContent = `${plan.name} (${price}${suffix})`;
-                  } else {
-                    billingPlanName.textContent = `${plan ? plan.name : "Custom Plan"} (Custom)`;
-                  }
-                }
-                if (billingCycle) {
-                  billingCycle.textContent = getBillingCycleText(isYearly);
-                }
-                if (billingNextDate) {
-                  billingNextDate.textContent = getNextPaymentDate(isYearly);
-                }
-              }
-
-              // Listen for plan selection changes
-              planCards.forEach((card) => {
-                card.addEventListener("click", updateBillingSummary);
-              });
-
-              // Listen for billing toggle changes
-              if (billingToggle) {
-                billingToggle.addEventListener("change", updateBillingSummary);
-              }
-
-              // Edit Plan button scrolls to plan selection
-              if (editPlanBtn) {
-                editPlanBtn.addEventListener("click", function () {
-                  const planSection = document.querySelector('section.mb-8');
-                  if (planSection) {
-                    planSection.scrollIntoView({ behavior: "smooth" });
-                  }
-                });
-              }
-
-              // Initial update
-              updateBillingSummary();
-            });
-          </script>
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
               <!-- Save Wallet Form -->
               <section>
@@ -2224,8 +1918,8 @@ $sessions = $stmt->fetchAll();
           sidebarMobileClose.addEventListener("click", closeSidebar);
         }
       });
-    </script>
-    <script id="plan-selection-script">
+    </script><!--
+   <script id="plan-selection-script">
       document.addEventListener("DOMContentLoaded", function () {
         const planGetStartedBtns = document.querySelectorAll(".plan-get-started");
         const planCards = document.querySelectorAll(".plan-card");
@@ -2362,7 +2056,7 @@ $sessions = $stmt->fetchAll();
           updatePlanPrices(billingToggle.checked);
         }
       });
-    </script>
+    </script>-->
     <script id="wallet-form-script">
       document.addEventListener("DOMContentLoaded", function () {
         const walletForm = document.getElementById("wallet-form");
@@ -2503,69 +2197,257 @@ $sessions = $stmt->fetchAll();
         }
       });
     </script>
+   
     <script id="qr-payment-section-script">
-      document.addEventListener("DOMContentLoaded", function () {
-        // Plan data for QR payment
-        const qrPlans = {
-          basic: { name: "Basic", price: 20 },
-          pro: { name: "Pro", price: 50 },
-          enterprise: { name: "Enterprise", price: 100 }
-        };
-        const qrPlanBtns = document.querySelectorAll(".qr-plan-btn");
-        const qrSelectedPlan = document.getElementById("qr-selected-plan");
-        const qrAmount = document.getElementById("qr-amount");
-        const qrOrderId = document.getElementById("qr-order-id");
-        const qrTxidForm = document.getElementById("qr-txid-form");
-        const qrTxidSuccess = document.getElementById("qr-txid-success");
+document.addEventListener('DOMContentLoaded', async function () {
+    try {
+        // Fetch plan data from backend
+        const response = await fetch('payment.php', {
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json' }
+        });
+        const data = await response.json();
+        
 
-        let currentPlan = null;
-
-        // Helper to generate a unique order ID
-        function generateOrderId() {
-          return "ORD-QR-" + Date.now() + "-" + Math.floor(Math.random() * 10000);
-        }
-
-        // Update the QR payment panel UI
-        function updateQRPaymentPanel(planKey) {
-          if (!qrPlans[planKey]) {
-            qrSelectedPlan.textContent = "None";
-            qrAmount.textContent = "0";
-            qrOrderId.textContent = "ORD-QR-0";
+        if (!data.success) {
+            console.error('Error fetching plans:', data.message);
+            document.getElementById('plan-container').innerHTML = '<p class="text-red-600 text-center">Failed to load plans. Please try again later.</p>';
             return;
-          }
-          qrSelectedPlan.textContent = qrPlans[planKey].name;
-          qrAmount.textContent = qrPlans[planKey].price !== null ? qrPlans[planKey].price : "Custom";
-          qrOrderId.textContent = generateOrderId();
         }
 
-        // Plan button selection logic
-        qrPlanBtns.forEach((btn) => {
-          btn.addEventListener("click", function () {
-            qrPlanBtns.forEach((b) => b.classList.remove("border-primary", "ring-2", "ring-primary/20"));
-            this.classList.add("border-primary", "ring-2", "ring-primary/20");
-            currentPlan = this.getAttribute("data-plan");
-            updateQRPaymentPanel(currentPlan);
-          });
+        const planContainer = document.getElementById('plan-container');
+        const billingToggle = document.getElementById('billing-toggle');
+        const billingPlanName = document.getElementById('billing-plan-name');
+        const billingCycle = document.getElementById('billing-cycle');
+        const billingNextDate = document.getElementById('billing-next-date');
+        const editPlanBtn = document.getElementById('edit-plan-btn');
+        let isYearly = billingToggle.checked;
+        let selectedPlanId = 'pro'; // Default to Pro plan
+        const TRC20_ADDRESS = 'TVTkZq3ghDZgF8txTdDM3s8g76XM2pgiey';
+
+        // QR section elements
+        const qrSection = document.getElementById('qr-section');
+        const qrSelectedPlan = document.getElementById('qr-selected-plan');
+        const qrAmount = document.getElementById('qr-amount');
+        const qrOrderId = document.getElementById('qr-order-id');
+        const qrTxidInput = document.getElementById('qr-txid');
+        const qrTxidBtn = document.getElementById('qr-txid-btn');
+        const qrImg = document.getElementById('qr-img');
+
+        // Function to render plans
+        function renderPlans(plans, isYearly) {
+            planContainer.innerHTML = '';
+            plans.forEach(plan => {
+                const price = isYearly ? plan.yearly_price : plan.monthly_price;
+                const priceText = plan.plan_name.toLowerCase() === 'enterprise' ? 'Custom' : `$${parseFloat(price).toFixed(2)}`;
+                const periodText = plan.plan_name.toLowerCase() === 'enterprise' ? '' : (isYearly ? '/yr' : '/mo');
+                const planCard = document.createElement('div');
+                planCard.id = `${plan.plan_name.toLowerCase()}-plan`;
+                planCard.className = `plan-card glassmorphism bg-white rounded-lg border ${plan.is_popular ? 'border-2 border-primary active' : 'border-gray-200'} p-6 cursor-pointer relative ${plan.plan_name.toLowerCase() === selectedPlanId ? 'active border-2 border-primary' : ''}`;
+                planCard.innerHTML = `
+                    ${plan.is_popular ? '<div class="absolute -top-3 right-4 bg-primary text-white text-xs font-medium px-3 py-1 rounded-full">POPULAR</div>' : ''}
+                    <div class="mb-4">
+                        <h3 class="text-xl font-semibold text-gray-900">${plan.plan_name}</h3>
+                        <p class="text-sm text-gray-500 mt-1">${plan.description}</p>
+                    </div>
+                    <div class="mb-6">
+                        <div class="flex items-baseline">
+                            <span class="text-3xl font-bold text-gray-900">${priceText}</span>
+                            <span class="text-gray-500 ml-1">${periodText}</span>
+                        </div>
+                    </div>
+                    <ul class="space-y-3 mb-8">
+                        ${plan.features.map(feature => `
+                            <li class="flex items-start">
+                                <div class="w-5 h-5 flex items-center justify-center text-primary mt-0.5">
+                                    <i class="ri-check-line"></i>
+                                </div>
+                                <span class="text-sm text-gray-700 ml-2">${feature}</span>
+                            </li>
+                        `).join('')}
+                    </ul>
+                    <button class="w-full py-3 text-sm font-medium ${plan.is_popular ? 'bg-primary text-white hover:bg-primary/90' : 'text-primary border border-primary hover:bg-primary/5'} rounded-button transition-colors whitespace-nowrap plan-get-started" data-plan="${plan.plan_name.toLowerCase()}">
+                        ${plan.plan_name.toLowerCase() === 'enterprise' ? 'Contact sales' : 'Get started'}
+                    </button>
+                `;
+                planContainer.appendChild(planCard);
+            });
+        }
+
+        // Helper: Get plan price and suffix
+        function getPlanPrice(planId, isYearly) {
+            const plan = data.plans.find(p => p.plan_name.toLowerCase() === planId);
+            if (!plan || plan.plan_name.toLowerCase() === 'enterprise') {
+                return { price: 'Custom', suffix: '' };
+            }
+            const price = isYearly ? plan.yearly_price : plan.monthly_price;
+            return { price: `$${parseFloat(price).toFixed(2)}`, suffix: isYearly ? '/yr' : '/mo' };
+        }
+
+        // Helper: Get billing cycle text
+        function getBillingCycleText(isYearly) {
+            return isYearly ? 'Yearly (Renews every 12 months)' : 'Monthly (Renews every 30 days)';
+        }
+
+        // Helper: Get next payment date
+        function getNextPaymentDate(isYearly) {
+            const now = new Date();
+            if (isYearly) {
+                now.setFullYear(now.getFullYear() + 1);
+            } else {
+                now.setDate(now.getDate() + 30);
+            }
+            return now.toLocaleDateString(undefined, {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+        }
+
+        // Helper: Generate order ID
+        function generateOrderId() {
+            return "ORD-" + Date.now() + "-" + Math.floor(Math.random() * 10000);
+        }
+
+        // Helper: Enable QR section and update info
+        function enableQrSection(planId, orderId, isYearly) {
+            qrSection.classList.remove('qr-disabled');
+            qrSection.classList.add('qr-enabled');
+            qrTxidInput.disabled = false;
+            qrTxidBtn.disabled = false;
+            const plan = data.plans.find(p => p.plan_name.toLowerCase() === planId);
+            qrSelectedPlan.textContent = plan.plan_name;
+            const priceObj = getPlanPrice(planId, isYearly);
+            qrAmount.textContent = priceObj.price === 'Custom' ? 'Custom' : priceObj.price;
+            qrOrderId.textContent = orderId;
+            qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent('TRC20 USDT Wallet Address: ' + TRC20_ADDRESS)}`;
+        }
+
+        // Helper: Disable QR section
+        function disableQrSection() {
+            qrSection.classList.remove('qr-enabled');
+            qrSection.classList.add('qr-disabled');
+            qrTxidInput.disabled = true;
+            qrTxidBtn.disabled = true;
+            qrSelectedPlan.textContent = 'None';
+            qrAmount.textContent = '0';
+            qrOrderId.textContent = 'ORD-QR-0';
+            document.querySelectorAll('.plan-card').forEach(card => card.classList.remove('selected'));
+        }
+
+        // Update billing summary UI
+        function updateBillingSummary() {
+            const isYearly = billingToggle.checked;
+            const plan = data.plans.find(p => p.plan_name.toLowerCase() === selectedPlanId);
+            const { price, suffix } = getPlanPrice(selectedPlanId, isYearly);
+
+            if (billingPlanName) {
+                billingPlanName.textContent = `${plan.plan_name} (${price}${suffix})`;
+            }
+            if (billingCycle) {
+                billingCycle.textContent = getBillingCycleText(isYearly);
+            }
+            if (billingNextDate) {
+                billingNextDate.textContent = getNextPaymentDate(isYearly);
+            }
+        }
+
+        // Initial render
+        renderPlans(data.plans, isYearly);
+        updateBillingSummary();
+        disableQrSection();
+
+        // Handle billing toggle
+        billingToggle.addEventListener('change', function () {
+            isYearly = this.checked;
+            renderPlans(data.plans, isYearly);
+            updateBillingSummary();
+            if (qrSection.classList.contains('qr-enabled')) {
+                const selectedCard = Array.from(document.querySelectorAll('.plan-card')).find(card => card.classList.contains('active'));
+                if (selectedCard) {
+                    const planId = selectedCard.id.replace('-plan', '');
+                    const orderId = qrOrderId.textContent;
+                    enableQrSection(planId, orderId, isYearly);
+                }
+            }
         });
 
-        // Set default state (no plan selected)
-        updateQRPaymentPanel(null);
+        // Handle plan selection
+        planContainer.addEventListener('click', async function (e) {
+            const button = e.target.closest('.plan-get-started');
+            if (!button) return;
+            const plan = button.dataset.plan;
+            if (plan === 'enterprise') {
+                window.location.href = 'contact-sales.html';
+                return;
+            }
+            selectedPlanId = plan;
+            document.querySelectorAll('.plan-card').forEach(card => card.classList.remove('active', 'border-2', 'border-primary'));
+            document.getElementById(`${plan}-plan`).classList.add('active', 'border-2', 'border-primary', 'selected');
+            updateBillingSummary();
 
-        // TXID form logic
-        if (qrTxidForm && qrTxidSuccess) {
-          qrTxidForm.addEventListener("submit", function (e) {
+            // Generate order ID and update QR section
+            const orderId = generateOrderId();
+            enableQrSection(plan, orderId, isYearly);
+
+            // Show dual payment modal
+            const priceObj = getPlanPrice(plan, isYearly);
+            window.showDualPaymentModal({
+                orderId: orderId,
+                amount: priceObj.price === 'Custom' ? '' : priceObj.price.replace('$', ''),
+                wallet: TRC20_ADDRESS
+            });
+
+            // Submit plan selection to backend
+            try {
+                const response = await fetch('dash-pay.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: `selected_plan=${encodeURIComponent(plan)}`
+                });
+                if (response.ok) {
+                    console.log(`Plan ${plan} submitted successfully`);
+                } else {
+                    console.error('Failed to submit plan');
+                }
+            } catch (error) {
+                console.error('Error submitting plan:', error);
+            }
+        });
+
+        // Edit Plan button scrolls to plan selection
+        editPlanBtn.addEventListener('click', function () {
+            const planSection = document.querySelector('section.mb-8');
+            if (planSection) {
+                planSection.scrollIntoView({ behavior: 'smooth' });
+            }
+        });
+
+        // Handle QR TXID form submission
+        qrTxidForm.addEventListener('submit', async function (e) {
             e.preventDefault();
-            qrTxidForm.classList.add("pointer-events-none", "opacity-60");
-            qrTxidSuccess.classList.remove("hidden");
+            const txid = qrTxidInput.value.trim();
+            const valid = /^([0-9a-fA-F]{64}|0x[0-9a-fA-F]{64})$/.test(txid);
+            if (!valid) {
+                qrTxidInput.classList.add('border-red-500', 'ring-2', 'ring-red-500/20');
+                return;
+            }
+            qrTxidForm.classList.add('pointer-events-none', 'opacity-60');
+            document.getElementById('qr-txid-success').classList.remove('hidden');
             setTimeout(() => {
-              qrTxidForm.reset();
-              qrTxidForm.classList.remove("pointer-events-none", "opacity-60");
-              qrTxidSuccess.classList.add("hidden");
+                qrTxidForm.reset();
+                qrTxidForm.classList.remove('pointer-events-none', 'opacity-60');
+                document.getElementById('qr-txid-success').classList.add('hidden');
+                disableQrSection();
             }, 2500);
-          });
-        }
-      });
-    </script>
+        });
+    } catch (error) {
+        console.error('Error loading plans:', error);
+        /*document.getElementById('plan-container').innerHTML = '<p class="text-red-600 text-center">Failed to load plans. Please try again later.</p>';*/
+    }
+});
+</script>
+   
   </body>
 
 </html>

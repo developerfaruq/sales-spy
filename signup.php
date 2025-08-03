@@ -200,7 +200,7 @@
 <?php endif; ?>
  <?php if (isset($_GET['status']) && $_GET['status'] === 'ip_blocked'): ?>
   <div id="BackAlert" class="popup-alert">
-    🚫 Only <strong>2 accounts</strong> are allowed per device. Further registrations are blocked for security reasons, please contact support for help.
+    🚫 Only <strong>1 accounts</strong> are allowed per user. Further registrations are blocked for security reasons, please contact support for help.
   </div>
 <?php endif; ?>
 <?php if (isset($_GET['status']) && $_GET['status'] === 'duplicate_email_or_phone'): ?>
