@@ -108,7 +108,15 @@ $stats = [
 $stmt = $pdo->prepare("SELECT * FROM user_sessions WHERE user_id = ? ORDER BY last_active DESC");
 $stmt->execute([$_SESSION['user_id']]);
 $sessions = $stmt->fetchAll();
+// Fetch the active TRC-20 USDT wallet
+$stmt = $pdo->prepare("SELECT * FROM payment_wallets WHERE network = 'TRC-20' AND currency = 'USDT' AND is_active = 1 LIMIT 1");
+$stmt->execute();
+$wallet = $stmt->fetch(PDO::FETCH_ASSOC);
 
+// Fetch transactions
+/*$stmt = $pdo->prepare("SELECT * FROM transactions WHERE user_id = ? ORDER BY created_at DESC");
+$stmt->execute([$userId]);
+$transactions = $stmt->fetchAll(PDO::FETCH_ASSOC);*/
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -782,64 +790,60 @@ $sessions = $stmt->fetchAll();
               <!-- Save Wallet Form -->
               <section>
               <h2 class="text-lg font-semibold text-gray-800 mb-4">
-                TRC-20 USDT Payment Wallet
-              </h2>
-              <div class="glassmorphism bg-white rounded-lg border border-gray-200 p-6">
-                <form id="wallet-form">
-                <div class="space-y-5">
-                  <div>
-                  <label for="wallet-name" class="block text-sm font-medium text-gray-700 mb-1">Wallet Name</label>
-                  <input type="text" id="wallet-name"
-                  class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 text-sm"
-                  placeholder="e.g. My TRC-20 USDT Wallet" value="TRC-20 USDT Wallet" readonly />
-                </div>
-                <div>
-                  <label for="blockchain" class="block text-sm font-medium text-gray-700 mb-1">Blockchain</label>
-                  <input type="text" id="blockchain"
-                  class="w-full px-4 py-2.5 rounded-lg border border-gray-300 bg-gray-100 text-gray-700 text-sm"
-                  value="TRON (TRC-20)" readonly />
-                </div>
-                <div>
-                  <label class="block text-sm font-medium text-gray-700 mb-2">Token Standard</label>
-                  <input type="text"
-                  class="w-full px-4 py-2.5 rounded-lg border border-gray-300 bg-gray-100 text-gray-700 text-sm"
-                  value="USDT (TRC-20)" readonly />
-                </div>
-                <div>
-                  <label for="wallet-address" class="block text-sm font-medium text-gray-700 mb-1">Wallet
-                  Address</label>
-                  <div class="relative">
-                  <input type="text" id="wallet-address"
-                    class="w-full px-4 py-2.5 rounded-lg border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 text-sm font-mono"
-                    placeholder="TVTkZq3ghDZgF8txTdDM3s8g76XM2pgiey" value="TVTkZq3ghDZgF8txTdDM3s8g76XM2pgiey"
-                    readonly />
-                  <div class="absolute right-3 top-1/2 transform -translate-y-1/2 tooltip">
-                    <button type="button" class="w-5 h-5 flex items-center justify-center text-gray-400"
-                    title="Copy address"
-                    onclick="navigator.clipboard.writeText('TVTkZq3ghDZgF8txTdDM3s8g76XM2pgiey')" tabindex="-1">
-                    <i class="ri-file-copy-line"></i>
-                    </button>
-                    <span class="tooltip-text text-xs" style="z-index: 1000;">Copy Payment wallet address</span>
-                  </div>
-                  </div>
-                  <p class="text-xs text-gray-500 mt-1">
-                  This is the static TRC-20 USDT wallet address for payments.
-                  </p>
-                </div>
-                <div class="flex items-center justify-end">
-                  <button type="button"
-                  class="px-5 py-2.5 text-sm font-medium bg-primary text-white rounded-button hover:bg-primary/90 transition-colors flex items-center whitespace-nowrap"
-                  onclick="navigator.clipboard.writeText('TQJv1kQ2w1v8kQ2w1v8kQ2w1v8kQ2w1v8k')">
-                  <div class="w-4 h-4 flex items-center justify-center mr-1">
-                    <i class="ri-file-copy-line"></i>
-                  </div>
-                  Copy Address
-                  </button>
-                </div>
-                </div>
-              </form>
-              </div>
+    TRC-20 USDT Payment Wallet
+  </h2>
 
+  <div class="glassmorphism bg-white rounded-lg border border-gray-200 p-6">
+    <?php if ($wallet): ?>
+      <form id="wallet-form">
+        <div class="space-y-5">
+          <div>
+            <label for="wallet-name" class="block text-sm font-medium text-gray-700">
+              Network
+            </label>
+            <input type="text" id="wallet-name" value="<?= htmlspecialchars($wallet['network']) ?>" disabled class="w-full px-4 py-2 border rounded-md bg-gray-100 cursor-not-allowed" />
+          </div>
+
+          <div>
+            <label for="wallet-currency" class="block text-sm font-medium text-gray-700">
+              Currency
+            </label>
+            <input type="text" id="wallet-currency" value="<?= htmlspecialchars($wallet['currency']) ?>" disabled class="w-full px-4 py-2 border rounded-md bg-gray-100 cursor-not-allowed" />
+          </div>
+
+          <div>
+            <label for="wallet-address" class="block text-sm font-medium text-gray-700">
+              Wallet Address
+            </label>
+            <div class="flex items-center space-x-2">
+              <input type="text" id="wallet-address" value="<?= htmlspecialchars($wallet['wallet_address']) ?>" readonly class="w-full px-4 py-2 border rounded-md bg-gray-50" />
+              <button type="button" onclick="copyWalletAddress()" class="px-3 py-2 text-sm font-medium bg-blue-500 text-white rounded hover:bg-blue-600">
+                Copy
+              </button>
+            </div>
+          </div>
+
+          <?php if (!empty($wallet['instructions'])): ?>
+          <div class="text-sm text-gray-700 mt-4">
+            <?= nl2br(htmlspecialchars($wallet['instructions'])) ?>
+          </div>
+          <?php endif; ?>
+        </div>
+      </form>
+    <?php else: ?>
+      <p class="text-red-600 text-center">No active TRC-20 USDT wallet found.</p>
+    <?php endif; ?>
+  </div>
+  <script>
+function copyWalletAddress() {
+  const walletInput = document.getElementById("wallet-address");
+  walletInput.select();
+  walletInput.setSelectionRange(0, 99999);
+  document.execCommand("copy");
+
+  alert("Wallet address copied to clipboard!");
+}
+</script>
               
             <!-- Transaction History Section: Improved Layout & "View Full Transaction History" Button -->
             <div class="mt-8">
@@ -897,10 +901,12 @@ $sessions = $stmt->fetchAll();
                   <div id="pay-tx-modal-content" class="space-y-4"></div>
                   <div class="flex gap-3 mt-6">
                     <button
+                    onclick="downloadReceipt()"
                       class="flex-1 bg-primary hover:bg-primary/80 text-white px-4 py-3 rounded-button font-medium transition-all whitespace-nowrap !rounded-button"
                     >
                       Download Receipt
                     </button>
+
                     <button
                       onclick="document.getElementById('pay-tx-modal').classList.add('hidden')"
                       class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-900 px-4 py-3 rounded-button font-medium transition-all whitespace-nowrap !rounded-button"
@@ -910,289 +916,150 @@ $sessions = $stmt->fetchAll();
                   </div>
                 </div>
               </div>
-              <script>
-                // Demo transaction data (same as Dashboard-his.html, up to 3 rows)
-                const payTxs = [
-                  {
-                    id: "TXN-2024-001847",
-                    date: "Dec 28, 2024",
-                    time: "14:32 UTC",
-                    type: "Credit Card",
-                    amount: 149.99,
-                    status: "Success",
-                    orderId: "ORD-2024-5847",
-                    paymentId: "PAY-7834-9281-4756",
-                    description: "Premium Plan Subscription",
-                    cardLast4: "****4532",
-                  },
-                  {
-                    id: "TXN-2024-001832",
-                    date: "Dec 25, 2024",
-                    time: "09:15 UTC",
-                    type: "Bitcoin",
-                    amount: 89.50,
-                    status: "Pending",
-                    orderId: "ORD-2024-5832",
-                    paymentId: "BTC-8394-2847-1923",
-                    description: "Standard Plan Subscription",
-                    walletAddress: "1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa",
-                  },
-                  {
-                    id: "TXN-2024-001819",
-                    date: "Dec 22, 2024",
-                    time: "16:48 UTC",
-                    type: "Credit Card",
-                    amount: 299.99,
-                    status: "Success",
-                    orderId: "ORD-2024-5819",
-                    paymentId: "PAY-9472-3851-6294",
-                    description: "Enterprise Plan Subscription",
-                    cardLast4: "****7891",
-                  },
-                ];
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  fetch("fetch_transactions.php")
+    .then((response) => response.json())
+    .then((data) => {
+      const desktopList = document.getElementById("pay-tx-list");
+      const mobileList = document.getElementById("pay-tx-mobile-list");
+      const emptyState = document.getElementById("pay-tx-empty");
 
-                // Payment type mapping
-                function mapPayType(type) {
-                  if (!type) return "";
-                  const t = type.toLowerCase();
-                  if (t.includes("credit")) return "Credit Card";
-                  if (t.includes("bitcoin") || t.includes("ethereum")) return "Cryptocurrency";
-                  if (t.includes("crypto")) return "Cryptocurrency";
-                  return type;
-                }
+      if (data.success && data.data.length > 0) {
+        desktopList.innerHTML = "";
+        mobileList.innerHTML = "";
+        emptyState.classList.add("hidden");
 
-                // Render transactions (desktop)
-                function renderPayTxs(list) {
-                  const container = document.getElementById("pay-tx-list");
-                  if (!container) return;
-                  container.innerHTML = "";
-                  if (!list.length) {
-                    document.getElementById("pay-tx-empty").classList.remove("hidden");
-                    return;
-                  }
-                  document.getElementById("pay-tx-empty").classList.add("hidden");
-                  list.forEach((tx) => {
-                    let icon = "";
-                    let iconColor = "";
-                    if (mapPayType(tx.type) === "Credit Card") {
-                      icon = "ri-bank-card-line";
-                      iconColor = "text-blue-600";
-                    } else if (tx.type.toLowerCase().includes("bitcoin")) {
-                      icon = "ri-bit-coin-line";
-                      iconColor = "text-orange-500";
-                    } else if (tx.type.toLowerCase().includes("ethereum")) {
-                      icon = "ri-ethereum-line";
-                      iconColor = "text-purple-600";
-                    } else {
-                      icon = "ri-bank-card-line";
-                      iconColor = "text-gray-400";
-                    }
-                    let statusBg = "";
-                    let statusIcon = "";
-                    if (tx.status === "Success") {
-                      statusBg = "bg-green-100 text-green-800";
-                      statusIcon = "ri-check-line";
-                    } else if (tx.status === "Pending") {
-                      statusBg = "bg-yellow-100 text-yellow-800";
-                      statusIcon = "ri-time-line";
-                    } else {
-                      statusBg = "bg-red-100 text-red-800";
-                      statusIcon = "ri-close-line";
-                    }
-                    const row = document.createElement("div");
-                    row.className = "hidden sm:grid sm:grid-cols-6 gap-4 p-6 items-center";
-                    row.innerHTML = `
-                      <div class="flex flex-col gap-1 text-gray-900">
-                        <div class="font-medium text-xs">${tx.date}</div>
-                        <div class="text-[11px] text-gray-500">${tx.time}</div>
-                      </div>
-                      <div class="font-mono text-[11px] text-gray-700 truncate">${tx.id}</div>
-                      <div class="flex items-center gap-1">
-                        <div class="w-5 h-5 flex items-center justify-center">
-                          <i class="${icon} ${iconColor}"></i>
-                        </div>
-                        <span class="text-xs text-gray-900">${mapPayType(tx.type).replace("Credit Card", "Card").replace("Cryptocurrency", "Crypto")}</span>
-                      </div>
-                      <div class="font-semibold text-xs text-gray-900">$${tx.amount.toFixed(2)}</div>
-                      <div>
-                        <span class="px-2 py-0.5 rounded-full text-[11px] font-medium flex items-center gap-1 w-fit ${statusBg}">
-                          <div class="w-3 h-3 flex items-center justify-center">
-                            <i class="${statusIcon} ri-xs"></i>
-                          </div>
-                          ${tx.status === "Success" ? "Paid" : tx.status === "Pending" ? "Wait" : "Fail"}
-                        </span>
-                      </div>
-                      <div>
-                        <button
-                          class="rounded-button px-2 py-1 hover:bg-gray-100 transition-all whitespace-nowrap !rounded-button text-gray-900 text-xs"
-                          onclick="showPayTxDetails('${tx.id}')"
-                          title="Details"
-                        >
-                          <div class="w-4 h-4 flex items-center justify-center">
-                            <i class="ri-eye-line"></i>
-                          </div>
-                        </button>
-                      </div>
-                    `;
-                    container.appendChild(row);
-                  });
-                }
+        data.data.forEach((tx) => {
+          const statusClasses = {
+            success: "text-green-700 bg-green-100",
+            failed: "text-red-700 bg-red-100",
+            pending: "text-yellow-700 bg-yellow-100",
+          };
+          const statusClass = statusClasses[tx.status] || "bg-gray-100 text-gray-800";
 
-                // Render transactions (mobile)
-                function renderPayTxsMobile(list) {
-                  const container = document.getElementById("pay-tx-mobile-list");
-                  if (!container) return;
-                  container.innerHTML = "";
-                  if (!list.length) return;
-                  list.forEach((tx) => {
-                    let icon = "";
-                    let iconColor = "";
-                    if (mapPayType(tx.type) === "Credit Card") {
-                      icon = "ri-bank-card-line";
-                      iconColor = "text-blue-600";
-                    } else if (tx.type.toLowerCase().includes("bitcoin")) {
-                      icon = "ri-bit-coin-line";
-                      iconColor = "text-orange-500";
-                    } else if (tx.type.toLowerCase().includes("ethereum")) {
-                      icon = "ri-ethereum-line";
-                      iconColor = "text-purple-600";
-                    } else {
-                      icon = "ri-bank-card-line";
-                      iconColor = "text-gray-400";
-                    }
-                    let statusBg = "";
-                    let statusIcon = "";
-                    if (tx.status === "Success") {
-                      statusBg = "bg-green-100 text-green-800";
-                      statusIcon = "ri-check-line";
-                    } else if (tx.status === "Pending") {
-                      statusBg = "bg-yellow-100 text-yellow-800";
-                      statusIcon = "ri-time-line";
-                    } else {
-                      statusBg = "bg-red-100 text-red-800";
-                      statusIcon = "ri-close-line";
-                    }
-                    const card = document.createElement("div");
-                    card.className = "sm:hidden glassmorphism rounded-2xl m-4 p-6 bg-white/95 shadow";
-                    card.innerHTML = `
-                      <div class="flex justify-between items-start mb-4">
-                        <div>
-                          <div class="font-semibold text-gray-900 text-lg">$${tx.amount.toFixed(2)}</div>
-                          <div class="text-sm text-gray-600">${tx.date} • ${tx.time}</div>
-                        </div>
-                        <span class="px-3 py-1 rounded-full text-xs font-medium flex items-center gap-1 ${statusBg}">
-                          <div class="w-3 h-3 flex items-center justify-center">
-                            <i class="${statusIcon} ri-xs"></i>
-                          </div>
-                          ${tx.status}
-                        </span>
-                      </div>
-                      <div class="flex items-center justify-between">
-                        <div class="flex items-center gap-2">
-                          <div class="w-6 h-6 flex items-center justify-center">
-                            <i class="${icon} ${iconColor}"></i>
-                          </div>
-                          <span class="text-gray-900">${mapPayType(tx.type)}</span>
-                        </div>
-                        <button
-                          class="glassmorphism rounded-button px-4 py-2 hover:bg-gray-100 transition-all whitespace-nowrap !rounded-button text-gray-900"
-                          onclick="showPayTxDetails('${tx.id}')"
-                        >
-                          View Details
-                        </button>
-                      </div>
-                      <div class="mt-3 pt-3 border-t border-gray-200">
-                        <div class="text-xs text-gray-700 font-mono">${tx.id}</div>
-                      </div>
-                    `;
-                    container.appendChild(card);
-                  });
-                }
+          // Desktop row
+          const row = document.createElement("div");
+          row.className = "grid grid-cols-6 gap-4 p-6 text-sm text-gray-700";
+          row.innerHTML = `
+            <div>${tx.created_at}</div>
+            <div>${tx.txid}</div>
+            <div>${tx.payment_type}</div>
+            <div>$${tx.amount}</div>
+            <div><span class="px-2 py-1 rounded-full text-xs font-medium ${statusClass}">${tx.status}</span></div>
+            <div>
+              <button
+                class="text-blue-600 hover:underline font-medium"
+                onclick='showTransactionDetails(${JSON.stringify(tx)})'
+              >
+                View
+              </button>
+            </div>
+          `;
+          desktopList.appendChild(row);
 
-                // Modal details logic (matches Dashboard-his.html)
-                function showPayTxDetails(txId) {
-                  const tx = payTxs.find((t) => t.id === txId);
-                  if (!tx) return;
-                  let statusClass = "";
-                  let statusIcon = "";
-                  let statusColor = "";
-                  if (tx.status === "Success") {
-                    statusClass = "status-success";
-                    statusIcon = "ri-check-line";
-                    statusColor = "green";
-                  } else if (tx.status === "Pending") {
-                    statusClass = "status-pending";
-                    statusIcon = "ri-time-line";
-                    statusColor = "yellow";
-                  } else {
-                    statusClass = "status-failed";
-                    statusIcon = "ri-close-line";
-                    statusColor = "red";
-                  }
-                  document.getElementById("pay-tx-modal-content").innerHTML = `
-                    <div class="space-y-4">
-                      <div class="flex justify-between items-center">
-                        <span class="text-gray-800">Transaction ID</span>
-                        <span class="text-gray-500 font-mono text-sm">${tx.id}</span>
-                      </div>
-                      <div class="flex justify-between items-center">
-                        <span class="text-gray-800">Date & Time</span>
-                        <span class="text-gray-500">${tx.date} • ${tx.time}</span>
-                      </div>
-                      <div class="flex justify-between items-center">
-                        <span class="text-gray-800">Payment Type</span>
-                        <span class="text-gray-500">${tx.type}</span>
-                      </div>
-                      <div class="flex justify-between items-center">
-                        <span class="text-gray-800">Amount</span>
-                        <span class="text-gray-500 font-semibold text-lg">$${tx.amount.toFixed(2)}</span>
-                      </div>
-                      <div class="flex justify-between items-center">
-                        <span class="text-gray-800">Status</span>
-                        <span class="${statusClass} px-3 py-1 rounded-full text-xs font-medium flex items-center gap-1 w-fit bg-${statusColor}-100 text-${statusColor}-800">
-                          <div class="w-3 h-3 flex items-center justify-center">
-                            <i class="${statusIcon} ri-xs"></i>
-                          </div>
-                          ${tx.status}
-                        </span>
-                      </div>
-                      <div class="flex justify-between items-center">
-                        <span class="text-gray-800">Order ID</span>
-                        <span class="text-gray-500 font-mono text-sm">${tx.orderId}</span>
-                      </div>
-                      <div class="flex justify-between items-center">
-                        <span class="text-gray-800">Payment ID</span>
-                        <span class="text-white font-mono text-sm">${tx.paymentId}</span>
-                      </div>
-                      <div class="flex justify-between items-center">
-                        <span class="text-gray-800">Description</span>
-                        <span class="text-gray-500">${tx.description}</span>
-                      </div>
-                      ${
-                        tx.cardLast4
-                          ? `<div class="flex justify-between items-center">
-                              <span class="text-gray-800">Card</span>
-                              <span class="text-gray-500 font-mono">${tx.cardLast4}</span>
-                            </div>`
-                          : ""
-                      }
-                      ${
-                        tx.walletAddress
-                          ? `<div class="flex justify-between items-start">
-                              <span class="text-gray-800">Wallet</span>
-                              <span class="text-gray-500 font-mono text-xs break-all text-right max-w-48">${tx.walletAddress}</span>
-                            </div>`
-                          : ""
-                      }
-                    </div>
-                  `;
-                  document.getElementById("pay-tx-modal").classList.remove("hidden");
-                }
+          // Mobile card
+          const card = document.createElement("div");
+          card.className = "p-4 border-b border-gray-200";
+          card.innerHTML = `
+            <div class="flex justify-between mb-2">
+              <span class="text-sm text-gray-500">${tx.created_at}</span>
+              <span class="text-xs ${statusClass} px-2 py-1 rounded-full">${tx.status}</span>
+            </div>
+            <div class="text-gray-700 font-medium text-sm mb-1">${tx.txid}</div>
+            <div class="text-sm text-gray-600">Payment Type: ${tx.payment_type}</div>
+            <div class="text-sm text-gray-600 mb-2">Amount: $${tx.amount}</div>
+            <button
+              class="text-blue-600 text-sm hover:underline font-medium"
+              onclick='showTransactionDetails(${JSON.stringify(tx)})'
+            >
+              View Details
+            </button>
+          `;
+          mobileList.appendChild(card);
+        });
+      } else {
+        desktopList.innerHTML = "";
+        mobileList.innerHTML = "";
+        emptyState.classList.remove("hidden");
+      }
+    })
+    .catch((error) => {
+      console.error("Error fetching transaction history:", error);
+    });
+});
 
-                // Initial render
-                renderPayTxs(payTxs);
-                renderPayTxsMobile(payTxs);
-              </script>
+function showTransactionDetails(tx) {
+  const modal = document.getElementById("pay-tx-modal");
+  const content = document.getElementById("pay-tx-modal-content");
+
+  content.innerHTML = `
+    <div class="grid grid-cols-2 gap-3 text-sm">
+      <div>
+        <p class="text-gray-500">Transaction ID</p>
+        <p class="font-medium text-gray-900">${tx.txid}</p>
+      </div>
+      <div>
+        <p class="text-gray-500">Payment Type</p>
+        <p class="font-medium text-gray-900">${tx.payment_type}</p>
+      </div>
+      <div>
+        <p class="text-gray-500">Amount</p>
+        <p class="font-medium text-gray-900">$${tx.amount}</p>
+      </div>
+      <div>
+        <p class="text-gray-500">Status</p>
+        <p class="font-medium text-gray-900 capitalize">${tx.status}</p>
+      </div>
+      <div class="col-span-2">
+        <p class="text-gray-500">Date</p>
+        <p class="font-medium text-gray-900">${tx.created_at}</p>
+      </div>
+    </div>
+  `;
+
+  // Store transaction in modal dataset
+  modal.dataset.txid = tx.txid;
+  modal.dataset.payment_type = tx.payment_type;
+  modal.dataset.amount = tx.amount;
+  modal.dataset.status = tx.status;
+  modal.dataset.created_at = tx.created_at;
+
+  modal.classList.remove("hidden");
+}
+
+function downloadReceipt() {
+  const modal = document.getElementById("pay-tx-modal");
+  const txid = modal.dataset.txid;
+  const payment_type = modal.dataset.payment_type;
+  const amount = modal.dataset.amount;
+  const status = modal.dataset.status;
+  const created_at = modal.dataset.created_at;
+
+  const receiptText = `
+Transaction Receipt
+--------------------------
+Transaction ID: ${txid}
+Payment Type: ${payment_type}
+Amount: $${amount}
+Status: ${status}
+Date: ${created_at}
+  `.trim();
+
+  const blob = new Blob([receiptText], { type: "text/plain" });
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `${txid}_receipt.txt`;
+  a.click();
+
+  URL.revokeObjectURL(url);
+}
+</script>
+
+
+
             </div>
             </section>
 
@@ -2199,254 +2066,214 @@ $sessions = $stmt->fetchAll();
     </script>
    
     <script id="qr-payment-section-script">
-document.addEventListener('DOMContentLoaded', async function () {
-    try {
-        // Fetch plan data from backend
-        const response = await fetch('payment.php', {
-            method: 'GET',
-            headers: { 'Content-Type': 'application/json' }
-        });
-        const data = await response.json();
-        
+document.addEventListener('DOMContentLoaded', function () {
+    const planContainer = document.getElementById('plan-container');
+    const billingToggle = document.getElementById('billing-toggle');
+    const billingPlanName = document.getElementById('billing-plan-name');
+    const billingCycle = document.getElementById('billing-cycle');
+    const billingNextDate = document.getElementById('billing-next-date');
+    const editPlanBtn = document.getElementById('edit-plan-btn');
+    const qrSection = document.getElementById('qr-section');
+    const qrSelectedPlan = document.getElementById('qr-selected-plan');
+    const qrAmount = document.getElementById('qr-amount');
+    const qrOrderId = document.getElementById('qr-order-id');
+    const qrTxidInput = document.getElementById('qr-txid');
+    const qrTxidBtn = document.getElementById('qr-txid-btn');
+    const qrImg = document.getElementById('qr-img');
+    const qrTxidForm = document.getElementById('qr-txid-form'); // Assumes you have this ID
+    const TRC20_ADDRESS = 'TVTkZq3ghDZgF8txTdDM3s8g76XM2pgiey';
 
-        if (!data.success) {
-            console.error('Error fetching plans:', data.message);
-            document.getElementById('plan-container').innerHTML = '<p class="text-red-600 text-center">Failed to load plans. Please try again later.</p>';
+    let isYearly = billingToggle.checked;
+    let selectedPlanId = 'pro';
+    let plans = [];
+
+    // Fetch plans
+    async function fetchPlans() {
+        try {
+            const response = await fetch('payment.php');
+            const data = await response.json();
+
+            if (!data.success) {
+                planContainer.innerHTML = `<p class="text-red-600 text-center">${data.message}</p>`;
+                return false;
+            }
+
+            plans = data.plans;
+            return true;
+        } catch (err) {
+            console.error('Fetch error:', err);
+            planContainer.innerHTML = `<p class="text-red-600 text-center">Failed to load plans. Please try again later.</p>`;
+            return false;
+        }
+    }
+
+    function getPlanPrice(planId, yearly) {
+        const plan = plans.find(p => p.plan_name.toLowerCase() === planId);
+        if (!plan || plan.plan_name.toLowerCase() === 'enterprise') return { price: 'Custom', suffix: '' };
+        const price = yearly ? plan.yearly_price : plan.monthly_price;
+        return { price: `$${price.toFixed(2)}`, suffix: yearly ? '/yr' : '/mo' };
+    }
+
+    function renderPlans() {
+        planContainer.innerHTML = '';
+        plans.forEach(plan => {
+            const price = isYearly ? plan.yearly_price : plan.monthly_price;
+            const isEnterprise = plan.plan_name.toLowerCase() === 'enterprise';
+            const priceText = isEnterprise ? 'Custom' : `$${price.toFixed(2)}`;
+            const suffix = isEnterprise ? '' : (isYearly ? '/yr' : '/mo');
+            const isActive = selectedPlanId === plan.plan_name.toLowerCase();
+
+            const card = document.createElement('div');
+            card.id = `${plan.plan_name.toLowerCase()}-plan`;
+            card.className = `plan-card glassmorphism bg-white rounded-lg border p-6 cursor-pointer relative ${
+                plan.is_popular ? 'border-2 border-primary' : 'border-gray-200'
+            } ${isActive ? 'active border-2 border-primary' : ''}`;
+
+            card.innerHTML = `
+                ${plan.is_popular ? '<div class="absolute -top-3 right-4 bg-primary text-white text-xs font-medium px-3 py-1 rounded-full">POPULAR</div>' : ''}
+                <div class="mb-4">
+                    <h3 class="text-xl font-semibold text-gray-900">${plan.plan_name}</h3>
+                    <p class="text-sm text-gray-500 mt-1">${plan.description}</p>
+                </div>
+                <div class="mb-6">
+                    <div class="flex items-baseline">
+                        <span class="text-3xl font-bold text-gray-900">${priceText}</span>
+                        <span class="text-gray-500 ml-1">${suffix}</span>
+                    </div>
+                </div>
+                <ul class="space-y-3 mb-8">
+                    ${plan.features.map(f => `
+                        <li class="flex items-start">
+                            <div class="w-5 h-5 flex items-center justify-center text-primary mt-0.5">
+                                <i class="ri-check-line"></i>
+                            </div>
+                            <span class="text-sm text-gray-700 ml-2">${f}</span>
+                        </li>
+                    `).join('')}
+                </ul>
+                <button class="w-full py-3 text-sm font-medium ${plan.is_popular ? 'bg-primary text-white hover:bg-primary/90' : 'text-primary border border-primary hover:bg-primary/5'} rounded-button transition-colors plan-get-started" data-plan="${plan.plan_name.toLowerCase()}">
+                    ${isEnterprise ? 'Contact sales' : 'Get started'}
+                </button>
+            `;
+
+            planContainer.appendChild(card);
+        });
+    }
+
+    function updateBillingSummary() {
+        const plan = plans.find(p => p.plan_name.toLowerCase() === selectedPlanId);
+        const { price, suffix } = getPlanPrice(selectedPlanId, isYearly);
+        const date = new Date();
+        date.setDate(isYearly ? date.getDate() + 365 : date.getDate() + 30);
+
+        billingPlanName.textContent = `${plan.plan_name} (${price}${suffix})`;
+        billingCycle.textContent = isYearly ? 'Yearly (Renews every 12 months)' : 'Monthly (Renews every 30 days)';
+        billingNextDate.textContent = date.toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
+    }
+
+    function generateOrderId() {
+        return `ORD-${Date.now()}-${Math.floor(Math.random() * 10000)}`;
+    }
+
+    function enableQrSection(planId, orderId) {
+        const { price } = getPlanPrice(planId, isYearly);
+        const plan = plans.find(p => p.plan_name.toLowerCase() === planId);
+        qrSection.classList.remove('qr-disabled');
+        qrSection.classList.add('qr-enabled');
+        qrTxidInput.disabled = false;
+        qrTxidBtn.disabled = false;
+        qrSelectedPlan.textContent = plan.plan_name;
+        qrAmount.textContent = price;
+        qrOrderId.textContent = orderId;
+        qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent('TRC20 USDT Wallet Address: ' + TRC20_ADDRESS)}`;
+    }
+
+    function disableQrSection() {
+        qrSection.classList.remove('qr-enabled');
+        qrSection.classList.add('qr-disabled');
+        qrTxidInput.disabled = true;
+        qrTxidBtn.disabled = true;
+        qrSelectedPlan.textContent = 'None';
+        qrAmount.textContent = '0';
+        qrOrderId.textContent = 'ORD-QR-0';
+    }
+
+    // Setup event listeners
+    billingToggle.addEventListener('change', () => {
+        isYearly = billingToggle.checked;
+        renderPlans();
+        updateBillingSummary();
+    });
+
+    planContainer.addEventListener('click', async e => {
+        const button = e.target.closest('.plan-get-started');
+        if (!button) return;
+        const plan = button.dataset.plan;
+        if (plan === 'enterprise') {
+            window.location.href = 'contact-sales.html';
             return;
         }
 
-        const planContainer = document.getElementById('plan-container');
-        const billingToggle = document.getElementById('billing-toggle');
-        const billingPlanName = document.getElementById('billing-plan-name');
-        const billingCycle = document.getElementById('billing-cycle');
-        const billingNextDate = document.getElementById('billing-next-date');
-        const editPlanBtn = document.getElementById('edit-plan-btn');
-        let isYearly = billingToggle.checked;
-        let selectedPlanId = 'pro'; // Default to Pro plan
-        const TRC20_ADDRESS = 'TVTkZq3ghDZgF8txTdDM3s8g76XM2pgiey';
+        selectedPlanId = plan;
+        document.querySelectorAll('.plan-card').forEach(card => card.classList.remove('active', 'border-2', 'border-primary'));
+        document.getElementById(`${plan}-plan`).classList.add('active', 'border-2', 'border-primary');
 
-        // QR section elements
-        const qrSection = document.getElementById('qr-section');
-        const qrSelectedPlan = document.getElementById('qr-selected-plan');
-        const qrAmount = document.getElementById('qr-amount');
-        const qrOrderId = document.getElementById('qr-order-id');
-        const qrTxidInput = document.getElementById('qr-txid');
-        const qrTxidBtn = document.getElementById('qr-txid-btn');
-        const qrImg = document.getElementById('qr-img');
+        updateBillingSummary();
+        const orderId = generateOrderId();
+        enableQrSection(plan, orderId);
 
-        // Function to render plans
-        function renderPlans(plans, isYearly) {
-            planContainer.innerHTML = '';
-            plans.forEach(plan => {
-                const price = isYearly ? plan.yearly_price : plan.monthly_price;
-                const priceText = plan.plan_name.toLowerCase() === 'enterprise' ? 'Custom' : `$${parseFloat(price).toFixed(2)}`;
-                const periodText = plan.plan_name.toLowerCase() === 'enterprise' ? '' : (isYearly ? '/yr' : '/mo');
-                const planCard = document.createElement('div');
-                planCard.id = `${plan.plan_name.toLowerCase()}-plan`;
-                planCard.className = `plan-card glassmorphism bg-white rounded-lg border ${plan.is_popular ? 'border-2 border-primary active' : 'border-gray-200'} p-6 cursor-pointer relative ${plan.plan_name.toLowerCase() === selectedPlanId ? 'active border-2 border-primary' : ''}`;
-                planCard.innerHTML = `
-                    ${plan.is_popular ? '<div class="absolute -top-3 right-4 bg-primary text-white text-xs font-medium px-3 py-1 rounded-full">POPULAR</div>' : ''}
-                    <div class="mb-4">
-                        <h3 class="text-xl font-semibold text-gray-900">${plan.plan_name}</h3>
-                        <p class="text-sm text-gray-500 mt-1">${plan.description}</p>
-                    </div>
-                    <div class="mb-6">
-                        <div class="flex items-baseline">
-                            <span class="text-3xl font-bold text-gray-900">${priceText}</span>
-                            <span class="text-gray-500 ml-1">${periodText}</span>
-                        </div>
-                    </div>
-                    <ul class="space-y-3 mb-8">
-                        ${plan.features.map(feature => `
-                            <li class="flex items-start">
-                                <div class="w-5 h-5 flex items-center justify-center text-primary mt-0.5">
-                                    <i class="ri-check-line"></i>
-                                </div>
-                                <span class="text-sm text-gray-700 ml-2">${feature}</span>
-                            </li>
-                        `).join('')}
-                    </ul>
-                    <button class="w-full py-3 text-sm font-medium ${plan.is_popular ? 'bg-primary text-white hover:bg-primary/90' : 'text-primary border border-primary hover:bg-primary/5'} rounded-button transition-colors whitespace-nowrap plan-get-started" data-plan="${plan.plan_name.toLowerCase()}">
-                        ${plan.plan_name.toLowerCase() === 'enterprise' ? 'Contact sales' : 'Get started'}
-                    </button>
-                `;
-                planContainer.appendChild(planCard);
+        window.showDualPaymentModal({
+            orderId,
+            amount: getPlanPrice(plan, isYearly).price.replace('$', ''),
+            wallet: TRC20_ADDRESS
+        });
+
+        try {
+            await fetch('dash-pay.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: `selected_plan=${encodeURIComponent(plan)}`
             });
+        } catch (err) {
+            console.error('Error submitting plan:', err);
+        }
+    });
+
+    editPlanBtn?.addEventListener('click', () => {
+        const section = document.querySelector('section.mb-8');
+        section?.scrollIntoView({ behavior: 'smooth' });
+    });
+
+    qrTxidForm?.addEventListener('submit', e => {
+        e.preventDefault();
+        const txid = qrTxidInput.value.trim();
+        const valid = /^([0-9a-fA-F]{64}|0x[0-9a-fA-F]{64})$/.test(txid);
+        if (!valid) {
+            qrTxidInput.classList.add('border-red-500', 'ring-2', 'ring-red-500/20');
+            return;
         }
 
-        // Helper: Get plan price and suffix
-        function getPlanPrice(planId, isYearly) {
-            const plan = data.plans.find(p => p.plan_name.toLowerCase() === planId);
-            if (!plan || plan.plan_name.toLowerCase() === 'enterprise') {
-                return { price: 'Custom', suffix: '' };
-            }
-            const price = isYearly ? plan.yearly_price : plan.monthly_price;
-            return { price: `$${parseFloat(price).toFixed(2)}`, suffix: isYearly ? '/yr' : '/mo' };
-        }
+        qrTxidForm.classList.add('pointer-events-none', 'opacity-60');
+        document.getElementById('qr-txid-success')?.classList.remove('hidden');
+        setTimeout(() => {
+            qrTxidForm.reset();
+            qrTxidForm.classList.remove('pointer-events-none', 'opacity-60');
+            document.getElementById('qr-txid-success')?.classList.add('hidden');
+            disableQrSection();
+        }, 2500);
+    });
 
-        // Helper: Get billing cycle text
-        function getBillingCycleText(isYearly) {
-            return isYearly ? 'Yearly (Renews every 12 months)' : 'Monthly (Renews every 30 days)';
-        }
-
-        // Helper: Get next payment date
-        function getNextPaymentDate(isYearly) {
-            const now = new Date();
-            if (isYearly) {
-                now.setFullYear(now.getFullYear() + 1);
-            } else {
-                now.setDate(now.getDate() + 30);
-            }
-            return now.toLocaleDateString(undefined, {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric'
-            });
-        }
-
-        // Helper: Generate order ID
-        function generateOrderId() {
-            return "ORD-" + Date.now() + "-" + Math.floor(Math.random() * 10000);
-        }
-
-        // Helper: Enable QR section and update info
-        function enableQrSection(planId, orderId, isYearly) {
-            qrSection.classList.remove('qr-disabled');
-            qrSection.classList.add('qr-enabled');
-            qrTxidInput.disabled = false;
-            qrTxidBtn.disabled = false;
-            const plan = data.plans.find(p => p.plan_name.toLowerCase() === planId);
-            qrSelectedPlan.textContent = plan.plan_name;
-            const priceObj = getPlanPrice(planId, isYearly);
-            qrAmount.textContent = priceObj.price === 'Custom' ? 'Custom' : priceObj.price;
-            qrOrderId.textContent = orderId;
-            qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent('TRC20 USDT Wallet Address: ' + TRC20_ADDRESS)}`;
-        }
-
-        // Helper: Disable QR section
-        function disableQrSection() {
-            qrSection.classList.remove('qr-enabled');
-            qrSection.classList.add('qr-disabled');
-            qrTxidInput.disabled = true;
-            qrTxidBtn.disabled = true;
-            qrSelectedPlan.textContent = 'None';
-            qrAmount.textContent = '0';
-            qrOrderId.textContent = 'ORD-QR-0';
-            document.querySelectorAll('.plan-card').forEach(card => card.classList.remove('selected'));
-        }
-
-        // Update billing summary UI
-        function updateBillingSummary() {
-            const isYearly = billingToggle.checked;
-            const plan = data.plans.find(p => p.plan_name.toLowerCase() === selectedPlanId);
-            const { price, suffix } = getPlanPrice(selectedPlanId, isYearly);
-
-            if (billingPlanName) {
-                billingPlanName.textContent = `${plan.plan_name} (${price}${suffix})`;
-            }
-            if (billingCycle) {
-                billingCycle.textContent = getBillingCycleText(isYearly);
-            }
-            if (billingNextDate) {
-                billingNextDate.textContent = getNextPaymentDate(isYearly);
-            }
-        }
-
-        // Initial render
-        renderPlans(data.plans, isYearly);
+    // Init sequence
+    (async () => {
+        const loaded = await fetchPlans();
+        if (!loaded) return;
+        renderPlans();
         updateBillingSummary();
         disableQrSection();
-
-        // Handle billing toggle
-        billingToggle.addEventListener('change', function () {
-            isYearly = this.checked;
-            renderPlans(data.plans, isYearly);
-            updateBillingSummary();
-            if (qrSection.classList.contains('qr-enabled')) {
-                const selectedCard = Array.from(document.querySelectorAll('.plan-card')).find(card => card.classList.contains('active'));
-                if (selectedCard) {
-                    const planId = selectedCard.id.replace('-plan', '');
-                    const orderId = qrOrderId.textContent;
-                    enableQrSection(planId, orderId, isYearly);
-                }
-            }
-        });
-
-        // Handle plan selection
-        planContainer.addEventListener('click', async function (e) {
-            const button = e.target.closest('.plan-get-started');
-            if (!button) return;
-            const plan = button.dataset.plan;
-            if (plan === 'enterprise') {
-                window.location.href = 'contact-sales.html';
-                return;
-            }
-            selectedPlanId = plan;
-            document.querySelectorAll('.plan-card').forEach(card => card.classList.remove('active', 'border-2', 'border-primary'));
-            document.getElementById(`${plan}-plan`).classList.add('active', 'border-2', 'border-primary', 'selected');
-            updateBillingSummary();
-
-            // Generate order ID and update QR section
-            const orderId = generateOrderId();
-            enableQrSection(plan, orderId, isYearly);
-
-            // Show dual payment modal
-            const priceObj = getPlanPrice(plan, isYearly);
-            window.showDualPaymentModal({
-                orderId: orderId,
-                amount: priceObj.price === 'Custom' ? '' : priceObj.price.replace('$', ''),
-                wallet: TRC20_ADDRESS
-            });
-
-            // Submit plan selection to backend
-            try {
-                const response = await fetch('dash-pay.php', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                    body: `selected_plan=${encodeURIComponent(plan)}`
-                });
-                if (response.ok) {
-                    console.log(`Plan ${plan} submitted successfully`);
-                } else {
-                    console.error('Failed to submit plan');
-                }
-            } catch (error) {
-                console.error('Error submitting plan:', error);
-            }
-        });
-
-        // Edit Plan button scrolls to plan selection
-        editPlanBtn.addEventListener('click', function () {
-            const planSection = document.querySelector('section.mb-8');
-            if (planSection) {
-                planSection.scrollIntoView({ behavior: 'smooth' });
-            }
-        });
-
-        // Handle QR TXID form submission
-        qrTxidForm.addEventListener('submit', async function (e) {
-            e.preventDefault();
-            const txid = qrTxidInput.value.trim();
-            const valid = /^([0-9a-fA-F]{64}|0x[0-9a-fA-F]{64})$/.test(txid);
-            if (!valid) {
-                qrTxidInput.classList.add('border-red-500', 'ring-2', 'ring-red-500/20');
-                return;
-            }
-            qrTxidForm.classList.add('pointer-events-none', 'opacity-60');
-            document.getElementById('qr-txid-success').classList.remove('hidden');
-            setTimeout(() => {
-                qrTxidForm.reset();
-                qrTxidForm.classList.remove('pointer-events-none', 'opacity-60');
-                document.getElementById('qr-txid-success').classList.add('hidden');
-                disableQrSection();
-            }, 2500);
-        });
-    } catch (error) {
-        console.error('Error loading plans:', error);
-        /*document.getElementById('plan-container').innerHTML = '<p class="text-red-600 text-center">Failed to load plans. Please try again later.</p>';*/
-    }
+    })();
 });
 </script>
+
    
   </body>
 

@@ -21,7 +21,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $user = $stmt->fetch();
 
     if ($user) {
-        $current_time = new DateTime();
+        $now = new DateTime('now', new DateTimeZone('UTC'));
 
         // Check if account is disabled
         if ($user['account_status'] === 'disabled') {
@@ -32,9 +32,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Handle auto-unlock if account is locked
         if ($user['account_status'] === 'locked') {
             if (!empty($user['unlock_time'])) {
-                $unlock_time = new DateTime($user['unlock_time']);
-                if ($current_time >= $unlock_time) {
-                    // Unlock account after 1 hour
+                $unlock_time = new DateTime($user['unlock_time'], new DateTimeZone('UTC'));
+                if ($now >= $unlock_time) {
+                    // Unlock account
                     $stmt = $pdo->prepare("UPDATE users SET account_status = 'active', failed_attempts = 0, last_failed_attempt = NULL, unlock_time = NULL WHERE email = ?");
                     $stmt->execute([$email]);
 
@@ -79,8 +79,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $existing = $stmt->fetch();
 
             if ($existing) {
-                $stmt = $pdo->prepare("UPDATE user_sessions SET session_id = ?, last_active = NOW(), city = ?, country = ? WHERE id = ?");
-                $stmt->execute([$session_id, $city, $country, $existing['id']]);
+                $stmt = $pdo->prepare("UPDATE user_sessions SET session_id = ?, last_active = ?, city = ?, country = ? WHERE id = ?");
+                $stmt->execute([$session_id, $now->format('Y-m-d H:i:s'), $city, $country, $existing['id']]);
             } else {
                 $stmt = $pdo->prepare("INSERT INTO user_sessions (user_id, session_id, ip_address, user_agent, city, country) VALUES (?, ?, ?, ?, ?, ?)");
                 $stmt->execute([$user['id'], $session_id, $ip_address, $user_agent, $city, $country]);
@@ -91,15 +91,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } else {
             // Wrong password - increment failed_attempts
             $new_failed = $user['failed_attempts'] + 1;
+            $now_str = $now->format('Y-m-d H:i:s');
 
             if ($new_failed >= 5) {
-                $unlock_time = $current_time->modify('+1 hour')->format('Y-m-d H:i:s');
-                $stmt = $pdo->prepare("UPDATE users SET failed_attempts = ?, last_failed_attempt = NOW(), account_status = 'locked', unlock_time = ? WHERE email = ?");
-                $stmt->execute([$new_failed, $unlock_time, $email]);
+                $unlock_time = $now->modify('+300 seconds')->format('Y-m-d H:i:s');
+                $stmt = $pdo->prepare("UPDATE users SET failed_attempts = ?, last_failed_attempt = ?, account_status = 'locked', unlock_time = ? WHERE email = ?");
+                $stmt->execute([$new_failed, $now_str, $unlock_time, $email]);
+
                 header('Location:' . BASE_URL . 'signup.php?form=login&status=account_locked_pword');
             } else {
-                $stmt = $pdo->prepare("UPDATE users SET failed_attempts = ?, last_failed_attempt = NOW() WHERE email = ?");
-                $stmt->execute([$new_failed, $email]);
+                $stmt = $pdo->prepare("UPDATE users SET failed_attempts = ?, last_failed_attempt = ? WHERE email = ?");
+                $stmt->execute([$new_failed, $now_str, $email]);
+
                 header('Location:' . BASE_URL . 'signup.php?form=login&status=invalid_credentials');
             }
             exit;
