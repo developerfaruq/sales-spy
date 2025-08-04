@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Aug 02, 2025 at 03:52 PM
+-- Generation Time: Aug 05, 2025 at 01:37 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -195,6 +195,59 @@ INSERT INTO `password_reset_attempts` (`id`, `email`, `ip_address`, `created_at`
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `payment_wallets`
+--
+
+CREATE TABLE `payment_wallets` (
+  `id` int(11) NOT NULL,
+  `network` varchar(50) NOT NULL,
+  `currency` varchar(20) NOT NULL,
+  `wallet_address` varchar(100) NOT NULL,
+  `instructions` text DEFAULT NULL,
+  `is_active` tinyint(1) DEFAULT 1,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `payment_wallets`
+--
+
+INSERT INTO `payment_wallets` (`id`, `network`, `currency`, `wallet_address`, `instructions`, `is_active`, `created_at`, `updated_at`) VALUES
+(1, 'TRC-20', 'USDT', 'TVg1LJq6zQ7zvC3k4RCYf8gEJ7VuvHg8QH', 'Send only USDT (TRC-20) to this address. Minimum confirmation required: 1.', 1, '2025-08-04 07:45:48', '2025-08-04 07:45:48');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `plans`
+--
+
+CREATE TABLE `plans` (
+  `id` int(11) NOT NULL,
+  `plan_name` varchar(50) NOT NULL,
+  `description` text NOT NULL,
+  `monthly_price` decimal(10,2) NOT NULL,
+  `yearly_price` decimal(10,2) NOT NULL,
+  `leads_per_month` int(11) NOT NULL,
+  `features` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL CHECK (json_valid(`features`)),
+  `is_active` tinyint(1) DEFAULT 1,
+  `is_popular` tinyint(1) DEFAULT 0,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `plans`
+--
+
+INSERT INTO `plans` (`id`, `plan_name`, `description`, `monthly_price`, `yearly_price`, `leads_per_month`, `features`, `is_active`, `is_popular`, `created_at`, `updated_at`) VALUES
+(1, 'Basic', 'Perfect for small businesses just getting started with lead generation', 20.00, 192.00, 500, '[\"500 leads per month\", \"Basic filtering options\", \"Email and phone support\", \"Weekly database updates\"]', 1, 0, '2025-08-02 18:51:43', '2025-08-04 20:27:10'),
+(2, 'Pro', 'Ideal for growing businesses with serious lead generation needs', 50.00, 480.00, 2000, '[\"2,000 leads per month\", \"Advanced filtering options\", \"Priority support\", \"Daily database updates\", \"CRM integration\", \"Email sequence automation\"]', 1, 1, '2025-08-02 18:51:43', '2025-08-03 09:31:20'),
+(3, 'Enterprise', 'For large organizations with custom lead generation requirements', 150.00, 1440.00, 0, '[\"Unlimited leads\", \"Custom filtering options\", \"Dedicated account manager\", \"Real-time database updates\", \"Advanced API access\", \"Custom integration development\"]', 1, 0, '2025-08-02 18:51:43', '2025-08-02 18:51:43');
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `search_logs`
 --
 
@@ -279,7 +332,33 @@ CREATE TABLE `subscriptions` (
 
 INSERT INTO `subscriptions` (`id`, `user_id`, `plan_name`, `credits_remaining`, `credits_total`, `start_date`, `end_date`, `is_active`, `leads_balance`, `status`) VALUES
 (10, 22, 'free', 1000, 1000, '2025-07-23 13:11:19', NULL, 1, 1000, 'active'),
-(13, 25, 'free', 1000, 1000, '2025-07-23 16:09:49', NULL, 1, 1000, 'active');
+(13, 25, 'free', 1000, 1000, '2025-08-02 20:11:34', NULL, 1, 1000, 'active');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `transactions`
+--
+
+CREATE TABLE `transactions` (
+  `id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `txid` varchar(100) NOT NULL,
+  `payment_type` varchar(50) NOT NULL,
+  `amount` decimal(10,2) NOT NULL,
+  `status` enum('pending','success','failed') NOT NULL DEFAULT 'pending',
+  `created_at` datetime DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `transactions`
+--
+
+INSERT INTO `transactions` (`id`, `user_id`, `txid`, `payment_type`, `amount`, `status`, `created_at`) VALUES
+(1, 25, 'TXN12345678hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh', 'crypto', 49.99, 'success', '2025-08-04 23:40:30'),
+(2, 25, 'TXN87654321', 'crupto', 19.99, 'failed', '2025-08-04 23:40:30'),
+(3, 25, 'TXN99900011', 'crypto', 29.99, 'pending', '2025-08-04 23:40:30'),
+(4, 25, 'TXN22244455', 'crypto', 9.99, 'success', '2025-08-04 23:40:30');
 
 -- --------------------------------------------------------
 
@@ -333,7 +412,7 @@ CREATE TABLE `users` (
 
 INSERT INTO `users` (`id`, `full_name`, `email`, `phone`, `password`, `role`, `created_at`, `reset_token`, `reset_token_expiry`, `failed_attempts`, `last_failed_attempt`, `avatar_url`, `credits`, `profile_picture`, `twofa_secret`, `twofa_enabled`, `twofa_backup_codes`, `ip_address`, `city`, `is_disabled`, `account_status`, `unlock_time`) VALUES
 (22, 'faru', 'emm@gmail.com', '08116533387', '$2y$10$Ya39CvXgc9jOxEOpi1u93O/.sgMGN5Wpq7N3Uljm7B4lnp2ucvjWO', 'user', '2025-07-23 13:11:19', NULL, NULL, 0, NULL, NULL, 1250, NULL, NULL, 0, NULL, '::1', NULL, 0, 'active', NULL),
-(25, 'faru', 'ada@gmail.com', '08116533380', '$2y$10$TvHtm4OzVMdy2D48CT9ziuiTRnI/bQ6/9/IygaBbFSGAeAtAAaary', 'user', '2025-07-23 16:09:49', NULL, NULL, 0, NULL, NULL, 1250, 'uploads/profile_pictures/profile_25_1753288173.jpg', NULL, 0, NULL, '::1', NULL, 0, 'active', NULL);
+(25, 'faruq', 'ada@gmail.com', '08116533380', '$2y$10$A3lH0LMXTQ7NQ45oR6L/rO9E.okbHnZAqW8QxKWjKMsiKGmdUGKl2', 'user', '2025-07-23 16:09:49', NULL, NULL, 0, NULL, NULL, 1250, 'uploads/profile_pictures/profile_25_1754157738.jpg', NULL, 0, NULL, '::1', NULL, 0, 'active', NULL);
 
 -- --------------------------------------------------------
 
@@ -373,8 +452,7 @@ CREATE TABLE `user_sessions` (
 --
 
 INSERT INTO `user_sessions` (`id`, `user_id`, `session_id`, `user_agent`, `ip_address`, `last_active`, `created_at`, `city`, `country`) VALUES
-(26, 25, 'obs8e71ibvc1d0e0ev6iju732k', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0', '127.0.0.1', '2025-08-02 14:07:01', '2025-08-02 14:06:50', 'Unknown', 'Unknown'),
-(27, 25, 'l1gubhn2kesspol6a4su11f6ok', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36', '::1', '2025-08-02 14:48:10', '2025-08-02 14:28:57', 'Unknown', 'Unknown');
+(32, 25, '5u4jej2f7ffivdg9tui6373j5l', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36', '::1', '2025-08-04 23:35:12', '2025-08-04 22:24:33', 'Unknown', 'Unknown');
 
 -- --------------------------------------------------------
 
@@ -473,6 +551,18 @@ ALTER TABLE `password_reset_attempts`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Indexes for table `payment_wallets`
+--
+ALTER TABLE `payment_wallets`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `plans`
+--
+ALTER TABLE `plans`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Indexes for table `search_logs`
 --
 ALTER TABLE `search_logs`
@@ -498,6 +588,12 @@ ALTER TABLE `stores`
 ALTER TABLE `subscriptions`
   ADD PRIMARY KEY (`id`),
   ADD KEY `user_id` (`user_id`);
+
+--
+-- Indexes for table `transactions`
+--
+ALTER TABLE `transactions`
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indexes for table `txid_requests`
@@ -596,6 +692,18 @@ ALTER TABLE `password_reset_attempts`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
+-- AUTO_INCREMENT for table `payment_wallets`
+--
+ALTER TABLE `payment_wallets`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT for table `plans`
+--
+ALTER TABLE `plans`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
 -- AUTO_INCREMENT for table `search_logs`
 --
 ALTER TABLE `search_logs`
@@ -620,6 +728,12 @@ ALTER TABLE `subscriptions`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
+-- AUTO_INCREMENT for table `transactions`
+--
+ALTER TABLE `transactions`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+
+--
 -- AUTO_INCREMENT for table `txid_requests`
 --
 ALTER TABLE `txid_requests`
@@ -635,7 +749,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `user_sessions`
 --
 ALTER TABLE `user_sessions`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=33;
 
 --
 -- AUTO_INCREMENT for table `user_stats`
