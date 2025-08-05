@@ -1,6 +1,6 @@
 <?php
 header('Content-Type: application/json');
-require '../config/db.php';
+require '../../config/db.php';
 session_start();
 
 // ====== Session & Auth Validation ======

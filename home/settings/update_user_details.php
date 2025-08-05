@@ -1,5 +1,5 @@
 <?php
-require '../auth/auth_check.php';
+require 'auth_check.php';
 
 // Initialize response array
 $response = [
@@ -79,7 +79,7 @@ try {
     // Format avatar_url path
     if (!empty($user['avatar_url'])) {
         $filename = str_replace('uploads/profile_pictures/', '', $user['avatar_url']);
-        $user['avatar_url'] = '../uploads/profile_pictures/' . $filename;
+        $user['avatar_url'] = '../../uploads/profile_pictures/' . $filename;
     }
 
     $response['success'] = true;

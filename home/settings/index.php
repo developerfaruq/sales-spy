@@ -1,5 +1,5 @@
 <?php
-require '../auth/auth_check.php';
+require 'auth_check.php';
 
 $user = [];
 $stats = [
@@ -301,7 +301,7 @@ display: block;
   <nav class="flex-1 overflow-y-auto py-4">
     <ul>
       <li class="mb-2">
-        <a href="index.php" class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-r-lg hover:text-primary transition-colors">
+        <a href="../" class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-r-lg hover:text-primary transition-colors">
           <div class="w-6 h-6 flex items-center justify-center mr-3 sidebar-icon">
             <i class="ri-dashboard-line"></i>
           </div>
@@ -309,7 +309,7 @@ display: block;
         </a>
       </li>
       <li class="mb-2">
-        <a href="Dashboard-com.html" class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-r-lg hover:text-primary transition-colors">
+        <a href="#" class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-r-lg hover:text-primary transition-colors">
           <div class="w-6 h-6 flex items-center justify-center mr-3 sidebar-icon">
             <i class="ri-global-line"></i>
           </div>
@@ -317,15 +317,25 @@ display: block;
         </a>
       </li> 
       <li class="mb-2">
-        <a href="Dashboard-ecc.html" class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-r-lg hover:text-primary transition-colors">
+        <a href="#" class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-r-lg hover:text-primary transition-colors">
           <div class="w-6 h-6 flex items-center justify-center mr-3 sidebar-icon">
             <i class="ri-shopping-cart-line"></i>
           </div>
           <span class="sidebar-text">E-commerce</span>
         </a>
       </li>
+      <li class="mb-2">
+              <a href="../transaction_his/"
+                class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-r-lg hover:text-primary transition-colors">
+                <div class="w-6 h-6 flex items-center justify-center mr-3">
+                <i class="ri-file-list-3-line"></i>
+                </div>
+                <span class="sidebar-text">Transaction History</span>
+              </a>
+              </li>
+
        <li class="mb-2">
-                <a href="Dash-pay.php" class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-r-lg hover:text-primary transition-colors">
+                <a href="../payment/" class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-r-lg hover:text-primary transition-colors">
                   <div class="w-6 h-6 flex items-center justify-center mr-3"> <i class="ri-bank-card-line"></i></div>
                   <span class="sidebar-text">Payment</span>
                 </a>
@@ -352,7 +362,7 @@ display: block;
                             <div class="bg-primary rounded-full h-2" style="width: <?= $stats['credits_percentage'] ?>%"></div>
                         </div>
                     </div>
-                    <a href="Dash-pay.php">
+                    <a href="../payment/">
                     <button id="upgrade-btn-expanded" class="w-full bg-primary text-white py-2 px-4 rounded-button flex items-center justify-center whitespace-nowrap hover:bg-blue-600 transition-colors">
                         <div class="w-5 h-5 flex items-center justify-center mr-2">
                             <i class="ri-arrow-up-line"></i>
@@ -360,7 +370,7 @@ display: block;
                         <span>Upgrade Plan</span>
                     </button>
                     </a>
-                    <a href="Dash-pay.php">
+                    <a href="../payment/">
                     <button id="upgrade-btn-collapsed" class="hidden bg-primary text-white w-10 h-10 rounded-full flex items-center justify-center mx-auto mt-2 hover:bg-blue-600 transition-colors" title="Upgrade">
                         <i class="ri-arrow-up-line"></i>
                     </button>
@@ -509,7 +519,7 @@ document.addEventListener('DOMContentLoaded', function() {
           <div class="dropdown-content right-0 mt-2">
             <a href="#">Profile</a>
             <a href="#">Settings</a>
-            <a href="logout.php">Logout</a>
+            <a href="../logout.php">Logout</a>
           </div>
         </div>
       </div>
@@ -972,7 +982,7 @@ document.addEventListener('DOMContentLoaded', function() {
 <script>
 document.addEventListener('DOMContentLoaded', function() {
   // Fetch user settings data
-  fetch('../home/update_settings.php')
+  fetch('update_settings.php')
     .then(response => response.json())
     .then(data => {
       if (data.success) {
@@ -1145,7 +1155,7 @@ document.addEventListener('DOMContentLoaded', function() {
       formData.append('profile_picture', profilePreview.src);
 
       // Send to server
-      fetch('../home/update_profile.php', {
+      fetch('update_profile.php', {
         method: 'POST',
         body: formData
       })
@@ -1266,7 +1276,7 @@ document.addEventListener('DOMContentLoaded', function() {
       submitBtn.innerHTML = '<div class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2 inline-block"></div> Saving...';
 
       // Send update request
-      fetch('../home/update_user_details.php', {
+      fetch('update_user_details.php', {
         method: 'POST',
         body: formData
       })

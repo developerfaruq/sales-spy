@@ -1,5 +1,5 @@
 <?php
-require '../auth/auth_check.php';
+require 'auth_check.php';
 // Initialize response array
 $response = [
     'success' => false,
@@ -25,7 +25,7 @@ try {
     if (!empty($user['profile_picture'])) {
         // Remove any existing uploads/profile_pictures/ prefix to avoid duplication
         $filename = str_replace('uploads/profile_pictures/', '', $user['profile_picture']);
-        $user['profile_picture'] = '../uploads/profile_pictures/' . $filename;
+        $user['profile_picture'] = '../../uploads/profile_pictures/' . $filename;
     } else {
         $user['profile_picture'] = null;
     }

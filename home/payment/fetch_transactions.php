@@ -1,5 +1,5 @@
 <?php
-require '../config/db.php';
+require '../../config/db.php';
 session_start(); // Start session to access $_SESSION
 
 // Use session user_id or hardcode temporarily

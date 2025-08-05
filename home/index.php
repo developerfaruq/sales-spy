@@ -309,7 +309,7 @@ display: block;
                             </a>
                         </li>
                         <li class="mb-2">
-                            <a href="../frontend/Dashboard-com.html" class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-r-lg hover:text-primary transition-colors">
+                            <a href="#" class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-r-lg hover:text-primary transition-colors">
                                 <div class="w-6 h-6 flex items-center justify-center mr-3">
                                     <i class="ri-global-line"></i>
                                 </div>
@@ -317,21 +317,31 @@ display: block;
                             </a>
                         </li>
                         <li class="mb-2">
-                            <a href="../frontend/Dashboard-ecc.html" class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-r-lg hover:text-primary transition-colors">
+                            <a href="#" class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-r-lg hover:text-primary transition-colors">
                                 <div class="w-6 h-6 flex items-center justify-center mr-3">
                                     <i class="ri-shopping-cart-line"></i>
                                 </div>
                                 <span class="sidebar-text">E-commerce</span>
                             </a>
                         </li>
+                        <li class="mb-2">
+              <a href="transaction_his/"
+                class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-r-lg hover:text-primary transition-colors">
+                <div class="w-6 h-6 flex items-center justify-center mr-3">
+                <i class="ri-file-list-3-line"></i>
+                </div>
+                <span class="sidebar-text">Transaction History</span>
+              </a>
+              </li>
+
                          <li class="mb-2">
-                <a href="Dash-pay.php" class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-r-lg hover:text-primary transition-colors">
+                <a href="payment/" class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-r-lg hover:text-primary transition-colors">
                   <div class="w-6 h-6 flex items-center justify-center mr-3"> <i class="ri-bank-card-line"></i></div>
                   <span class="sidebar-text">Payment</span>
                 </a>
               </li>
                         <li class="mb-2">
-                            <a href="settings.php" class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-r-lg hover:text-primary transition-colors">
+                            <a href="settings/" class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-r-lg hover:text-primary transition-colors">
                                 <div class="w-6 h-6 flex items-center justify-center mr-3">
                                     <i class="ri-settings-line"></i>
                                 </div>

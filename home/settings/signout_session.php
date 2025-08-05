@@ -1,5 +1,5 @@
 <?php
-require '../config/db.php';
+require '../../config/db.php';
 session_start();
 
 if (!isset($_SESSION['user_id'])) {
@@ -18,6 +18,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['session_id'])) {
     }
 }
 
-header("Location: settings.php?status=session_signed_out");
+header("Location: index.php?status=session_signed_out");
 exit;
 ?>

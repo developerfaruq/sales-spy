@@ -1,5 +1,5 @@
 <?php
-require '../auth/auth_check.php';
+require 'auth_check.php';
 // Initialize response
 $response = [
     'success' => false,
@@ -20,7 +20,7 @@ try {
     }
 
     // Create uploads directory if it doesn't exist
-    $uploadDir = '../uploads/profile_pictures/';
+    $uploadDir = '../../uploads/profile_pictures/';
     if (!file_exists($uploadDir)) {
         mkdir($uploadDir, 0777, true);
     }

@@ -1,5 +1,5 @@
 <?php
- require '../auth/auth_check.php';
+ require 'auth_check.php';
 $user_id = $_SESSION['user_id'];
 /*
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['selected_plan'])) {
@@ -77,7 +77,7 @@ try {
 // Profile picture handling
 if (!empty($user['profile_picture'])) {
     $filename = str_replace('uploads/profile_pictures/', '', $user['profile_picture']);
-    $avatarUrl = '../uploads/profile_pictures/' . $filename;
+    $avatarUrl = '../../uploads/profile_pictures/' . $filename;
 } else {
     $avatarUrl = "https://ui-avatars.com/api/?name=" . 
                  urlencode($user['full_name'] ?? 'User') . 
@@ -514,7 +514,7 @@ $transactions = $stmt->fetchAll(PDO::FETCH_ASSOC);*/
             <nav class="flex-1 overflow-y-auto py-4">
             <ul>
               <li class="mb-2">
-              <a href="index.php"
+              <a href="../"
                 class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-r-lg hover:text-primary transition-colors">
                 <div class="w-6 h-6 flex items-center justify-center mr-3">
                 <i class="ri-dashboard-line"></i>
@@ -523,7 +523,7 @@ $transactions = $stmt->fetchAll(PDO::FETCH_ASSOC);*/
               </a>
               </li>
               <li class="mb-2">
-              <a href="Dashboard-com.html"
+              <a href="#"
                 class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-r-lg hover:text-primary transition-colors">
                 <div class="w-6 h-6 flex items-center justify-center mr-3">
                 <i class="ri-global-line"></i>
@@ -532,7 +532,7 @@ $transactions = $stmt->fetchAll(PDO::FETCH_ASSOC);*/
               </a>
               </li>
               <li class="mb-2">
-              <a href="Dashboard-ecc.html"
+              <a href="#"
                 class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-r-lg hover:text-primary transition-colors">
                 <div class="w-6 h-6 flex items-center justify-center mr-3">
                 <i class="ri-shopping-cart-line"></i>
@@ -542,7 +542,7 @@ $transactions = $stmt->fetchAll(PDO::FETCH_ASSOC);*/
               </li>
 
               <li class="mb-2">
-              <a href="Dashboard-pay.html"
+              <a href="#"
                 class="flex items-center px-4 py-3 text-primary bg-blue-50 rounded-r-lg border-l-4 border-primary">
                 <div class="w-6 h-6 flex items-center justify-center mr-3">
                 <i class="ri-bank-card-line"></i>
@@ -552,7 +552,7 @@ $transactions = $stmt->fetchAll(PDO::FETCH_ASSOC);*/
               </li>
 
               <li class="mb-2">
-              <a href="Dashboard-his.html"
+              <a href="../transaction_his/"
                 class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-r-lg hover:text-primary transition-colors">
                 <div class="w-6 h-6 flex items-center justify-center mr-3">
                 <i class="ri-file-list-3-line"></i>
@@ -562,7 +562,7 @@ $transactions = $stmt->fetchAll(PDO::FETCH_ASSOC);*/
               </li>
 
               <li class="mb-2">
-              <a href="settings.php"
+              <a href="../settings/"
                 class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-r-lg hover:text-primary transition-colors">
                 <div class="w-6 h-6 flex items-center justify-center mr-3">
                 <i class="ri-settings-line"></i>
@@ -943,7 +943,7 @@ document.addEventListener("DOMContentLoaded", function () {
           row.className = "grid grid-cols-6 gap-4 p-6 text-sm text-gray-700";
           row.innerHTML = `
             <div>${tx.created_at}</div>
-            <div>${tx.txid}</div>
+            <div  class="break-words truncate max-w-[120px]">${tx.txid}</div>
             <div>${tx.payment_type}</div>
             <div>$${tx.amount}</div>
             <div><span class="px-2 py-1 rounded-full text-xs font-medium ${statusClass}">${tx.status}</span></div>
@@ -959,7 +959,7 @@ document.addEventListener("DOMContentLoaded", function () {
           desktopList.appendChild(row);
 
           // Mobile card
-          const card = document.createElement("div");
+        /*  const card = document.createElement("div");
           card.className = "p-4 border-b border-gray-200";
           card.innerHTML = `
             <div class="flex justify-between mb-2">
@@ -975,7 +975,7 @@ document.addEventListener("DOMContentLoaded", function () {
             >
               View Details
             </button>
-          `;
+          `;*/
           mobileList.appendChild(card);
         });
       } else {
@@ -997,7 +997,7 @@ function showTransactionDetails(tx) {
     <div class="grid grid-cols-2 gap-3 text-sm">
       <div>
         <p class="text-gray-500">Transaction ID</p>
-        <p class="font-medium text-gray-900">${tx.txid}</p>
+        <p  class="break-words truncate max-w-[120px]">${tx.txid}</p>
       </div>
       <div>
         <p class="text-gray-500">Payment Type</p>
