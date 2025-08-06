@@ -1,5 +1,5 @@
 <?php
-require '../../config/db.php';
+require '../../../config/db.php';
 session_start();
 header('Content-Type: application/json');
 
@@ -17,7 +17,7 @@ $user_id = $_SESSION['user_id'];
 try {
     // Get parameters from request
     $page = isset($_GET['page']) ? max(1, intval($_GET['page'])) : 1;
-    $limit = isset($_GET['limit']) ? min(100, max(1, intval($_GET['limit']))) : 10;
+    $limit = isset($_GET['limit']) ? min(100, max(1, intval($_GET['limit']))) : 20;
     $offset = ($page - 1) * $limit;
 
     // Filter parameters
@@ -81,10 +81,10 @@ try {
     $total_records = $count_stmt->fetch(PDO::FETCH_ASSOC)['total'];
 
     // Get transactions with pagination
-    $sql = "SELECT id, txid, payment_type, amount, status, created_at
-            FROM transactions
-            $where_clause
-            ORDER BY created_at DESC
+    $sql = "SELECT id, txid, payment_type, amount, status, created_at 
+            FROM transactions 
+            $where_clause 
+            ORDER BY created_at DESC 
             LIMIT ? OFFSET ?";
 
     $params[] = $limit;
@@ -96,16 +96,38 @@ try {
 
     // Format transactions for frontend
     $formatted_transactions = array_map(function ($tx) {
+        // Map payment types to display names
+        $payment_type_display = $tx['payment_type'];
+        if (strtolower($tx['payment_type']) === 'crypto' || strtolower($tx['payment_type']) === 'crupto') {
+            $payment_type_display = 'Cryptocurrency';
+        } elseif (strtolower($tx['payment_type']) === 'card') {
+            $payment_type_display = 'Credit Card';
+        }
+
+        // Map status to display format
+        $status_display = ucfirst($tx['status']);
+        if ($tx['status'] === 'success') {
+            $status_display = 'Success';
+        } elseif ($tx['status'] === 'pending') {
+            $status_display = 'Pending';
+        } elseif ($tx['status'] === 'failed') {
+            $status_display = 'Failed';
+        }
+
         return [
-            'id' => $tx['id'],
+            'id' => 'TXN-' . str_pad($tx['id'], 6, '0', STR_PAD_LEFT),
+            'db_id' => $tx['id'],
             'txid' => $tx['txid'],
-            'payment_type' => $tx['payment_type'],
+            'payment_type' => $payment_type_display,
+            'payment_type_raw' => $tx['payment_type'],
             'amount' => floatval($tx['amount']),
-            'status' => $tx['status'],
+            'status' => $status_display,
+            'status_raw' => $tx['status'],
             'created_at' => $tx['created_at'],
-            'formatted_date' => date('M j, Y', strtotime($tx['created_at'])),
-            'formatted_time' => date('H:i T', strtotime($tx['created_at'])),
-            'formatted_amount' => '$' . number_format($tx['amount'], 2)
+            'date' => date('M j, Y', strtotime($tx['created_at'])),
+            'time' => date('H:i T', strtotime($tx['created_at'])),
+            'formatted_amount' => '$' . number_format($tx['amount'], 2),
+            'description' => $payment_type_display . ' Payment'
         ];
     }, $transactions);
 
