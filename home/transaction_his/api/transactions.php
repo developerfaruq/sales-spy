@@ -7,7 +7,7 @@ header('Content-Type: application/json');
 if (!isset($_SESSION['user_id'])) {
     echo json_encode([
         'success' => false,
-        'message' => 'User not authenticated'
+        'message' => 'User not authenticated. Please log in to view your transactions.'
     ]);
     exit;
 }
@@ -15,6 +15,17 @@ if (!isset($_SESSION['user_id'])) {
 $user_id = $_SESSION['user_id'];
 
 try {
+    // Test database connection
+    if (!isset($pdo)) {
+        throw new Exception("Database connection not available");
+    }
+
+    // Test if transactions table exists
+    $stmt = $pdo->query("SHOW TABLES LIKE 'transactions'");
+    if ($stmt->rowCount() == 0) {
+        throw new Exception("Transactions table does not exist");
+    }
+
     // Get parameters from request
     $page = isset($_GET['page']) ? max(1, intval($_GET['page'])) : 1;
     $limit = isset($_GET['limit']) ? min(100, max(1, intval($_GET['limit']))) : 20;
@@ -81,14 +92,11 @@ try {
     $total_records = $count_stmt->fetch(PDO::FETCH_ASSOC)['total'];
 
     // Get transactions with pagination
-    $sql = "SELECT id, txid, payment_type, amount, status, created_at 
-            FROM transactions 
-            $where_clause 
-            ORDER BY created_at DESC 
-            LIMIT ? OFFSET ?";
-
-    $params[] = $limit;
-    $params[] = $offset;
+    $sql = "SELECT id, txid, payment_type, amount, status, created_at
+            FROM transactions
+            $where_clause
+            ORDER BY created_at DESC
+            LIMIT $limit OFFSET $offset";
 
     $stmt = $pdo->prepare($sql);
     $stmt->execute($params);
@@ -159,12 +167,17 @@ try {
     error_log("Transaction fetch error: " . $e->getMessage());
     echo json_encode([
         'success' => false,
-        'message' => 'Database error occurred'
+        'message' => 'Database error occurred',
+        'debug' => $e->getMessage(),
+        'user_id' => $user_id,
+        'sql_error' => $e->getCode()
     ]);
 } catch (Exception $e) {
     error_log("General error: " . $e->getMessage());
     echo json_encode([
         'success' => false,
-        'message' => 'An error occurred while fetching transactions'
+        'message' => 'An error occurred while fetching transactions',
+        'debug' => $e->getMessage(),
+        'user_id' => $user_id
     ]);
 }

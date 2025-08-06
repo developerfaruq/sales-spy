@@ -375,7 +375,8 @@
                   <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                     <i class="ri-search-line text-gray-400"></i>
                   </div>
-                  <input type="text" id="searchInput" name="search" placeholder="Search by transaction ID or amount..."
+                  <input type="text" id="searchInput" name="search"
+                    placeholder="Search by transaction ID or amount..."
                     class="w-full bg-white border border-gray-300 rounded-lg pl-10 pr-4 py-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/50" />
                 </div>
               </div>
@@ -493,7 +494,8 @@
               <div class="flex justify-between items-center mt-4">
                 <div class="flex items-center gap-2">
                   <label class="text-sm font-medium text-gray-800">Show:</label>
-                  <select id="pageSize" class="bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary/50">
+                  <select id="pageSize"
+                    class="bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary/50">
                     <option value="10">10 per page</option>
                     <option value="20" selected>20 per page</option>
                     <option value="50">50 per page</option>
@@ -548,7 +550,8 @@
               showLoadingState();
 
               try {
-                const pageSize = document.getElementById("pageSize") ? document.getElementById("pageSize").value : 20;
+                const pageSize = document.getElementById("pageSize") ? document.getElementById(
+                  "pageSize").value : 20;
                 const params = new URLSearchParams({
                   page: page,
                   limit: pageSize,
@@ -784,14 +787,6 @@
 
             // Pagination functions
             function updatePagination(pagination) {
-              // Update transaction count
-              const countElement = document.getElementById("transactionCount");
-              if (countElement) {
-                const start = ((pagination.current_page - 1) * pagination.per_page) + 1;
-                const end = Math.min(pagination.current_page * pagination.per_page, pagination.total_records);
-                countElement.textContent = `Showing ${start}-${end} of ${pagination.total_records} transactions`;
-              }
-
               const paginationContainer = document.getElementById("pagination");
               if (!paginationContainer) {
                 // Create pagination container if it doesn't exist
@@ -941,13 +936,10 @@
                 });
 
               // Live filtering for date and search
-              document.getElementById("dateFrom").addEventListener("input", () => filterTransactions(true));
-              document.getElementById("searchInput").addEventListener("input", () => filterTransactions(true));
-
-              // Page size change
-              document.getElementById("pageSize").addEventListener("change", () => {
-                fetchTransactions(1, currentFilters);
-              });
+              document.getElementById("dateFrom").addEventListener("input", () => filterTransactions(
+                true));
+              document.getElementById("searchInput").addEventListener("input", () =>
+                filterTransactions(true));
             });
 
             // Reset button
@@ -993,9 +985,6 @@
               fetchTransactions(1, {});
             });
           </script>
-
-          <!-- Transaction Count -->
-          <div id="transactionCount" class="mb-4 text-sm text-gray-600"></div>
 
           <!-- Desktop Table Header -->
           <div class="hidden md:block bg-white border-b border-gray-200">
