@@ -1,61 +1,7 @@
 <?php
- require 'auth_check.php';
+ require 'api/auth_check.php';
 $user_id = $_SESSION['user_id'];
-/*
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['selected_plan'])) {
-    $selected = $_POST['selected_plan'];
 
-    // Plan mapping
-    $plans = [
-        'free' => ['plan_name' => 'free', 'credits_total' => 1000, 'leads_balance' => 1000, 'price' => 0],
-        'basic' => ['plan_name' => 'basic', 'credits_total' => 5000, 'leads_balance' => 5000, 'price' => 20],
-        'pro' => ['plan_name' => 'pro', 'credits_total' => 10000, 'leads_balance' => 10000, 'price' => 50],
-        'expertise' => ['plan_name' => 'enterprise', 'credits_total' => 10000000, 'leads_balance' => 10000000, 'price' => 150]
-    ];
-
-    if (!array_key_exists($selected, $plans)) {
-        die("Invalid plan selected.");
-    }
-
-    $plan = $plans[$selected];
-
-    try {
-        // Check if subscription already exists
-        $stmt = $pdo->prepare("SELECT id FROM subscriptions WHERE user_id = ?");
-        $stmt->execute([$user_id]);
-        $subscription = $stmt->fetch();
-
-        if ($subscription) {
-            // Update subscription
-            $update = $pdo->prepare("UPDATE subscriptions SET plan_name = ?, credits_remaining = ?, credits_total = ?, leads_balance = ?, start_date = NOW(), is_active = 1 WHERE user_id = ?");
-            $update->execute([
-                $plan['plan_name'],
-                $plan['credits_total'],
-                $plan['credits_total'],
-                $plan['leads_balance'],
-                $user_id
-            ]);
-        } else {
-            // Create new subscription
-            $insert = $pdo->prepare("INSERT INTO subscriptions (user_id, plan_name, credits_remaining, credits_total, leads_balance, start_date, is_active) VALUES (?, ?, ?, ?, ?, NOW(), 1)");
-            $insert->execute([
-                $user_id,
-                $plan['plan_name'],
-                $plan['credits_total'],
-                $plan['credits_total'],
-                $plan['leads_balance']
-            ]);
-        }
-
-        // Optional: redirect or show success message
-        header("Location: dashboard.php?payment=success&plan={$plan['plan_name']}");
-        exit;
-
-    } catch (PDOException $e) {
-        echo "Error: " . $e->getMessage();
-    }
-
-}*/
 // Profile picture handling
 try {
     // Get user data
@@ -873,7 +819,7 @@ function copyWalletAddress() {
                 </div>
                 <!-- View Full History Button -->
                 <div class="flex justify-end p-4 bg-gray-50 border-t">
-                  <a href="Dashboard-his.html">
+                  <a href="../transaction_his/">
                     <button class="bg-primary text-white px-6 py-2 rounded-button hover:bg-blue-700 transition-all flex items-center gap-2">
                       <i class="ri-file-list-3-line"></i>
                       View Full Transaction History
@@ -918,19 +864,32 @@ function copyWalletAddress() {
               </div>
 <script>
 document.addEventListener("DOMContentLoaded", function () {
-  fetch("fetch_transactions.php")
-    .then((response) => response.json())
+  fetch("api/fetch_transactions.php")
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      return response.json();
+    })
     .then((data) => {
+      console.log('Fetched transaction data:', data); // Debug log
+      
       const desktopList = document.getElementById("pay-tx-list");
       const mobileList = document.getElementById("pay-tx-mobile-list");
       const emptyState = document.getElementById("pay-tx-empty");
 
-      if (data.success && data.data.length > 0) {
+      if (data.success && data.data && data.data.length > 0) {
         desktopList.innerHTML = "";
         mobileList.innerHTML = "";
         emptyState.classList.add("hidden");
 
-        data.data.forEach((tx) => {
+        // Display up to 3 transactions
+        const transactionsToShow = data.data.slice(0, 3);
+        console.log('Transactions to display:', transactionsToShow); // Debug log
+
+        transactionsToShow.forEach((tx, index) => {
+          console.log(`Processing transaction ${index + 1}:`, tx); // Debug log
+          
           const statusClasses = {
             success: "text-green-700 bg-green-100",
             failed: "text-red-700 bg-red-100",
@@ -940,16 +899,16 @@ document.addEventListener("DOMContentLoaded", function () {
 
           // Desktop row
           const row = document.createElement("div");
-          row.className = "grid grid-cols-6 gap-4 p-6 text-sm text-gray-700";
+          row.className = "grid grid-cols-6 gap-4 p-6 text-sm text-gray-700 hover:bg-gray-50 transition-colors";
           row.innerHTML = `
-            <div>${tx.created_at}</div>
-            <div  class="break-words truncate max-w-[120px]">${tx.txid}</div>
-            <div>${tx.payment_type}</div>
-            <div>$${tx.amount}</div>
-            <div><span class="px-2 py-1 rounded-full text-xs font-medium ${statusClass}">${tx.status}</span></div>
+            <div class="font-medium">${tx.created_at}</div>
+            <div class="break-words truncate max-w-[120px] font-mono text-xs">${tx.txid}</div>
+            <div class="capitalize">${tx.payment_type}</div>
+            <div class="font-semibold">$${tx.amount}</div>
+            <div><span class="px-2 py-1 rounded-full text-xs font-medium ${statusClass} capitalize">${tx.status}</span></div>
             <div>
               <button
-                class="text-blue-600 hover:underline font-medium"
+                class="text-blue-600 hover:text-blue-800 hover:underline font-medium transition-colors"
                 onclick='showTransactionDetails(${JSON.stringify(tx)})'
               >
                 View
@@ -959,26 +918,39 @@ document.addEventListener("DOMContentLoaded", function () {
           desktopList.appendChild(row);
 
           // Mobile card
-        /*  const card = document.createElement("div");
-          card.className = "p-4 border-b border-gray-200";
+          const card = document.createElement("div");
+          card.className = "p-4 border-b border-gray-200 last:border-b-0";
           card.innerHTML = `
-            <div class="flex justify-between mb-2">
-              <span class="text-sm text-gray-500">${tx.created_at}</span>
-              <span class="text-xs ${statusClass} px-2 py-1 rounded-full">${tx.status}</span>
+            <div class="flex justify-between items-start mb-2">
+              <span class="text-sm text-gray-500 font-medium">${tx.created_at}</span>
+              <span class="text-xs ${statusClass} px-2 py-1 rounded-full font-medium capitalize">${tx.status}</span>
             </div>
-            <div class="text-gray-700 font-medium text-sm mb-1">${tx.txid}</div>
-            <div class="text-sm text-gray-600">Payment Type: ${tx.payment_type}</div>
-            <div class="text-sm text-gray-600 mb-2">Amount: $${tx.amount}</div>
+            <div class="text-gray-700 font-medium text-sm mb-1 font-mono break-all">${tx.txid}</div>
+            <div class="flex justify-between items-center mb-2">
+              <span class="text-sm text-gray-600">Type: <span class="capitalize">${tx.payment_type}</span></span>
+              <span class="text-sm font-semibold text-gray-900">$${tx.amount}</span>
+            </div>
             <button
-              class="text-blue-600 text-sm hover:underline font-medium"
+              class="text-blue-600 text-sm hover:text-blue-800 hover:underline font-medium transition-colors"
               onclick='showTransactionDetails(${JSON.stringify(tx)})'
             >
-              View Details
+              View Details →
             </button>
-          `;*/
+          `;
           mobileList.appendChild(card);
         });
+
+        // Show desktop table on larger screens, mobile cards on smaller screens
+        if (window.innerWidth >= 640) {
+          desktopList.classList.remove("hidden");
+          mobileList.classList.add("hidden");
+        } else {
+          desktopList.classList.add("hidden");
+          mobileList.classList.remove("hidden");
+        }
+
       } else {
+        console.log('No transactions found or API error:', data); // Debug log
         desktopList.innerHTML = "";
         mobileList.innerHTML = "";
         emptyState.classList.remove("hidden");
@@ -986,44 +958,89 @@ document.addEventListener("DOMContentLoaded", function () {
     })
     .catch((error) => {
       console.error("Error fetching transaction history:", error);
+      
+      const desktopList = document.getElementById("pay-tx-list");
+      const mobileList = document.getElementById("pay-tx-mobile-list");
+      const emptyState = document.getElementById("pay-tx-empty");
+      
+      if (desktopList && mobileList && emptyState) {
+        desktopList.innerHTML = "";
+        mobileList.innerHTML = "";
+        emptyState.classList.remove("hidden");
+        emptyState.innerHTML = `
+          <div class="flex flex-col items-center justify-center py-12 text-red-500">
+            <i class="ri-error-warning-line text-5xl mb-4"></i>
+            <span class="text-lg font-medium">Error loading transactions</span>
+            <span class="text-sm">Please try refreshing the page</span>
+          </div>
+        `;
+      }
     });
+
+  // Handle window resize for responsive display
+  window.addEventListener('resize', function() {
+    const desktopList = document.getElementById("pay-tx-list");
+    const mobileList = document.getElementById("pay-tx-mobile-list");
+    
+    if (desktopList && mobileList) {
+      if (window.innerWidth >= 640) {
+        desktopList.classList.remove("hidden");
+        mobileList.classList.add("hidden");
+      } else {
+        desktopList.classList.add("hidden");
+        mobileList.classList.remove("hidden");
+      }
+    }
+  });
 });
 
 function showTransactionDetails(tx) {
   const modal = document.getElementById("pay-tx-modal");
   const content = document.getElementById("pay-tx-modal-content");
 
+  if (!modal || !content) {
+    console.error('Transaction modal elements not found');
+    return;
+  }
+
   content.innerHTML = `
     <div class="grid grid-cols-2 gap-3 text-sm">
       <div>
-        <p class="text-gray-500">Transaction ID</p>
-        <p  class="break-words truncate max-w-[120px]">${tx.txid}</p>
+        <p class="text-gray-500 font-medium">Transaction ID</p>
+        <p class="break-words font-mono text-xs bg-gray-50 p-2 rounded">${tx.txid}</p>
       </div>
       <div>
-        <p class="text-gray-500">Payment Type</p>
-        <p class="font-medium text-gray-900">${tx.payment_type}</p>
+        <p class="text-gray-500 font-medium">Payment Type</p>
+        <p class="font-medium text-gray-900 capitalize">${tx.payment_type}</p>
       </div>
       <div>
-        <p class="text-gray-500">Amount</p>
-        <p class="font-medium text-gray-900">$${tx.amount}</p>
+        <p class="text-gray-500 font-medium">Amount</p>
+        <p class="font-medium text-gray-900 text-lg">$${tx.amount}</p>
       </div>
       <div>
-        <p class="text-gray-500">Status</p>
+        <p class="text-gray-500 font-medium">Status</p>
         <p class="font-medium text-gray-900 capitalize">${tx.status}</p>
       </div>
       <div class="col-span-2">
-        <p class="text-gray-500">Date</p>
+        <p class="text-gray-500 font-medium">Date</p>
         <p class="font-medium text-gray-900">${tx.created_at}</p>
       </div>
+      ${tx.plan_name ? `
+      <div class="col-span-2">
+        <p class="text-gray-500 font-medium">Plan</p>
+        <p class="font-medium text-gray-900">${tx.plan_name}</p>
+      </div>
+      ` : ''}
     </div>
   `;
 
-  // Store transaction in modal dataset
+  // Store transaction data in modal for download
   modal.dataset.txid = tx.txid;
   modal.dataset.payment_type = tx.payment_type;
   modal.dataset.amount = tx.amount;
   modal.dataset.status = tx.status;
   modal.dataset.created_at = tx.created_at;
+  modal.dataset.plan_name = tx.plan_name || '';
 
   modal.classList.remove("hidden");
 }
@@ -1287,7 +1304,7 @@ Date: ${created_at}
           <div class="mb-1">
           <span class="block text-xs text-gray-500">TRC-20 Wallet Address</span>
           <span class="block font-mono text-xs text-gray-800"
-            id="dual-crypto-wallet">TVTkZq3ghDZgF8txTdDM3s8g76XM2pgiey</span>
+            id="dual-crypto-wallet"><?= htmlspecialchars($wallet['wallet_address']) ?></span>
           </div>
         </div>
         </div>
@@ -1506,9 +1523,9 @@ Date: ${created_at}
           // Set crypto info
           cryptoOrderId.textContent = orderId || "";
           cryptoAmount.textContent = amount || "";
-          cryptoWallet.textContent = wallet || "TVTkZq3ghDZgF8txTdDM3s8g76XM2pgiey";
+          cryptoWallet.textContent = wallet || "<?= htmlspecialchars($wallet['wallet_address']) ?>";
           cryptoQr.src = "https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=" +
-            encodeURIComponent("TRC20 USDT Wallet Address: " + (wallet || "TVTkZq3ghDZgF8txTdDM3s8g76XM2pgiey"));
+            encodeURIComponent("TRC20 USDT Wallet Address: " + (wallet || "<?= htmlspecialchars($wallet['wallet_address']) ?>"));
           // Reset forms
           cryptoForm.reset();
           cardForm.reset();
@@ -2080,24 +2097,25 @@ document.addEventListener('DOMContentLoaded', function () {
     const qrTxidInput = document.getElementById('qr-txid');
     const qrTxidBtn = document.getElementById('qr-txid-btn');
     const qrImg = document.getElementById('qr-img');
-    const qrTxidForm = document.getElementById('qr-txid-form'); // Assumes you have this ID
-    const TRC20_ADDRESS = 'TVTkZq3ghDZgF8txTdDM3s8g76XM2pgiey';
+    const qrTxidForm = document.getElementById('qr-txid-form');
+    const proofUploadForm = document.getElementById('proof-upload-form');
+    const proofFile = document.getElementById('proof-file');
+    const modalLoading = document.getElementById('modal-loading');
+    const paymentCompleteModal = document.getElementById('payment-complete-modal');
+    const TRC20_ADDRESS = '<?= htmlspecialchars($wallet['wallet_address']) ?>';
 
     let isYearly = billingToggle.checked;
     let selectedPlanId = 'pro';
     let plans = [];
 
-    // Fetch plans
     async function fetchPlans() {
         try {
-            const response = await fetch('payment.php');
+            const response = await fetch('api/payment.php');
             const data = await response.json();
-
             if (!data.success) {
                 planContainer.innerHTML = `<p class="text-red-600 text-center">${data.message}</p>`;
                 return false;
             }
-
             plans = data.plans;
             return true;
         } catch (err) {
@@ -2125,9 +2143,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
             const card = document.createElement('div');
             card.id = `${plan.plan_name.toLowerCase()}-plan`;
-            card.className = `plan-card glassmorphism bg-white rounded-lg border p-6 cursor-pointer relative ${
-                plan.is_popular ? 'border-2 border-primary' : 'border-gray-200'
-            } ${isActive ? 'active border-2 border-primary' : ''}`;
+            card.className = `plan-card glassmorphism bg-white rounded-lg border p-6 cursor-pointer relative ${plan.is_popular ? 'border-2 border-primary' : 'border-gray-200'} ${isActive ? 'active border-2 border-primary' : ''}`;
 
             card.innerHTML = `
                 ${plan.is_popular ? '<div class="absolute -top-3 right-4 bg-primary text-white text-xs font-medium px-3 py-1 rounded-full">POPULAR</div>' : ''}
@@ -2142,19 +2158,11 @@ document.addEventListener('DOMContentLoaded', function () {
                     </div>
                 </div>
                 <ul class="space-y-3 mb-8">
-                    ${plan.features.map(f => `
-                        <li class="flex items-start">
-                            <div class="w-5 h-5 flex items-center justify-center text-primary mt-0.5">
-                                <i class="ri-check-line"></i>
-                            </div>
-                            <span class="text-sm text-gray-700 ml-2">${f}</span>
-                        </li>
-                    `).join('')}
+                    ${plan.features.map(f => `<li class="flex items-start"><div class="w-5 h-5 flex items-center justify-center text-primary mt-0.5"><i class="ri-check-line"></i></div><span class="text-sm text-gray-700 ml-2">${f}</span></li>`).join('')}
                 </ul>
                 <button class="w-full py-3 text-sm font-medium ${plan.is_popular ? 'bg-primary text-white hover:bg-primary/90' : 'text-primary border border-primary hover:bg-primary/5'} rounded-button transition-colors plan-get-started" data-plan="${plan.plan_name.toLowerCase()}">
                     ${isEnterprise ? 'Contact sales' : 'Get started'}
-                </button>
-            `;
+                </button>`;
 
             planContainer.appendChild(card);
         });
@@ -2182,8 +2190,8 @@ document.addEventListener('DOMContentLoaded', function () {
         qrSection.classList.add('qr-enabled');
         qrTxidInput.disabled = false;
         qrTxidBtn.disabled = false;
-        qrSelectedPlan.textContent = plan.plan_name;
-        qrAmount.textContent = price;
+        qrSelectedPlan.textContent = plan.plan_name.toLowerCase();
+        qrAmount.textContent = price.replace('$', '');
         qrOrderId.textContent = orderId;
         qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent('TRC20 USDT Wallet Address: ' + TRC20_ADDRESS)}`;
     }
@@ -2193,12 +2201,11 @@ document.addEventListener('DOMContentLoaded', function () {
         qrSection.classList.add('qr-disabled');
         qrTxidInput.disabled = true;
         qrTxidBtn.disabled = true;
-        qrSelectedPlan.textContent = 'None';
-        qrAmount.textContent = '0';
+        qrSelectedPlan.textContent = '';
+        qrAmount.textContent = '';
         qrOrderId.textContent = 'ORD-QR-0';
     }
 
-    // Setup event listeners
     billingToggle.addEventListener('change', () => {
         isYearly = billingToggle.checked;
         renderPlans();
@@ -2213,30 +2220,17 @@ document.addEventListener('DOMContentLoaded', function () {
             window.location.href = 'contact-sales.html';
             return;
         }
-
         selectedPlanId = plan;
         document.querySelectorAll('.plan-card').forEach(card => card.classList.remove('active', 'border-2', 'border-primary'));
         document.getElementById(`${plan}-plan`).classList.add('active', 'border-2', 'border-primary');
-
         updateBillingSummary();
         const orderId = generateOrderId();
         enableQrSection(plan, orderId);
-
         window.showDualPaymentModal({
             orderId,
             amount: getPlanPrice(plan, isYearly).price.replace('$', ''),
             wallet: TRC20_ADDRESS
         });
-
-        try {
-            await fetch('dash-pay.php', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: `selected_plan=${encodeURIComponent(plan)}`
-            });
-        } catch (err) {
-            console.error('Error submitting plan:', err);
-        }
     });
 
     editPlanBtn?.addEventListener('click', () => {
@@ -2244,26 +2238,109 @@ document.addEventListener('DOMContentLoaded', function () {
         section?.scrollIntoView({ behavior: 'smooth' });
     });
 
-    qrTxidForm?.addEventListener('submit', e => {
+    // Fixed proof upload form submission handler
+if (proofUploadForm) {
+    proofUploadForm.addEventListener("submit", async function (e) {
         e.preventDefault();
-        const txid = qrTxidInput.value.trim();
-        const valid = /^([0-9a-fA-F]{64}|0x[0-9a-fA-F]{64})$/.test(txid);
-        if (!valid) {
-            qrTxidInput.classList.add('border-red-500', 'ring-2', 'ring-red-500/20');
+        
+        // Check both possible TXID input sources
+        const qrTxidInput = document.getElementById('qr-txid');
+        const dualCryptoTxidInput = document.getElementById('dual-crypto-txid');
+        
+        let txid = '';
+        
+        // Get TXID from whichever input is being used
+        if (qrTxidInput && qrTxidInput.value.trim()) {
+            txid = qrTxidInput.value.trim();
+        } else if (dualCryptoTxidInput && dualCryptoTxidInput.value.trim()) {
+            txid = dualCryptoTxidInput.value.trim();
+        }
+        
+        const file = proofFile.files[0];
+        const amount = qrAmount.textContent.trim();
+        const plan = qrSelectedPlan.textContent.trim();
+
+        // Debug logging
+        console.log("Form submission debug:");
+        console.log("TXID from QR:", qrTxidInput ? qrTxidInput.value.trim() : "N/A");
+        console.log("TXID from Dual:", dualCryptoTxidInput ? dualCryptoTxidInput.value.trim() : "N/A");
+        console.log("Final TXID:", txid);
+        console.log("File:", file ? file.name : "No file selected");
+        console.log("Amount:", amount);
+        console.log("Plan:", plan);
+
+        // Validation with better error handling
+        if (!txid) {
+            alert("Please enter your Transaction ID (TXID) in the payment form");
+            // Focus on the appropriate input
+            if (qrTxidInput && !qrTxidInput.disabled) {
+                qrTxidInput.focus();
+            } else if (dualCryptoTxidInput && !dualCryptoTxidInput.disabled) {
+                dualCryptoTxidInput.focus();
+            }
             return;
         }
 
-        qrTxidForm.classList.add('pointer-events-none', 'opacity-60');
-        document.getElementById('qr-txid-success')?.classList.remove('hidden');
-        setTimeout(() => {
-            qrTxidForm.reset();
-            qrTxidForm.classList.remove('pointer-events-none', 'opacity-60');
-            document.getElementById('qr-txid-success')?.classList.add('hidden');
-            disableQrSection();
-        }, 2500);
-    });
+        if (!file) {
+            alert("Please select a screenshot file");
+            proofFile.focus();
+            return;
+        }
 
-    // Init sequence
+        if (!amount || amount === "0" || amount === "") {
+            alert("Invalid amount. Please select a plan first.");
+            return;
+        }
+
+        if (!plan || plan === "" || plan === "None") {
+            alert("Please select a plan first to enable payment processing.");
+            return;
+        }
+
+        // Validate TXID format (TRON TXID is typically 64 hex characters)
+        const txidPattern = /^([0-9a-fA-F]{64}|0x[0-9a-fA-F]{64})$/;
+        if (!txidPattern.test(txid)) {
+            alert("Invalid TXID format. TRON TXID should be 64 hexadecimal characters.");
+            // Focus on the appropriate input
+            if (qrTxidInput && qrTxidInput.value.trim()) {
+                qrTxidInput.focus();
+            } else if (dualCryptoTxidInput && dualCryptoTxidInput.value.trim()) {
+                dualCryptoTxidInput.focus();
+            }
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append("txid", txid);
+        formData.append("screenshot", file);
+        formData.append("amount", amount);
+        formData.append("plan_name", plan);
+
+        modalLoading.style.display = "flex";
+        try {
+            const response = await fetch("api/submit_payment.php", {
+                method: "POST",
+                body: formData,
+            });
+            const result = await response.json();
+            modalLoading.style.display = "none";
+            
+            if (result.success) {
+                paymentCompleteModal.style.display = "flex";
+                // Reset both forms
+                if (qrTxidInput) qrTxidInput.value = "";
+                if (dualCryptoTxidInput) dualCryptoTxidInput.value = "";
+                proofFile.value = "";
+            } else {
+                alert("Server error: " + (result.message || "Unknown error occurred"));
+            }
+        } catch (err) {
+            modalLoading.style.display = "none";
+            console.error("Network error:", err);
+            alert("Network error: " + err.message);
+        }
+    });
+}
     (async () => {
         const loaded = await fetchPlans();
         if (!loaded) return;

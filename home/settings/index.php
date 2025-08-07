@@ -324,7 +324,15 @@ display: block;
           <span class="sidebar-text">E-commerce</span>
         </a>
       </li>
-      <li class="mb-2">
+ 
+
+       <li class="mb-2">
+                <a href="../payment/" class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-r-lg hover:text-primary transition-colors">
+                  <div class="w-6 h-6 flex items-center justify-center mr-3"> <i class="ri-bank-card-line"></i></div>
+                  <span class="sidebar-text">Payment</span>
+                </a>
+              </li>
+                   <li class="mb-2">
               <a href="../transaction_his/"
                 class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-r-lg hover:text-primary transition-colors">
                 <div class="w-6 h-6 flex items-center justify-center mr-3">
@@ -332,13 +340,6 @@ display: block;
                 </div>
                 <span class="sidebar-text">Transaction History</span>
               </a>
-              </li>
-
-       <li class="mb-2">
-                <a href="../payment/" class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-r-lg hover:text-primary transition-colors">
-                  <div class="w-6 h-6 flex items-center justify-center mr-3"> <i class="ri-bank-card-line"></i></div>
-                  <span class="sidebar-text">Payment</span>
-                </a>
               </li>
       <li class="mb-2">
         <a href="#" class="flex items-center px-4 py-3 text-primary bg-blue-50 rounded-r-lg border-l-4 border-primary">

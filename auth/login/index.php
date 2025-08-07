@@ -86,7 +86,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $stmt->execute([$user['id'], $session_id, $ip_address, $user_agent, $city, $country]);
             }
 
-            header('Location:' . BASE_URL . 'home/index.php?status=login_success');
+            header('Location:' . BASE_URL . 'home/');
             exit;
         } else {
             // Wrong password - increment failed_attempts
