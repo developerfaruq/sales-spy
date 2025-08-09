@@ -12,7 +12,7 @@ define ("BASE_URL", "http://localhost/sales-spy/");
 try{
   $pdo = new PDO("mysql:host=$servername;dbname=$dbname",$username,$password);
   $pdo->setAttribute(PDO::ATTR_ERRMODE, Pdo::ERRMODE_EXCEPTION);
-  $pdo->exec("SET time_zone = '+00:00'");
+  
 }catch(PDOException $e){
   echo "connection failed: ".$e->getMessage();
 }

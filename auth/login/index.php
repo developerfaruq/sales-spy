@@ -1,5 +1,9 @@
 <?php
 require '../../config/db.php';
+require '../../vendor/autoload.php';
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+
 session_start();
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -85,6 +89,47 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $stmt = $pdo->prepare("INSERT INTO user_sessions (user_id, session_id, ip_address, user_agent, city, country) VALUES (?, ?, ?, ?, ?, ?)");
                 $stmt->execute([$user['id'], $session_id, $ip_address, $user_agent, $city, $country]);
             }
+
+            // Send login notification email
+
+$mail = new PHPMailer(true);
+
+try {
+    $login_time = $now->format('Y-m-d H:i:s');
+    $subject = "New Login to Your Sales-Spy Account";
+
+    $body = "
+        <h2>Hello {$user['full_name']},</h2>
+        <p>We noticed a new login to your account:</p>
+        <ul>
+            <li><strong>Time (UTC):</strong> {$login_time}</li>
+            <li><strong>IP Address:</strong> {$ip_address}</li>
+            <li><strong>Location:</strong> {$city}, {$country}</li>
+            <li><strong>Device:</strong> {$user_agent}</li>
+        </ul>
+        <p>If this was you, you can ignore this message. If not, please change your password immediately.</p>
+        <p>— Sales-Spy Security Team</p>
+    ";
+
+    $mail->isSMTP();
+    $mail->Host       = 'smtp.yourhost.com'; // Your SMTP host
+    $mail->SMTPAuth   = true;
+    $mail->Username   = 'your@email.com';
+    $mail->Password   = 'your_password';
+    $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+    $mail->Port       = 587;
+
+    $mail->setFrom('no-reply@sales-spy.com', 'Sales-Spy Security');
+    $mail->addAddress($user['email'], $user['full_name']);
+    $mail->isHTML(true);
+    $mail->Subject = $subject;
+    $mail->Body    = $body;
+
+    $mail->send();
+} catch (Exception $e) {
+    error_log("Login email could not be sent. Mailer Error: {$mail->ErrorInfo}");
+}
+
 
             header('Location:' . BASE_URL . 'home/');
             exit;

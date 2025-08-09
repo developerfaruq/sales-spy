@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3306
--- Generation Time: Aug 07, 2025 at 11:09 PM
+-- Generation Time: Aug 09, 2025 at 12:02 PM
 -- Server version: 5.7.26
 -- PHP Version: 7.2.18
 
@@ -145,39 +145,6 @@ CREATE TABLE IF NOT EXISTS `leads` (
   KEY `user_id` (`user_id`),
   KEY `store_id` (`store_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `login_history`
---
-
-DROP TABLE IF EXISTS `login_history`;
-CREATE TABLE IF NOT EXISTS `login_history` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `user_id` int(11) DEFAULT NULL,
-  `email` varchar(255) DEFAULT NULL,
-  `status` enum('success','failed','locked','disabled') NOT NULL,
-  `ip_address` varchar(45) DEFAULT NULL,
-  `country` varchar(100) DEFAULT NULL,
-  `region` varchar(100) DEFAULT NULL,
-  `city` varchar(100) DEFAULT NULL,
-  `latitude` varchar(50) DEFAULT NULL,
-  `longitude` varchar(50) DEFAULT NULL,
-  `browser` varchar(100) DEFAULT NULL,
-  `platform` varchar(100) DEFAULT NULL,
-  `device` varchar(100) DEFAULT NULL,
-  `timestamp` datetime DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
-  KEY `user_id` (`user_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4;
-
---
--- Dumping data for table `login_history`
---
-
-INSERT INTO `login_history` (`id`, `user_id`, `email`, `status`, `ip_address`, `country`, `region`, `city`, `latitude`, `longitude`, `browser`, `platform`, `device`, `timestamp`) VALUES
-(1, 25, NULL, 'success', '::1', '', '', '', '', '', 'Chrome', 'Windows', 'Desktop', '2025-07-31 00:05:20');
 
 -- --------------------------------------------------------
 
@@ -447,7 +414,7 @@ CREATE TABLE IF NOT EXISTS `users` (
 
 INSERT INTO `users` (`id`, `full_name`, `email`, `phone`, `password`, `role`, `created_at`, `reset_token`, `reset_token_expiry`, `failed_attempts`, `last_failed_attempt`, `avatar_url`, `credits`, `profile_picture`, `twofa_secret`, `twofa_enabled`, `twofa_backup_codes`, `ip_address`, `city`, `is_disabled`, `account_status`, `unlock_time`) VALUES
 (22, 'faru', 'emm@gmail.com', '08116533387', '$2y$10$Ya39CvXgc9jOxEOpi1u93O/.sgMGN5Wpq7N3Uljm7B4lnp2ucvjWO', 'user', '2025-07-23 13:11:19', NULL, NULL, 0, NULL, NULL, 1250, NULL, NULL, 0, NULL, '::1', NULL, 0, 'active', NULL),
-(25, 'faruq', 'ada@gmail.com', '08116533380', '$2y$10$A3lH0LMXTQ7NQ45oR6L/rO9E.okbHnZAqW8QxKWjKMsiKGmdUGKl2', 'user', '2025-07-23 16:09:49', NULL, NULL, 0, NULL, NULL, 1250, 'uploads/profile_pictures/profile_25_1754608123.jpg', NULL, 0, NULL, '::1', NULL, 0, 'active', NULL);
+(25, 'faruq', 'ada@gmail.com', '08116533380', '$2y$10$A3lH0LMXTQ7NQ45oR6L/rO9E.okbHnZAqW8QxKWjKMsiKGmdUGKl2', 'user', '2025-07-23 16:09:49', '75356a52c6b5c39825c32a31390ce3d220d6a4cdbfc75d3ecfceef41280368a0', '2025-08-09 12:02:16', 0, NULL, NULL, 1250, 'uploads/profile_pictures/profile_25_1754608123.jpg', NULL, 0, NULL, '::1', NULL, 0, 'active', NULL);
 
 -- --------------------------------------------------------
 
@@ -484,7 +451,7 @@ CREATE TABLE IF NOT EXISTS `user_sessions` (
   `city` varchar(100) DEFAULT NULL,
   `country` varchar(100) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=34 DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB AUTO_INCREMENT=35 DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data for table `user_sessions`
@@ -492,7 +459,7 @@ CREATE TABLE IF NOT EXISTS `user_sessions` (
 
 INSERT INTO `user_sessions` (`id`, `user_id`, `session_id`, `user_agent`, `ip_address`, `last_active`, `created_at`, `city`, `country`) VALUES
 (32, 25, '5u4jej2f7ffivdg9tui6373j5l', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36', '::1', '2025-08-04 23:35:12', '2025-08-04 22:24:33', 'Unknown', 'Unknown'),
-(33, 25, 'ksu7132hdbgni837a6nvds2vjg', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36', '::1', '2025-08-07 23:08:46', '2025-08-07 20:29:29', 'Unknown', 'Unknown');
+(34, 25, '761f8o8otlkpknldhnl4eldjl2', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36', '::1', '2025-08-09 13:00:13', '2025-08-09 13:00:12', 'Unknown', 'Unknown');
 
 -- --------------------------------------------------------
 
@@ -556,12 +523,6 @@ ALTER TABLE `exports`
 ALTER TABLE `leads`
   ADD CONSTRAINT `leads_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`),
   ADD CONSTRAINT `leads_ibfk_2` FOREIGN KEY (`store_id`) REFERENCES `stores` (`id`);
-
---
--- Constraints for table `login_history`
---
-ALTER TABLE `login_history`
-  ADD CONSTRAINT `login_history_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL;
 
 --
 -- Constraints for table `search_logs`

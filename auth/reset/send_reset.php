@@ -34,8 +34,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $mail->Host = 'smtp.ethereal.email';
             $mail->SMTPAuth = true;
 
-            $mail->Username = 'dorcas.thiel@ethereal.email'; // Replace with your Mailtrap username
-            $mail->Password = 'Ff733PqPp1PUSDvDup'; // Replace with your Mailtrap password
+            $mail->Username = 'brendon72@ethereal.email'; // Replace with your Mailtrap username
+            $mail->Password = 'zf9MGMUxmef9ssgvem'; // Replace with your Mailtrap password
 
             $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
             $mail->Port = 587;
