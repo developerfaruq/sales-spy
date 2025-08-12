@@ -309,7 +309,7 @@ display: block;
                             </a>
                         </li>
                         <li class="mb-2">
-                            <a href="#" class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-r-lg hover:text-primary transition-colors">
+                            <a href="../website/" class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-r-lg hover:text-primary transition-colors">
                                 <div class="w-6 h-6 flex items-center justify-center mr-3">
                                     <i class="ri-global-line"></i>
                                 </div>
@@ -325,13 +325,7 @@ display: block;
                             </a>
                         </li>
                         <li class="mb-2">
-              <a href="transaction_his/"
-                class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-r-lg hover:text-primary transition-colors">
-                <div class="w-6 h-6 flex items-center justify-center mr-3">
-                <i class="ri-file-list-3-line"></i>
-                </div>
-                <span class="sidebar-text">Transaction History</span>
-              </a>
+              
               </li>
 
                          <li class="mb-2">
@@ -372,7 +366,7 @@ display: block;
                             <div class="bg-primary rounded-full h-2" style="width: <?= $stats['credits_percentage'] ?>%"></div>
                         </div>
                     </div>
-                    <a href="Dashboard-pay.html">
+                    <a href="payment/">
                     <button id="upgrade-btn-expanded" class="w-full bg-primary text-white py-2 px-4 rounded-button flex items-center justify-center whitespace-nowrap hover:bg-blue-600 transition-colors">
                         <div class="w-5 h-5 flex items-center justify-center mr-2">
                             <i class="ri-arrow-up-line"></i>
@@ -380,7 +374,7 @@ display: block;
                         <span>Upgrade Plan</span>
                     </button>
                     </a>
-                    <a href="Dashboard-pay.html">
+                    <a href="#">
                     <button id="upgrade-btn-collapsed" class="hidden bg-primary text-white w-10 h-10 rounded-full flex items-center justify-center mx-auto mt-2 hover:bg-blue-600 transition-colors" title="Upgrade">
                         <i class="ri-arrow-up-line"></i>
                     </button>
@@ -461,7 +455,7 @@ display: block;
                             </div>
                             <span class="text-sm font-medium"><?= number_format($stats['credits_remaining']) ?> credits</span>
                         </div>
-                        <a href="Dashboard-pay.html">
+                        <a href="payment/">
                         <button class="bg-primary text-white py-2 px-4 rounded-button whitespace-nowrap hover:bg-blue-600 transition-colors">
                             <span>Upgrade</span>
                         </button>

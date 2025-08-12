@@ -309,7 +309,7 @@ display: block;
         </a>
       </li>
       <li class="mb-2">
-        <a href="#" class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-r-lg hover:text-primary transition-colors">
+        <a href="../../website/" class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-r-lg hover:text-primary transition-colors">
           <div class="w-6 h-6 flex items-center justify-center mr-3 sidebar-icon">
             <i class="ri-global-line"></i>
           </div>
@@ -505,7 +505,7 @@ document.addEventListener('DOMContentLoaded', function() {
           </div>
           <span class="text-sm font-medium">1,000 credits</span>
         </div>
-        <a href="Dashboard-pay.html">
+        <a href="../payment/">
           <button class="bg-primary text-white py-2 px-4 rounded-button whitespace-nowrap hover:bg-blue-600 transition-colors">
             <span>Upgrade</span>
           </button>

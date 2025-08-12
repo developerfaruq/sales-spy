@@ -469,7 +469,7 @@ $transactions = $stmt->fetchAll(PDO::FETCH_ASSOC);*/
               </a>
               </li>
               <li class="mb-2">
-              <a href="#"
+              <a href="../../website/"
                 class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-r-lg hover:text-primary transition-colors">
                 <div class="w-6 h-6 flex items-center justify-center mr-3">
                 <i class="ri-global-line"></i>
@@ -533,7 +533,7 @@ $transactions = $stmt->fetchAll(PDO::FETCH_ASSOC);*/
                 ></div>
               </div>
             </div>
-            <a href="dash-pay.php">
+            <a href="../payment/">
               <button
                 id="upgrade-btn-expanded"
                 class="w-full bg-primary text-white py-2 px-4 rounded-button flex items-center justify-center whitespace-nowrap hover:bg-blue-600 transition-colors"
@@ -544,7 +544,7 @@ $transactions = $stmt->fetchAll(PDO::FETCH_ASSOC);*/
                 <span>Upgrade Plan</span>
               </button>
             </a>
-            <a href="Dashboard-pay.html">
+            <a href="../payment/">
               <button
                 id="upgrade-btn-collapsed"
                 class="hidden bg-primary text-white w-10 h-10 rounded-full flex items-center justify-center mx-auto mt-2 hover:bg-blue-600 transition-colors"
@@ -632,7 +632,7 @@ $transactions = $stmt->fetchAll(PDO::FETCH_ASSOC);*/
                 </div>
                 <span class="text-sm font-medium"><?= number_format($stats['credits_remaining']) ?> credits</span>
               </div>
-              <a href="Dashboard-pay.html">
+              <a href="../payment/">
                 <button
                   class="bg-primary text-white py-2 px-4 rounded-button whitespace-nowrap hover:bg-blue-600 transition-colors">
                   <span>Upgrade</span>
@@ -1137,7 +1137,7 @@ Date: ${created_at}
               </div>
               </section>
               <!-- QR Code Payment Support -->
-              <section>
+              <section style="display: none;">
               <h2 class="text-lg font-semibold text-gray-800 mb-4">
                 Quick Connect
               </h2>

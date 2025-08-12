@@ -218,7 +218,7 @@ $stats = [
               </a>
             </li>
             <li class="mb-2">
-              <a href="#"
+              <a href="../../website/"
                 class="   flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-r-lg hover:text-primary transition-colors">
                 <div class="w-6 h-6 flex items-center justify-center mr-3">
                   <i class="ri-global-line"></i>
@@ -277,7 +277,7 @@ $stats = [
               <div class="bg-primary rounded-full h-2" style="width: <?= $stats['credits_percentage'] ?>%"></div>
             </div>
           </div>
-          <a href="Dashboard-pay.html">
+          <a href="../payment/">
             <button id="upgrade-btn-expanded"
               class="w-full bg-primary text-white py-2 px-4 rounded-button flex items-center justify-center whitespace-nowrap hover:bg-blue-600 transition-colors">
               <div class="w-5 h-5 flex items-center justify-center mr-2">
@@ -386,7 +386,7 @@ $stats = [
               </div>
               <span class="text-sm font-medium"><?= number_format($stats['credits_remaining']) ?> credits</span>
             </div>
-            <a href="Dashboard-pay.html">
+            <a href="../payment/">
               <button
                 class="bg-primary text-white py-2 px-4 rounded-button whitespace-nowrap hover:bg-blue-600 transition-colors">
                 <span>Upgrade</span>
