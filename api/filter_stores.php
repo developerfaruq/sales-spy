@@ -104,6 +104,15 @@ try {
     $stmt->execute();
     $stores = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+    // Mapping backend keys to frontend keys
+    foreach ($stores as &$store) {
+        $store['facebook'] = $store['facebook_url'] ?? '';
+        $store['twitter'] = $store['twitter_url'] ?? '';
+        $store['instagram'] = $store['instagram_url'] ?? '';
+        $store['linkedin'] = $store['linkedin_url'] ?? '';
+        $store['pinterest'] = $store['pinterest_url'] ?? '';
+    }
+
     // Get total count for pagination
     $countSql = "SELECT COUNT(*) FROM stores WHERE 1=1";
     $countParams = [];
@@ -158,12 +167,9 @@ try {
 
     echo json_encode([
         'stores' => $stores,
-        'pagination' => [
-            'total_results' => $totalStores,
-            'total_pages' => $totalPages,
-            'page' => $page,
-            'limit' => $limit
-        ]
+        'total_count' => $totalStores,
+        'page' => $page,
+        'limit' => $limit
     ]);
 
 } catch (PDOException $e) {
@@ -172,8 +178,4 @@ try {
     echo json_encode(['error' => 'An error occurred while fetching data.']);
 }
 
-function is_logged_in() {
-    // This is a placeholder. Implement actual session-based authentication.
-    // For development, we'll assume true. In production, check $_SESSION['user_id'] etc.
-    return true; // For now, always true for development/testing
-} 
+// is_logged_in() function is already defined in auth_check.php
