@@ -1,17 +1,24 @@
-<?php
+<?php 
 declare(strict_types=1);
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
-Dotenv\Dotenv::createImmutable(dirname(__DIR__))->safeLoad();
+use Dotenv\Dotenv; // ✅ Import the class
+
+// Load .env variables
+$dotenv = Dotenv::createImmutable(dirname(__DIR__));
+$dotenv->load();
+
+
 
 header('Content-Type: application/json');
 
 // Load Shopify credentials from environment
-$api_key = getenv('SHOPIFY_API_KEY') ?: '';
-$api_secret = getenv('SHOPIFY_API_SECRET') ?: '';
-$access_token = getenv('SHOPIFY_ACCESS_TOKEN') ?: '';
-$store_domain = getenv('SHOPIFY_STORE_DOMAIN') ?: '';
+$api_key = $_ENV['SHOPIFY_API_KEY'] ?? '';
+$api_secret = $_ENV['SHOPIFY_API_SECRET'] ?? '';
+$access_token = $_ENV['SHOPIFY_ACCESS_TOKEN'] ?? '';
+$store_domain = $_ENV['SHOPIFY_STORE_DOMAIN'] ?? '';
+
 
 // Validate credentials
 if ($api_key === '' || $api_secret === '' || $access_token === '' || $store_domain === '') {
@@ -31,6 +38,7 @@ curl_setopt_array($ch, [
         'Content-Type: application/json',
         'Accept: application/json',
     ],
+ 
 ]);
 
 // Execute request

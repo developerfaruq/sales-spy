@@ -391,7 +391,7 @@ $activeSubscriptions = $pdo->query("SELECT COUNT(*) FROM subscriptions WHERE sta
         <nav class="flex-1 p-4 overflow-y-auto">
           <ul class="space-y-1">
             <li>
-              <a href="AdminUsers.html"
+              <a href="#"
                 class="nav-link w-full flex items-center px-3 py-2 text-sm font-medium rounded-md text-primary bg-blue-50">
                 <div class="w-5 h-5 flex items-center justify-center mr-3">
                   <i class="ri-user-line"></i>
@@ -400,7 +400,7 @@ $activeSubscriptions = $pdo->query("SELECT COUNT(*) FROM subscriptions WHERE sta
               </a>
             </li>
             <li>
-              <a href="AdminSubscriptions.html"
+              <a href="subscription/"
                 class="nav-link w-full flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-600 hover:text-primary hover:bg-blue-50">
                 <div class="w-5 h-5 flex items-center justify-center mr-3">
                   <i class="ri-vip-crown-line"></i>
@@ -409,7 +409,7 @@ $activeSubscriptions = $pdo->query("SELECT COUNT(*) FROM subscriptions WHERE sta
               </a>
             </li>
             <li>
-              <a href="AdminWallets.html"
+              <a href="wallets/"
                 class="nav-link w-full flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-600 hover:text-primary hover:bg-blue-50">
                 <div class="w-5 h-5 flex items-center justify-center mr-3">
                   <i class="ri-wallet-3-line"></i>
@@ -418,7 +418,7 @@ $activeSubscriptions = $pdo->query("SELECT COUNT(*) FROM subscriptions WHERE sta
               </a>
             </li>
             <li>
-              <a href="AdminPayments.html"
+              <a href="payment/"
                 class="nav-link w-full flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-600 hover:text-primary hover:bg-blue-50">
                 <div class="w-5 h-5 flex items-center justify-center mr-3">
                   <i class="ri-exchange-dollar-line"></i>
@@ -427,7 +427,7 @@ $activeSubscriptions = $pdo->query("SELECT COUNT(*) FROM subscriptions WHERE sta
               </a>
             </li>
             <li>
-              <a href="AdminPending.html"
+              <a href="pend_payment/"
                 class="nav-link w-full flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-600 hover:text-primary hover:bg-blue-50">
                 <div class="w-5 h-5 flex items-center justify-center mr-3">
                   <i class="ri-time-line"></i>
@@ -436,7 +436,7 @@ $activeSubscriptions = $pdo->query("SELECT COUNT(*) FROM subscriptions WHERE sta
               </a>
             </li>
             <li>
-              <a href="AdminSettings.html"
+              <a href="settings/"
                 class="nav-link w-full flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-600 hover:text-primary hover:bg-blue-50">
                 <div class="w-5 h-5 flex items-center justify-center mr-3">
                   <i class="ri-settings-3-line"></i>
