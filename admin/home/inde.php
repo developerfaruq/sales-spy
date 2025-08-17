@@ -1,28 +1,3 @@
-<?php
-require '../auth/auth_check.php';
-
-
-if (isset($_SESSION['admin_id'])) {
-    $stmt = $pdo->prepare("SELECT name FROM admins WHERE id = ?");
-    $stmt->execute([$_SESSION['admin_id']]);
-    $admin = $stmt->fetch();
-    
-    if ($admin) {
-        $adminName = htmlspecialchars($admin['name']);
-    }
-}
-
-
-$avatarUrl = "https://ui-avatars.com/api/?name=" . 
-                 urlencode( $adminName ) . 
-                 "&background=1E3A8A&color=fff&length=1&size=128";
-
-// Get counts from DB
-$totalUsers = $pdo->query("SELECT COUNT(*) FROM users")->fetchColumn();
-$pendingTXIDs = $pdo->query("SELECT COUNT(*) FROM txid_requests WHERE status = 'pending'")->fetchColumn();
-$activeSubscriptions = $pdo->query("SELECT COUNT(*) FROM subscriptions WHERE status = 'active'")->fetchColumn();                 
-?>
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -319,7 +294,7 @@ $activeSubscriptions = $pdo->query("SELECT COUNT(*) FROM subscriptions WHERE sta
               <div class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center">
                 <span class="text-sm font-medium">JD</span>
               </div>
-              <span class="ml-2 text-sm font-medium hidden md:block"><?= $adminName ?></span>
+              <span class="ml-2 text-sm font-medium hidden md:block">John Doe</span>
               <i class="ri-arrow-down-s-line ml-1 text-gray-500"></i>
             </button>
           </div>
@@ -383,7 +358,7 @@ $activeSubscriptions = $pdo->query("SELECT COUNT(*) FROM subscriptions WHERE sta
               <span class="text-sm font-medium">JD</span>
             </div>
             <div class="ml-3">
-              <p class="text-sm font-medium"><?= $adminName ?></p>
+              <p class="text-sm font-medium">John Doe</p>
               <p class="text-xs text-gray-500">Super Admin</p>
             </div>
           </div>
@@ -391,7 +366,7 @@ $activeSubscriptions = $pdo->query("SELECT COUNT(*) FROM subscriptions WHERE sta
         <nav class="flex-1 p-4 overflow-y-auto">
           <ul class="space-y-1">
             <li>
-              <a href="#"
+              <a href="AdminUsers.html"
                 class="nav-link w-full flex items-center px-3 py-2 text-sm font-medium rounded-md text-primary bg-blue-50">
                 <div class="w-5 h-5 flex items-center justify-center mr-3">
                   <i class="ri-user-line"></i>
@@ -400,7 +375,7 @@ $activeSubscriptions = $pdo->query("SELECT COUNT(*) FROM subscriptions WHERE sta
               </a>
             </li>
             <li>
-              <a href="subscription/"
+              <a href="AdminSubscriptions.html"
                 class="nav-link w-full flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-600 hover:text-primary hover:bg-blue-50">
                 <div class="w-5 h-5 flex items-center justify-center mr-3">
                   <i class="ri-vip-crown-line"></i>
@@ -409,7 +384,7 @@ $activeSubscriptions = $pdo->query("SELECT COUNT(*) FROM subscriptions WHERE sta
               </a>
             </li>
             <li>
-              <a href="wallets/"
+              <a href="AdminWallets.html"
                 class="nav-link w-full flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-600 hover:text-primary hover:bg-blue-50">
                 <div class="w-5 h-5 flex items-center justify-center mr-3">
                   <i class="ri-wallet-3-line"></i>
@@ -418,7 +393,7 @@ $activeSubscriptions = $pdo->query("SELECT COUNT(*) FROM subscriptions WHERE sta
               </a>
             </li>
             <li>
-              <a href="payment/"
+              <a href="AdminPayments.html"
                 class="nav-link w-full flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-600 hover:text-primary hover:bg-blue-50">
                 <div class="w-5 h-5 flex items-center justify-center mr-3">
                   <i class="ri-exchange-dollar-line"></i>
@@ -427,7 +402,7 @@ $activeSubscriptions = $pdo->query("SELECT COUNT(*) FROM subscriptions WHERE sta
               </a>
             </li>
             <li>
-              <a href="pend_payment/"
+              <a href="AdminPending.html"
                 class="nav-link w-full flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-600 hover:text-primary hover:bg-blue-50">
                 <div class="w-5 h-5 flex items-center justify-center mr-3">
                   <i class="ri-time-line"></i>
@@ -436,7 +411,7 @@ $activeSubscriptions = $pdo->query("SELECT COUNT(*) FROM subscriptions WHERE sta
               </a>
             </li>
             <li>
-              <a href="settings/"
+              <a href="AdminSettings.html"
                 class="nav-link w-full flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-600 hover:text-primary hover:bg-blue-50">
                 <div class="w-5 h-5 flex items-center justify-center mr-3">
                   <i class="ri-settings-3-line"></i>
@@ -509,8 +484,8 @@ $activeSubscriptions = $pdo->query("SELECT COUNT(*) FROM subscriptions WHERE sta
                                     <div class="custom-select-option" data-value="all">
                                         All Plans
                                     </div>
-                                    <div class="custom-select-option" data-value="free">
-                                        Free
+                                    <div class="custom-select-option" data-value="basic">
+                                        Basic
                                     </div>
                                     <div class="custom-select-option" data-value="pro">Pro</div>
                                     <div class="custom-select-option" data-value="enterprise">
@@ -537,7 +512,7 @@ $activeSubscriptions = $pdo->query("SELECT COUNT(*) FROM subscriptions WHERE sta
                             </div>
                             <button
                                 class="px-4 py-2 bg-primary text-white rounded-button whitespace-nowrap flex items-center"
-                                id="export-users-btn" style="color: white; background-color:#3366ff; border-radius: 8px;">
+                                id="export-users-btn">
                                 <i class="ri-download-2-line mr-2"></i>
                                 Export
                             </button>
@@ -567,10 +542,10 @@ $activeSubscriptions = $pdo->query("SELECT COUNT(*) FROM subscriptions WHERE sta
                                         class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                         Plan
                                     </th>
-                                   <!-- <th
+                                    <th
                                         class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                         Wallet
-                                    </th>-->
+                                    </th>
                                     <th
                                         class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                         Joined
@@ -923,709 +898,505 @@ $activeSubscriptions = $pdo->query("SELECT COUNT(*) FROM subscriptions WHERE sta
       </div>
     </div>
         <script>
-            // Replace the existing script section in index.php with this updated version
-(function () {
-    // State
-    let users = [];
-    let filteredUsers = [];
-    let currentPage = 1;
-    let pageSize = 10;
-    let planFilter = "all";
-    let statusFilter = "all";
-    let searchQuery = "";
-    let totalUsers = 0;
-    let totalPages = 1;
-    let loading = false;
+                (function () {
+                    // Mock user data
+                    const mockUsers = [];
+                    const plans = [
+                        { name: "Basic", color: "bg-gray-100 text-gray-600" },
+                        { name: "Pro", color: "bg-blue-50 text-primary" },
+                        { name: "Enterprise", color: "bg-purple-50 text-purple-600" },
+                    ];
+                    const statuses = [
+                        { name: "Active", color: "bg-green-50 text-green-600" },
+                        { name: "Suspended", color: "bg-yellow-50 text-yellow-600" },
+                    ];
+                    const walletStates = [
+                        { name: "Connected", color: "text-green-600 bg-green-50" },
+                        { name: "Not Connected", color: "text-gray-600 bg-gray-100" },
+                    ];
+                    const names = [
+                        "Emma Brown",
+                        "Robert Johnson",
+                        "Sarah Wilson",
+                        "David Miller",
+                        "Jessica Thompson",
+                        "Michael Lee",
+                        "Sophia Davis",
+                        "James Smith",
+                        "Olivia Garcia",
+                        "William Martinez",
+                        "Ava Rodriguez",
+                        "Benjamin Anderson",
+                        "Mia Hernandez",
+                        "Lucas Clark",
+                        "Charlotte Lewis",
+                        "Henry Walker",
+                        "Amelia Hall",
+                        "Jack Allen",
+                        "Emily Young",
+                        "Alexander King",
+                        "Ella Wright",
+                        "Daniel Scott",
+                        "Grace Green",
+                        "Matthew Adams",
+                        "Chloe Baker",
+                        "Sebastian Nelson",
+                        "Harper Carter",
+                        "Jackson Mitchell",
+                        "Lily Perez",
+                        "Logan Roberts",
+                        "Zoe Turner",
+                        "Mason Phillips",
+                        "Layla Campbell",
+                        "Elijah Parker",
+                        "Scarlett Evans",
+                        "Aiden Edwards",
+                        "Penelope Collins",
+                        "Carter Stewart",
+                        "Riley Sanchez",
+                        "Wyatt Morris",
+                        "Victoria Rogers",
+                        "Julian Reed",
+                        "Hannah Cook",
+                        "Levi Morgan",
+                        "Aria Bell",
+                        "Gabriel Murphy",
+                        "Nora Bailey",
+                        "Lincoln Rivera",
+                        "Sofia Cooper",
+                        "Samuel Richardson",
+                    ];
+                    for (let i = 0; i < 50; i++) {
+                        const planIdx = Math.floor(Math.random() * plans.length);
+                        const statusIdx = Math.random() < 0.8 ? 0 : 1; // 80% active, 20% suspended
+                        const walletIdx = Math.random() < 0.8 ? 0 : 1; // 80% connected
+                        const joined = new Date(
+                            2025,
+                            Math.floor(Math.random() * 6),
+                            1 + Math.floor(Math.random() * 28)
+                        );
+                        const initials = names[i]
+                            .split(" ")
+                            .map((n) => n[0])
+                            .join("");
+                        mockUsers.push({
+                            id: i + 1,
+                            name: names[i],
+                            email: names[i].toLowerCase().replace(/ /g, ".") + "@example.com",
+                            plan: plans[planIdx].name,
+                            planColor: plans[planIdx].color,
+                            wallet: walletStates[walletIdx].name,
+                            walletColor: walletStates[walletIdx].color,
+                            joined: joined.toLocaleDateString("en-US", {
+                                month: "short",
+                                day: "2-digit",
+                                year: "numeric",
+                            }),
+                            status: statuses[statusIdx].name,
+                            statusColor: statuses[statusIdx].color,
+                            initials: initials,
+                        });
+                    }
 
-    // DOM Elements
-    const tbody = document.getElementById("users-table-body");
-    const pageSizeSelect = document.getElementById("page-size-select");
-    const planFilterSelect = document.getElementById("plan-filter");
-    const statusFilterSelect = document.getElementById("status-filter");
-    const searchInput = document.getElementById("user-search");
-    const pagination = document.getElementById("users-pagination");
-    const prevBtn = document.getElementById("users-prev-page");
-    const nextBtn = document.getElementById("users-next-page");
-    const pageInfo = document.getElementById("users-pagination-info");
-    const totalCount = document.getElementById("users-total-count");
+                    // State
+                    let filteredUsers = [...mockUsers];
+                    let currentPage = 1;
+                    let pageSize = 10;
+                    let planFilter = "all";
+                    let statusFilter = "all";
+                    let searchQuery = "";
 
-    // For modals
-    let currentUserId = null;
+                    // DOM
+                    const tbody = document.getElementById("users-table-body");
+                    const pageSizeSelect = document.getElementById("page-size-select");
+                    const planFilterSelect = document.getElementById("plan-filter");
+                    const statusFilterSelect = document.getElementById("status-filter");
+                    const searchInput = document.getElementById("user-search");
+                    const pagination = document.getElementById("users-pagination");
+                    const prevBtn = document.getElementById("users-prev-page");
+                    const nextBtn = document.getElementById("users-next-page");
+                    const pageInfo = document.getElementById("users-pagination-info");
+                    const totalCount = document.getElementById("users-total-count");
 
-    // API Functions - Fixed with better error handling and correct paths
-    async function fetchUsers() {
-        if (loading) return;
-        
-        loading = true;
-        showLoadingState();
+                    // For unsuspend modal
+                    let unsuspendUserId = null;
 
-        try {
-            const params = new URLSearchParams({
-                page: currentPage,
-                limit: pageSize,
-                search: searchQuery,
-                plan: planFilter,
-                status: statusFilter
-            });
+                    // Render
+                    function renderTable() {
+                        // Filter
+                        filteredUsers = mockUsers.filter((u) => {
+                            let matchesPlan =
+                                planFilter === "all" || u.plan.toLowerCase() === planFilter;
+                            let matchesStatus =
+                                statusFilter === "all" ||
+                                u.status.toLowerCase() === statusFilter;
+                            let matchesSearch =
+                                !searchQuery ||
+                                u.name.toLowerCase().includes(searchQuery) ||
+                                u.email.toLowerCase().includes(searchQuery);
+                            return matchesPlan && matchesStatus && matchesSearch;
+                        });
+                        // Pagination
+                        const total = filteredUsers.length;
+                        const totalPages = Math.max(1, Math.ceil(total / pageSize));
+                        if (currentPage > totalPages) currentPage = totalPages;
+                        const start = (currentPage - 1) * pageSize;
+                        const end = Math.min(start + pageSize, total);
+                        const usersToShow = filteredUsers.slice(start, end);
 
-            console.log('Fetching users with params:', {
-                page: currentPage,
-                limit: pageSize,
-                search: searchQuery,
-                plan: planFilter,
-                status: statusFilter
-            });
-
-            // Determine the correct API path
-            let apiPath = 'api/users.php';
-            
-            // Check if we're in admin directory and adjust path accordingly
-            const currentPath = window.location.pathname;
-            if (currentPath.includes('/admin/home/') || currentPath.includes('/admin/')) {
-                apiPath = '../api/users.php';
-            }
-
-            console.log('Using API path:', apiPath);
-
-            const response = await fetch(`${apiPath}?${params}`, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                // Add cache busting
-                cache: 'no-cache'
-            });
-            
-            if (!response.ok) {
-                const errorText = await response.text();
-                console.error('API Error Response:', errorText);
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            
-            const data = await response.json();
-            console.log('API Response:', data);
-            
-            if (data.error) {
-                throw new Error(data.error);
-            }
-            
-            users = data.users || [];
-            totalUsers = data.total || 0;
-            totalPages = data.totalPages || 1;
-            currentPage = data.page || 1;
-            
-            console.log(`Loaded ${users.length} users out of ${totalUsers} total`);
-            
-            renderTable();
-            renderPagination();
-            updatePaginationInfo();
-            
-        } catch (error) {
-            console.error('Error fetching users:', error);
-            showError(`Failed to load users: ${error.message}`);
-        } finally {
-            loading = false;
-        }
-    }
-
-    async function performUserAction(action, userId, data = {}) {
-        try {
-            let apiPath = 'api/users.php';
-            
-            // Adjust path based on current location
-            const currentPath = window.location.pathname;
-            if (currentPath.includes('/admin/home/') || currentPath.includes('/admin/')) {
-                apiPath = '../api/users.php';
-            }
-
-            const response = await fetch(apiPath, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    action: action,
-                    userId: userId,
-                    ...data
-                })
-            });
-
-            const responseText = await response.text();
-            console.log('API Response:', responseText);
-
-            let result;
-            try {
-                result = JSON.parse(responseText);
-            } catch (e) {
-                console.error('Failed to parse JSON response:', responseText);
-                throw new Error('Invalid JSON response from server');
-            }
-            
-            if (!response.ok) {
-                throw new Error(result.error || `HTTP error! status: ${response.status}`);
-            }
-
-            return result;
-        } catch (error) {
-            console.error('Error performing user action:', error);
-            throw error;
-        }
-    }
-
-    async function fetchUserDetails(userId) {
-        try {
-            let apiPath = 'api/users.php';
-            
-            // Adjust path based on current location
-            const currentPath = window.location.pathname;
-            if (currentPath.includes('/admin/home/') || currentPath.includes('/admin/')) {
-                apiPath = '../api/users.php';
-            }
-
-            const response = await fetch(apiPath, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    action: 'getUserDetails',
-                    userId: userId
-                })
-            });
-
-            const responseText = await response.text();
-            console.log('User Details Response:', responseText);
-
-            let result;
-            try {
-                result = JSON.parse(responseText);
-            } catch (e) {
-                console.error('Failed to parse JSON response:', responseText);
-                throw new Error('Invalid JSON response from server');
-            }
-            
-            if (!response.ok) {
-                throw new Error(result.error || 'Failed to fetch user details');
-            }
-
-            return result.user;
-        } catch (error) {
-            console.error('Error fetching user details:', error);
-            throw error;
-        }
-    }
-
-    // UI Functions
-    function showLoadingState() {
-        tbody.innerHTML = `
+                        // Table rows
+                        tbody.innerHTML = usersToShow
+                            .map(
+                                (user) => `
             <tr>
-                <td colspan="8" class="px-4 py-8 text-center">
-                    <div class="flex items-center justify-center space-x-2">
-                        <div class="w-5 h-5 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
-                        <span class="text-gray-500">Loading users...</span>
-                    </div>
-                </td>
-            </tr>
-        `;
-    }
-
-    function showError(message) {
-        tbody.innerHTML = `
-            <tr>
-                <td colspan="8" class="px-4 py-8 text-center">
-                    <div class="flex flex-col items-center space-y-2">
-                        <div class="flex items-center space-x-2 text-red-600">
-                            <i class="ri-error-warning-line"></i>
-                            <span>${message}</span>
-                        </div>
-                        <button onclick="location.reload()" class="mt-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-blue-600">
-                            Retry
-                        </button>
-                    </div>
-                </td>
-            </tr>
-        `;
-    }
-
-    function showToast(message, type = 'success') {
-        // Create toast if it doesn't exist
-        let toast = document.getElementById('toast-notification');
-        if (!toast) {
-            toast = document.createElement('div');
-            toast.id = 'toast-notification';
-            toast.className = `fixed top-4 right-4 z-50 px-4 py-3 rounded-lg shadow-lg transition-transform transform translate-x-full ${
-                type === 'success' ? 'bg-green-500 text-white' : 'bg-red-500 text-white'
-            }`;
-            document.body.appendChild(toast);
-        }
-        
-        // Update toast class and message
-        toast.className = `fixed top-4 right-4 z-50 px-4 py-3 rounded-lg shadow-lg transition-transform transform ${
-            type === 'success' ? 'bg-green-500 text-white' : 'bg-red-500 text-white'
-        }`;
-        
-        toast.textContent = message;
-        toast.classList.remove('translate-x-full');
-        
-        setTimeout(() => {
-            toast.classList.add('translate-x-full');
-        }, 3000);
-    }
-
-    function renderTable() {
-        if (users.length === 0) {
-            tbody.innerHTML = `
-                <tr>
-                    <td colspan="8" class="px-4 py-8 text-center text-gray-500">
-                        ${searchQuery ? `No users found matching "${searchQuery}"` : 'No users found'}
-                    </td>
-                </tr>
-            `;
-            return;
-        }
-
-        tbody.innerHTML = users
-            .map(
-                (user) => `
-            <tr class="hover:bg-gray-50">
                 <td class="px-4 py-3 whitespace-nowrap">
                     <label class="custom-checkbox">
-                        <input type="checkbox" class="user-checkbox" data-user-id="${user.id}">
+                        <input type="checkbox" class="user-checkbox">
                         <span class="checkbox-mark"></span>
                     </label>
                 </td>
                 <td class="px-4 py-3 whitespace-nowrap">
                     <div class="flex items-center">
-                        ${user.profile_picture ? 
-                            `<img src="../../${user.profile_picture}" alt="${user.name}" class="w-8 h-8 rounded-full">` :
-                            `<div class="w-8 h-8 rounded-full ${user.planColor.includes('blue') ? 'bg-blue-100 text-primary' : 
-                                user.planColor.includes('purple') ? 'bg-purple-100 text-purple-600' : 
-                                user.planColor.includes('orange') ? 'bg-orange-100 text-orange-600' : 'bg-gray-100 text-gray-600'
-                            } flex items-center justify-center">
-                                <span class="text-sm font-medium">${user.initials}</span>
-                            </div>`
-                        }
+                        <div class="w-8 h-8 rounded-full ${user.plan === "Pro"
+                                        ? "bg-blue-100 text-primary"
+                                        : user.plan === "Enterprise"
+                                            ? "bg-purple-100 text-purple-600"
+                                            : user.plan === "Basic"
+                                                ? "bg-orange-100 text-orange-600"
+                                                : "bg-gray-100 text-gray-600"
+                                    } flex items-center justify-center">
+                            <span class="text-sm font-medium">${user.initials
+                                    }</span>
+                        </div>
                         <div class="ml-3">
-                            <p class="text-sm font-medium text-gray-800">${user.name}</p>
+                            <p class="text-sm font-medium text-gray-800">${user.name
+                                    }</p>
                         </div>
                     </div>
                 </td>
-                <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-600">${user.email}</td>
+                <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-600">${user.email
+                                    }</td>
                 <td class="px-4 py-3 whitespace-nowrap">
-                    <span class="px-2 py-1 text-xs font-medium ${user.planColor} rounded-full">${user.plan}</span>
+                    <span class="px-2 py-1 text-xs font-medium ${user.planColor
+                                    } rounded-full">${user.plan}</span>
                 </td>
-                <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-600">${user.joined}</td>
                 <td class="px-4 py-3 whitespace-nowrap">
-                    <span class="px-2 py-1 text-xs font-medium ${user.statusColor} rounded-full">${user.status}</span>
+                    <span class="text-xs font-medium ${user.walletColor
+                                    } px-2 py-1 rounded-full">${user.wallet}</span>
+                </td>
+                <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-600">${user.joined
+                                    }</td>
+                <td class="px-4 py-3 whitespace-nowrap">
+                    <span class="px-2 py-1 text-xs font-medium ${user.statusColor
+                                    } rounded-full">${user.status}</span>
                 </td>
                 <td class="px-4 py-3 whitespace-nowrap text-right text-sm font-medium">
                     <div class="flex items-center justify-end space-x-2">
-                        <button class="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-primary rounded-full hover:bg-blue-50" 
-                                data-action="view" data-user-id="${user.id}" title="View Details">
+                        <button class="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-primary rounded-full hover:bg-blue-50" data-action="view" data-user-id="${user.id
+                                    }">
                             <i class="ri-eye-line"></i>
                         </button>
                         ${user.status === "Suspended"
-                            ? `<button class="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-green-500 rounded-full hover:bg-green-50" 
-                                       data-action="unsuspend" data-user-id="${user.id}" title="Unsuspend User">
-                                    <i class="ri-play-circle-line"></i>
-                                </button>`
-                            : `<button class="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-yellow-500 rounded-full hover:bg-yellow-50" 
-                                       data-action="suspend" data-user-id="${user.id}" title="Suspend User">
-                                    <i class="ri-pause-circle-line"></i>
-                                </button>`
-                        }
-                        <button class="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-red-500 rounded-full hover:bg-red-50" 
-                                data-action="delete" data-user-id="${user.id}" title="Delete User">
+                                        ? `<button class="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-green-500 rounded-full hover:bg-green-50" data-action="activate" data-user-id="${user.id}">
+                                        <i class="ri-play-circle-line"></i>
+                                    </button>`
+                                        : `<button class="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-yellow-500 rounded-full hover:bg-yellow-50" data-action="suspend" data-user-id="${user.id}">
+                                        <i class="ri-pause-circle-line"></i>
+                                    </button>`
+                                    }
+                        <button class="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-red-500 rounded-full hover:bg-red-50" data-action="delete" data-user-id="${user.id
+                                    }">
                             <i class="ri-delete-bin-line"></i>
                         </button>
                     </div>
                 </td>
             </tr>
         `
-            )
-            .join("");
+                            )
+                            .join("");
 
-        // Reattach event listeners
-        attachTableEventListeners();
-    }
+                        // Pagination info
+                        pageInfo.querySelector(
+                            "span"
+                        ).nextElementSibling.nextElementSibling.textContent = `of ${total} users`;
+                        pageInfo.querySelector(
+                            "span"
+                        ).nextElementSibling.textContent = `${pageSize}`;
 
-    function attachTableEventListeners() {
-        // Select all checkbox
-        const selectAll = document.getElementById("select-all-users");
-        const checkboxes = tbody.querySelectorAll(".user-checkbox");
-        
-        if (selectAll) {
-            selectAll.checked = false;
-            selectAll.onchange = function () {
-                checkboxes.forEach((cb) => (cb.checked = selectAll.checked));
-            };
-        }
+                        // Pagination buttons
+                        renderPagination(totalPages);
 
-        // Action buttons
-        const actionButtons = tbody.querySelectorAll('[data-action]');
-        actionButtons.forEach(button => {
-            button.onclick = function(e) {
-                e.preventDefault();
-                const action = this.getAttribute('data-action');
-                const userId = this.getAttribute('data-user-id');
-                currentUserId = userId;
-                
-                handleUserAction(action, userId);
-            };
-        });
-    }
-
-    function handleUserAction(action, userId) {
-        switch (action) {
-            case 'view':
-                openViewUserModal(userId);
-                break;
-            case 'suspend':
-                openModal('suspend-user-modal');
-                break;
-            case 'unsuspend':
-                openModal('unsuspend-user-modal');
-                break;
-            case 'delete':
-                openModal('delete-user-modal');
-                break;
-        }
-    }
-
-    async function openViewUserModal(userId) {
-        try {
-            showLoadingInModal('view-user-modal');
-            const user = await fetchUserDetails(userId);
-            populateViewUserModal(user);
-            openModal('view-user-modal');
-        } catch (error) {
-            console.error('Failed to load user details:', error);
-            showToast('Failed to load user details', 'error');
-        }
-    }
-
-    function showLoadingInModal(modalId) {
-        const modal = document.getElementById(modalId);
-        if (modal) {
-            modal.querySelector('.modal-content').innerHTML = `
-                <div class="flex items-center justify-center py-8">
-                    <div class="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
-                    <span class="ml-3">Loading...</span>
-                </div>
-            `;
-        }
-    }
-
-    function populateViewUserModal(user) {
-        const modal = document.getElementById('view-user-modal');
-        if (!modal) return;
-
-        const walletAddress = user.wallet_address || '0x71C7656EC7ab88b098defB751B7401B5f6d8976F';
-        const recentTransactions = user.transactions || [];
-
-        modal.querySelector('.modal-content').innerHTML = `
-            <div class="flex items-center justify-between mb-4">
-                <h3 class="text-lg font-medium text-gray-800">User Details</h3>
-                <button class="modal-close text-gray-400 hover:text-gray-500">
-                    <i class="ri-close-line ri-lg"></i>
-                </button>
-            </div>
-            <div class="space-y-4">
-                <div class="flex items-center">
-                    <div class="w-16 h-16 rounded-full bg-blue-100 text-primary flex items-center justify-center">
-                        <span class="text-xl font-medium">${user.initials}</span>
-                    </div>
-                    <div class="ml-4">
-                        <h4 class="text-xl font-medium text-gray-800">${user.full_name}</h4>
-                        <p class="text-sm text-gray-500">${user.email}</p>
-                    </div>
-                </div>
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <p class="text-sm text-gray-500">Subscription</p>
-                        <p class="text-sm font-medium text-gray-800">${user.plan_name || 'Free'}</p>
-                    </div>
-                    <div>
-                        <p class="text-sm text-gray-500">Status</p>
-                        <p class="text-sm font-medium ${user.account_status === 'active' ? 'text-green-600' : 'text-yellow-600'}">
-                            ${user.account_status === 'active' ? 'Active' : 'Suspended'}
-                        </p>
-                    </div>
-                    <div>
-                        <p class="text-sm text-gray-500">Joined</p>
-                        <p class="text-sm font-medium text-gray-800">${user.joined}</p>
-                    </div>
-                    <div>
-                        <p class="text-sm text-gray-500">Leads Balance</p>
-                        <p class="text-sm font-medium text-blue-600">${user.leads_balance || 0}</p>
-                    </div>
-                </div>
-                <div>
-                    <p class="text-sm text-gray-500">Phone</p>
-                    <p class="text-sm font-medium text-gray-800">${user.phone || 'Not provided'}</p>
-                </div>
-                <div>
-                    <p class="text-sm text-gray-500">Total Paid</p>
-                    <p class="text-sm font-medium text-green-600">${user.total_paid || '0.00'}</p>
-                </div>
-                <div>
-                    <p class="text-sm text-gray-500">Recent Transactions</p>
-                    <div class="mt-2 space-y-2 max-h-32 overflow-y-auto">
-                        ${recentTransactions.length > 0 ? 
-                            recentTransactions.map(tx => `
-                                <div class="flex items-center justify-between">
-                                    <div class="flex items-center">
-                                        <div class="w-8 h-8 rounded-full ${tx.status === 'success' ? 'bg-green-100 text-green-600' : 'bg-yellow-100 text-yellow-600'} flex items-center justify-center">
-                                            <i class="ri-arrow-${tx.status === 'success' ? 'down' : 'right'}-line"></i>
-                                        </div>
-                                        <div class="ml-3">
-                                            <p class="text-sm font-medium text-gray-800">${tx.payment_type || 'Payment'}</p>
-                                            <p class="text-xs text-gray-500">${new Date(tx.created_at).toLocaleDateString()}</p>
-                                        </div>
-                                    </div>
-                                    <p class="text-sm font-medium text-gray-800">${tx.amount}</p>
-                                </div>
-                            `).join('') : 
-                            '<p class="text-sm text-gray-500">No recent transactions</p>'
+                        // Select all checkbox
+                        const selectAll = document.getElementById("select-all-users");
+                        const checkboxes = tbody.querySelectorAll(".user-checkbox");
+                        if (selectAll) {
+                            selectAll.checked = false;
+                            selectAll.onchange = function () {
+                                checkboxes.forEach((cb) => (cb.checked = selectAll.checked));
+                            };
                         }
-                    </div>
-                </div>
-                <div class="flex items-center justify-end space-x-3 pt-4 border-t">
-                    <button class="px-4 py-2 border border-gray-200 text-gray-600 rounded-button whitespace-nowrap hover:bg-gray-50 modal-close">
-                        Close
-                    </button>
-                    <button class="px-4 py-2 border border-yellow-200 text-yellow-600 rounded-button whitespace-nowrap hover:bg-yellow-50"
-                            onclick="closeModal(document.getElementById('view-user-modal')); handleUserAction('${user.account_status === 'active' ? 'suspend' : 'unsuspend'}', '${user.id}')">
-                        ${user.account_status === 'active' ? 'Suspend' : 'Unsuspend'} User
-                    </button>
-                    <button class="px-4 py-2 border border-red-200 text-red-600 rounded-button whitespace-nowrap hover:bg-red-50"
-                            onclick="closeModal(document.getElementById('view-user-modal')); handleUserAction('delete', '${user.id}')">
-                        Delete User
-                    </button>
-                </div>
-            </div>
-        `;
 
-        // Reattach modal close listeners
-        attachModalListeners();
-    }
+                        // Re-attach modal event listeners for user action buttons
+                        setTimeout(() => {
+                            const viewUserButtons = tbody.querySelectorAll(
+                                '[data-action="view"]'
+                            );
+                            const deleteUserButtons = tbody.querySelectorAll(
+                                '[data-action="delete"]'
+                            );
+                            const suspendUserButtons = tbody.querySelectorAll(
+                                '[data-action="suspend"]'
+                            );
+                            const activateUserButtons = tbody.querySelectorAll(
+                                '[data-action="activate"]'
+                            );
+                            viewUserButtons.forEach((button) => {
+                                button.onclick = function () {
+                                    const userId = this.getAttribute("data-user-id");
+                                    const modal = document.getElementById("view-user-modal");
+                                    if (modal) {
+                                        modal.classList.add("active");
+                                        document.body.style.overflow = "hidden";
+                                    }
+                                };
+                            });
+                            deleteUserButtons.forEach((button) => {
+                                button.onclick = function () {
+                                    const userId = this.getAttribute("data-user-id");
+                                    const modal = document.getElementById("delete-user-modal");
+                                    if (modal) {
+                                        modal.classList.add("active");
+                                        document.body.style.overflow = "hidden";
+                                    }
+                                };
+                            });
+                            suspendUserButtons.forEach((button) => {
+                                button.onclick = function () {
+                                    const userId = this.getAttribute("data-user-id");
+                                    const modal = document.getElementById("suspend-user-modal");
+                                    if (modal) {
+                                        modal.classList.add("active");
+                                        document.body.style.overflow = "hidden";
+                                    }
+                                };
+                            });
+                            // Unsuspend (activate) user modal
+                            activateUserButtons.forEach((button) => {
+                                button.onclick = function () {
+                                    unsuspendUserId = this.getAttribute("data-user-id");
+                                    const modal = document.getElementById("unsuspend-user-modal");
+                                    if (modal) {
+                                        modal.classList.add("active");
+                                        document.body.style.overflow = "hidden";
+                                    }
+                                };
+                            });
+                        }, 0);
+                    }
 
-    function renderPagination() {
-        // Clear existing page buttons
-        const existingPageButtons = pagination.querySelectorAll(".users-page-btn");
-        existingPageButtons.forEach(btn => btn.remove());
-        
-        // Calculate page range
-        const maxVisiblePages = 5;
-        let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
-        let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
-        
-        // Adjust start if we're near the end
-        if (endPage - startPage < maxVisiblePages - 1) {
-            startPage = Math.max(1, endPage - maxVisiblePages + 1);
-        }
-        
-        // Add new page buttons
-        for (let i = startPage; i <= endPage; i++) {
-            const btn = document.createElement("button");
-            btn.className = `pagination-item text-gray-600 hover:bg-gray-100 users-page-btn ${
-                i === currentPage ? 'active bg-primary text-white' : ''
-            }`;
-            btn.textContent = i;
-            btn.setAttribute("data-page", i);
-            
-            btn.onclick = function () {
-                if (currentPage !== i) {
-                    currentPage = i;
-                    fetchUsers();
-                }
-            };
-            
-            pagination.insertBefore(btn, nextBtn);
-        }
+                    function renderPagination(totalPages) {
+                        // Remove old page buttons
+                        pagination
+                            .querySelectorAll(".users-page-btn")
+                            .forEach((btn) => btn.remove());
+                        // Insert new page buttons
+                        for (let i = 1; i <= totalPages; i++) {
+                            const btn = document.createElement("button");
+                            btn.className =
+                                "pagination-item text-gray-600 hover:bg-gray-100 users-page-btn";
+                            btn.textContent = i;
+                            btn.setAttribute("data-page", i);
+                            if (i === currentPage)
+                                btn.classList.add("active", "bg-blue-50", "text-primary");
+                            btn.onclick = function () {
+                                currentPage = i;
+                                renderTable();
+                            };
+                            pagination.insertBefore(btn, nextBtn);
+                        }
+                        // Prev/next
+                        prevBtn.disabled = currentPage === 1;
+                        nextBtn.disabled = currentPage === totalPages;
+                        prevBtn.classList.toggle("opacity-50", prevBtn.disabled);
+                        prevBtn.classList.toggle("cursor-not-allowed", prevBtn.disabled);
+                        nextBtn.classList.toggle("opacity-50", nextBtn.disabled);
+                        nextBtn.classList.toggle("cursor-not-allowed", nextBtn.disabled);
+                    }
 
-        // Update prev/next buttons
-        prevBtn.disabled = currentPage === 1;
-        nextBtn.disabled = currentPage === totalPages || totalPages === 0;
-        prevBtn.classList.toggle("opacity-50", prevBtn.disabled);
-        prevBtn.classList.toggle("cursor-not-allowed", prevBtn.disabled);
-        nextBtn.classList.toggle("opacity-50", nextBtn.disabled);
-        nextBtn.classList.toggle("cursor-not-allowed", nextBtn.disabled);
-    }
+                    // Event listeners
+                    prevBtn.onclick = function () {
+                        if (currentPage > 1) {
+                            currentPage--;
+                            renderTable();
+                        }
+                    };
+                    nextBtn.onclick = function () {
+                        const total = filteredUsers.length;
+                        const totalPages = Math.max(1, Math.ceil(total / pageSize));
+                        if (currentPage < totalPages) {
+                            currentPage++;
+                            renderTable();
+                        }
+                    };
 
-    function updatePaginationInfo() {
-        const start = totalUsers === 0 ? 0 : (currentPage - 1) * pageSize + 1;
-        const end = Math.min(currentPage * pageSize, totalUsers);
-        
-        totalCount.textContent = `of ${totalUsers} users`;
-        
-        // Update the page size display
-        const pageSizeTrigger = pageSizeSelect.querySelector('.custom-select-trigger span');
-        if (pageSizeTrigger) {
-            pageSizeTrigger.textContent = pageSize.toString();
-        }
-    }
-
-    function openModal(modalId) {
-        const modal = document.getElementById(modalId);
-        if (modal) {
-            modal.classList.add('active');
-            document.body.style.overflow = 'hidden';
-        }
-    }
-
-    function closeModal(modal) {
-        modal.classList.remove('active');
-        document.body.style.overflow = '';
-    }
-
-    function attachModalListeners() {
-        // Modal close buttons
-        document.querySelectorAll('.modal-close').forEach(button => {
-            button.onclick = function() {
-                const modal = this.closest('.modal');
-                closeModal(modal);
-            };
-        });
-
-        // Click outside to close
-        document.querySelectorAll('.modal').forEach(modal => {
-            modal.onclick = function(e) {
-                if (e.target === this) {
-                    closeModal(this);
-                }
-            };
-        });
-    }
-
-    // Event Listeners
-    function attachEventListeners() {
-        // Search input with improved debouncing
-        let searchTimeout;
-        searchInput.addEventListener("input", function() {
-            clearTimeout(searchTimeout);
-            searchTimeout = setTimeout(() => {
-                const newSearchQuery = this.value.trim();
-                console.log('Search query changed to:', newSearchQuery);
-                searchQuery = newSearchQuery;
-                currentPage = 1;
-                fetchUsers();
-            }, 300);
-        });
-
-        // Also trigger search on Enter key
-        searchInput.addEventListener("keypress", function(e) {
-            if (e.key === 'Enter') {
-                clearTimeout(searchTimeout);
-                const newSearchQuery = this.value.trim();
-                console.log('Search triggered by Enter:', newSearchQuery);
-                searchQuery = newSearchQuery;
-                currentPage = 1;
-                fetchUsers();
-            }
-        });
-
-        // Pagination
-        prevBtn.onclick = function () {
-            if (currentPage > 1 && !loading) {
-                currentPage--;
-                fetchUsers();
-            }
-        };
-
-        nextBtn.onclick = function () {
-            if (currentPage < totalPages && !loading) {
-                currentPage++;
-                fetchUsers();
-            }
-        };
-
-        // Export button
-        document.getElementById("export-users-btn").onclick = async function () {
-            try {
-                this.disabled = true;
-                this.innerHTML = '<i class="ri-loader-4-line mr-2 animate-spin"></i>Exporting...';
-                
-                // Determine API path
-                let apiPath = 'api/users.php';
-                const currentPath = window.location.pathname;
-                if (currentPath.includes('/admin/home/') || currentPath.includes('/admin/')) {
-                    apiPath = '../api/users.php';
-                }
-                
-                // Fetch all users for export (without pagination)
-                const params = new URLSearchParams({
-                    limit: 1000,
-                    search: searchQuery,
-                    plan: planFilter,
-                    status: statusFilter
-                });
-                
-                const response = await fetch(`${apiPath}?${params}`);
-                const data = await response.json();
-                
-                if (data.error) {
-                    throw new Error(data.error);
-                }
-                
-                let csv = "Name,Email,Plan,Joined,Status\n";
-                data.users.forEach((u) => {
-                    csv += `"${u.name}","${u.email}","${u.plan}","${u.joined}","${u.status}"\n`;
-                });
-                
-                const blob = new Blob([csv], { type: "text/csv" });
-                const a = document.createElement("a");
-                a.href = URL.createObjectURL(blob);
-                a.download = `users_${new Date().toISOString().split('T')[0]}.csv`;
-                a.click();
-                
-                showToast('Users exported successfully');
-            } catch (error) {
-                console.error('Export error:', error);
-                showToast('Export failed: ' + error.message, 'error');
-            } finally {
-                this.disabled = false;
-                this.innerHTML = '<i class="ri-download-2-line mr-2"></i>Export';
-            }
-        };
-
-        // Modal action handlers
-        setupModalHandlers();
-    }
-
-    function setupModalHandlers() {
-        // Suspend user
-        const confirmSuspendBtn = document.querySelector('#suspend-user-modal .bg-yellow-600');
-        if (confirmSuspendBtn) {
-            confirmSuspendBtn.onclick = async function() {
-                try {
-                    this.disabled = true;
-                    this.textContent = 'Suspending...';
-                    
-                    const reason = document.getElementById('suspension-reason')?.value || '';
-                    const durationSelect = document.querySelector('#suspension-duration-select');
-                    const duration = durationSelect?.getAttribute('data-value') || '1week';
-                    const sendNotification = document.querySelector('#suspend-user-modal input[type="checkbox"]')?.checked || false;
-
-                    await performUserAction('suspend', currentUserId, {
-                        reason,
-                        duration,
-                        sendNotification
+                    // Page size select
+                    pageSizeSelect.addEventListener("change", function (e) {
+                        const value = pageSizeSelect.getAttribute("data-value");
+                        if (value) {
+                            pageSize = parseInt(value, 10);
+                            currentPage = 1;
+                            renderTable();
+                        }
+                    });
+                    // Plan filter
+                    planFilterSelect.addEventListener("change", function (e) {
+                        planFilter = planFilterSelect.getAttribute("data-value") || "all";
+                        currentPage = 1;
+                        renderTable();
+                    });
+                    // Status filter
+                    statusFilterSelect.addEventListener("change", function (e) {
+                        statusFilter =
+                            statusFilterSelect.getAttribute("data-value") || "all";
+                        currentPage = 1;
+                        renderTable();
+                    });
+                    // Search
+                    searchInput.addEventListener("input", function () {
+                        searchQuery = searchInput.value.trim().toLowerCase();
+                        currentPage = 1;
+                        renderTable();
                     });
 
-                    closeModal(document.getElementById('suspend-user-modal'));
-                    showToast('User suspended successfully');
-                    fetchUsers(); // Refresh the table
-                } catch (error) {
-                    console.error('Suspend error:', error);
-                    showToast(error.message || 'Failed to suspend user', 'error');
-                } finally {
-                    this.disabled = false;
-                    this.textContent = 'Suspend User';
-                }
-            };
+                    // Export (CSV)
+                    document.getElementById("export-users-btn").onclick = function () {
+                        let csv = "Name,Email,Plan,Wallet,Joined,Status\n";
+                        filteredUsers.forEach((u) => {
+                            csv += `"${u.name}","${u.email}","${u.plan}","${u.wallet}","${u.joined}","${u.status}"\n`;
+                        });
+                        const blob = new Blob([csv], { type: "text/csv" });
+                        const a = document.createElement("a");
+                        a.href = URL.createObjectURL(blob);
+                        a.download = "users.csv";
+                        a.click();
+                    };
+
+                    // Unsuspend user modal logic
+                    document.addEventListener("DOMContentLoaded", function () {
+                        const unsuspendModal = document.getElementById(
+                            "unsuspend-user-modal"
+                        );
+                        const confirmBtn = document.getElementById(
+                            "confirm-unsuspend-user"
+                        );
+                        if (confirmBtn) {
+                            confirmBtn.onclick = function () {
+                                if (unsuspendUserId) {
+                                    // Find user and set status to Active
+                                    const user = mockUsers.find((u) => u.id == unsuspendUserId);
+                                    if (user) {
+                                        user.status = "Active";
+                                        user.statusColor = "bg-green-50 text-green-600";
+                                    }
+                                    unsuspendUserId = null;
+                                    renderTable();
+                                }
+                                if (unsuspendModal) {
+                                    unsuspendModal.classList.remove("active");
+                                    document.body.style.overflow = "";
+                                }
+                            };
+                        }
+                    });
+
+                    // Initial render
+                    renderTable();
+
+                    // Custom select event patch for vanilla selects
+                    // (so the above .addEventListener("change") works)
+                    document.querySelectorAll(".custom-select").forEach((select) => {
+                        select.addEventListener("change", function (e) {
+                            // Already handled above
+                        });
+                    });
+                })();
+            </script>
+
+            <script id="modal-script">
+      document.addEventListener("DOMContentLoaded", function () {
+        const modals = document.querySelectorAll(".modal");
+        const modalCloseButtons = document.querySelectorAll(".modal-close");
+        const toast = document.getElementById("toast-success");
+
+        function showToast() {
+          toast.classList.remove("translate-x-full");
+          setTimeout(() => {
+            toast.classList.add("translate-x-full");
+          }, 3000);
         }
-// Add tooltip container to body
+
+        // Handle wallet verification
+        const verifyWalletButtons = document.querySelectorAll(
+          '[data-action="verify"]'
+        );
+        const verifyWalletModal = document.getElementById(
+          "verify-wallet-modal"
+        );
+        const confirmVerifyWalletBtn = document.getElementById(
+          "confirm-verify-wallet"
+        );
+
+        verifyWalletButtons.forEach((button) => {
+          button.addEventListener("click", function () {
+            const row = this.closest("tr");
+            const userName = row.querySelector(
+              ".text-sm.font-medium.text-gray-800"
+            ).textContent;
+            const blockchain = row.querySelector(
+              ".text-sm.text-gray-600"
+            ).textContent;
+            const walletAddress = row.querySelector(
+              ".text-sm.text-gray-600:nth-child(2)"
+            ).textContent;
+
+            document.getElementById("verify-wallet-user").textContent =
+              userName;
+            document.getElementById("verify-wallet-blockchain").textContent =
+              blockchain;
+            document.getElementById("verify-wallet-address").textContent =
+              walletAddress;
+
+            openModal("verify-wallet-modal");
+          });
+        });
+
+        if (confirmVerifyWalletBtn) {
+          confirmVerifyWalletBtn.addEventListener("click", function () {
+            const walletAddress = document.getElementById(
+              "verify-wallet-address"
+            ).textContent;
+            const statusElements = document.querySelectorAll(
+              "td:nth-child(6) span"
+            );
+
+            statusElements.forEach((element) => {
+              if (
+                element
+                  .closest("tr")
+                  .querySelector(".text-sm.text-gray-600:nth-child(2)")
+                  .textContent === walletAddress
+              ) {
+                element.className =
+                  "px-2 py-1 text-xs font-medium bg-green-50 text-green-600 rounded-full";
+                element.textContent = "Valid";
+              }
+            });
+
+            closeModal(verifyWalletModal);
+            showToast();
+          });
+        }
+        // Add tooltip container to body
         const tooltip = document.createElement("div");
         tooltip.className =
           "fixed px-2 py-1 text-xs text-white bg-gray-900 rounded pointer-events-none opacity-0 transition-opacity duration-200 z-50";
@@ -1648,186 +1419,100 @@ $activeSubscriptions = $pdo->query("SELECT COUNT(*) FROM subscriptions WHERE sta
         if (confirmLogoutBtn) {
           confirmLogoutBtn.addEventListener("click", function () {
             // Clear any session data here
-            window.location.href = "/sales-spy/admin/logout/"; // Redirect to login page
+            window.location.href = "/login"; // Redirect to login page
           });
         }
-        // Unsuspend user
-        const confirmUnsuspendBtn = document.getElementById('confirm-unsuspend-user');
-        if (confirmUnsuspendBtn) {
-            confirmUnsuspendBtn.onclick = async function() {
-                try {
-                    this.disabled = true;
-                    this.textContent = 'Unsuspending...';
-                    
-                    const reason = document.getElementById('unsuspend-reason')?.value || '';
-                    const sendNotification = document.querySelector('#unsuspend-user-modal input[type="checkbox"]')?.checked || false;
-
-                    await performUserAction('unsuspend', currentUserId, {
-                        reason,
-                        sendNotification
-                    });
-
-                    closeModal(document.getElementById('unsuspend-user-modal'));
-                    showToast('User unsuspended successfully');
-                    fetchUsers(); // Refresh the table
-                } catch (error) {
-                    console.error('Unsuspend error:', error);
-                    showToast(error.message || 'Failed to unsuspend user', 'error');
-                } finally {
-                    this.disabled = false;
-                    this.textContent = 'Unsuspend User';
-                }
-            };
+        // Action buttons for user actions
+        const viewUserButtons = document.querySelectorAll(
+          '[data-action="view"]'
+        );
+        const deleteUserButtons = document.querySelectorAll(
+          '[data-action="delete"]'
+        );
+        const suspendUserButtons = document.querySelectorAll(
+          '[data-action="suspend"]'
+        );
+        function openModal(modalId) {
+          const modal = document.getElementById(modalId);
+          if (modal) {
+            modal.classList.add("active");
+            document.body.style.overflow = "hidden";
+          }
         }
-
-        // Delete user
-        const confirmDeleteBtn = document.querySelector('#delete-user-modal .bg-red-600');
-        if (confirmDeleteBtn) {
-            confirmDeleteBtn.onclick = async function() {
-                try {
-                    this.disabled = true;
-                    this.textContent = 'Deleting...';
-                    
-                    const confirmation = document.getElementById('delete-confirmation')?.value || '';
-                    
-                    if (confirmation !== 'DELETE') {
-                        showToast('Please type "DELETE" to confirm', 'error');
-                        return;
-                    }
-
-                    await performUserAction('delete', currentUserId, { confirmation });
-
-                    closeModal(document.getElementById('delete-user-modal'));
-                    showToast('User deleted successfully');
-                    fetchUsers(); // Refresh the table
-                } catch (error) {
-                    console.error('Delete error:', error);
-                    showToast(error.message || 'Failed to delete user', 'error');
-                } finally {
-                    this.disabled = false;
-                    this.textContent = 'Delete User';
-                }
-            };
+        function closeModal(modal) {
+          modal.classList.remove("active");
+          document.body.style.overflow = "";
         }
-    }
-
-    // Custom select handlers
-    function setupCustomSelects() {
-        // Page size select
-        setupCustomSelect('page-size-select', function(value) {
-            pageSize = parseInt(value, 10);
-            currentPage = 1;
-            console.log('Page size changed to:', pageSize);
-            fetchUsers();
+        // Close modal when clicking close button
+        modalCloseButtons.forEach((button) => {
+          button.addEventListener("click", function () {
+            const modal = this.closest(".modal");
+            closeModal(modal);
+          });
         });
-
-        // Plan filter
-        setupCustomSelect('plan-filter', function(value) {
-            planFilter = value;
-            currentPage = 1;
-            console.log('Plan filter changed to:', planFilter);
-            fetchUsers();
-        });
-
-        // Status filter
-        setupCustomSelect('status-filter', function(value) {
-            statusFilter = value;
-            currentPage = 1;
-            console.log('Status filter changed to:', statusFilter);
-            fetchUsers();
-        });
-
-        // Suspension duration select
-        setupCustomSelect('suspension-duration-select', function(value) {
-            // This just sets the data attribute for later use
-            console.log('Suspension duration selected:', value);
-        });
-    }
-
-    function setupCustomSelect(selectId, onChange) {
-        const select = document.getElementById(selectId);
-        if (!select) return;
-
-        const trigger = select.querySelector('.custom-select-trigger');
-        const options = select.querySelector('.custom-select-options');
-        const optionElements = select.querySelectorAll('.custom-select-option');
-
-        if (!trigger || !options) return;
-
-        trigger.onclick = function(e) {
-            e.stopPropagation();
-            // Close other selects
-            document.querySelectorAll('.custom-select.open').forEach(otherSelect => {
-                if (otherSelect !== select) {
-                    otherSelect.classList.remove('open');
-                }
-            });
-            select.classList.toggle('open');
-        };
-
-        optionElements.forEach(option => {
-            option.onclick = function(e) {
-                e.stopPropagation();
-                const value = this.getAttribute('data-value');
-                const text = this.textContent.trim();
-                
-                trigger.querySelector('span').textContent = text;
-                select.setAttribute('data-value', value);
-                select.classList.remove('open');
-                
-                if (onChange) onChange(value);
-            };
-        });
-
-        // Close when clicking outside
-        document.addEventListener('click', function(e) {
-            if (!select.contains(e.target)) {
-                select.classList.remove('open');
+        // Close modal when clicking outside the modal content
+        modals.forEach((modal) => {
+          modal.addEventListener("click", function (e) {
+            if (e.target === this) {
+              closeModal(this);
             }
+          });
         });
-    }
-
-    // Utility functions
-    function debounce(func, wait) {
-        let timeout;
-        return function executedFunction(...args) {
-            const later = () => {
-                clearTimeout(timeout);
-                func(...args);
-            };
-            clearTimeout(timeout);
-            timeout = setTimeout(later, wait);
-        };
-    }
-
-    // Make some functions globally available for inline onclick handlers
-    window.handleUserAction = handleUserAction;
-    window.closeModal = closeModal;
-
-    // Initialize
-    document.addEventListener('DOMContentLoaded', function() {
-        console.log('User management script initializing...');
-        attachEventListeners();
-        setupCustomSelects();
-        attachModalListeners();
-        fetchUsers(); // Initial load
-    });
-
-    // Also initialize immediately if DOM is already loaded
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', initialize);
-    } else {
-        initialize();
-    }
-
-    function initialize() {
-        console.log('User management script initializing...');
-        attachEventListeners();
-        setupCustomSelects();
-        attachModalListeners();
-        fetchUsers(); // Initial load
-    }
-})();
+        // Open user action modals
+        viewUserButtons.forEach((button) => {
+          button.addEventListener("click", function () {
+            const userId = this.getAttribute("data-user-id");
+            openModal("view-user-modal");
+          });
+        });
+        // Handle subscription action buttons
+        const subscriptionButtons = document.querySelectorAll(
+          ".subscription-action"
+        );
+        subscriptionButtons.forEach((button) => {
+          // Tooltip handling
+          button.addEventListener("mouseenter", function (e) {
+            const tooltipText = this.getAttribute("data-tooltip");
+            tooltip.textContent = tooltipText;
+            tooltip.style.opacity = "1";
+            // Position tooltip above the button
+            const rect = this.getBoundingClientRect();
+            tooltip.style.top = rect.top - 30 + "px";
+            tooltip.style.left =
+              rect.left + rect.width / 2 - tooltip.offsetWidth / 2 + "px";
+          });
+          button.addEventListener("mouseleave", function () {
+            tooltip.style.opacity = "0";
+          });
+          // Modal handling
+          button.addEventListener("click", function () {
+            const action = this.getAttribute("data-action");
+            switch (action) {
+              case "history":
+                openModal("subscription-history-modal");
+                break;
+              case "pause":
+                openModal("pause-subscription-modal");
+                break;
+              case "cancel":
+                openModal("cancel-subscription-modal");
+                break;
+            }
+          });
+        });
+        deleteUserButtons.forEach((button) => {
+          button.addEventListener("click", function () {
+            const userId = this.getAttribute("data-user-id");
+            openModal("delete-user-modal");
+          });
+        });
+        suspendUserButtons.forEach((button) => {
+          button.addEventListener("click", function () {
+            const userId = this.getAttribute("data-user-id");
+            openModal("suspend-user-modal");
+          });
+        });
+      });
     </script>
 
      <script id="checkbox-script">

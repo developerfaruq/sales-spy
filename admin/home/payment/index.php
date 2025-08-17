@@ -1338,7 +1338,7 @@
         if (confirmLogoutBtn) {
           confirmLogoutBtn.addEventListener("click", function () {
             // Clear any session data here
-            window.location.href = "/login"; // Redirect to login page
+            window.location.href = "/sales-spy/admin/logout/"; // Redirect to login page
           });
         }
         // Action buttons for user actions

@@ -974,8 +974,133 @@
             }
           });
         });
+        
             </script>
 
+<script id="modal-script">
+            document.addEventListener("DOMContentLoaded", function () {
+                const modals = document.querySelectorAll(".modal");
+                const modalCloseButtons = document.querySelectorAll(".modal-close");
+                const toast = document.getElementById("toast-success");
+
+                function showToast() {
+                    toast.classList.remove("translate-x-full");
+                    setTimeout(() => {
+                        toast.classList.add("translate-x-full");
+                    }, 3000);
+                }
+
+                // Handle wallet verification
+                const verifyWalletButtons = document.querySelectorAll(
+                    '[data-action="verify"]'
+                );
+                const verifyWalletModal = document.getElementById(
+                    "verify-wallet-modal"
+                );
+                const confirmVerifyWalletBtn = document.getElementById(
+                    "confirm-verify-wallet"
+                );
+
+                verifyWalletButtons.forEach((button) => {
+                    button.addEventListener("click", function () {
+                        const row = this.closest("tr");
+                        const userName = row.querySelector(
+                            ".text-sm.font-medium.text-gray-800"
+                        ).textContent;
+                        const blockchain = row.querySelector(
+                            ".text-sm.text-gray-600"
+                        ).textContent;
+                        const walletAddress = row.querySelector(
+                            ".text-sm.text-gray-600:nth-child(2)"
+                        ).textContent;
+
+                        document.getElementById("verify-wallet-user").textContent =
+                            userName;
+                        document.getElementById("verify-wallet-blockchain").textContent =
+                            blockchain;
+                        document.getElementById("verify-wallet-address").textContent =
+                            walletAddress;
+
+                        openModal("verify-wallet-modal");
+                    });
+                });
+
+                if (confirmVerifyWalletBtn) {
+                    confirmVerifyWalletBtn.addEventListener("click", function () {
+                        const walletAddress = document.getElementById(
+                            "verify-wallet-address"
+                        ).textContent;
+                        const statusElements = document.querySelectorAll(
+                            "td:nth-child(6) span"
+                        );
+
+                        statusElements.forEach((element) => {
+                            if (
+                                element
+                                    .closest("tr")
+                                    .querySelector(".text-sm.text-gray-600:nth-child(2)")
+                                    .textContent === walletAddress
+                            ) {
+                                element.className =
+                                    "px-2 py-1 text-xs font-medium bg-green-50 text-green-600 rounded-full";
+                                element.textContent = "Valid";
+                            }
+                        });
+
+                        closeModal(verifyWalletModal);
+                        showToast();
+                    });
+                }
+                // Add tooltip container to body
+                const tooltip = document.createElement("div");
+                tooltip.className =
+                    "fixed px-2 py-1 text-xs text-white bg-gray-900 rounded pointer-events-none opacity-0 transition-opacity duration-200 z-50";
+                document.body.appendChild(tooltip);
+                const logoutBtn = document.getElementById("logout-btn");
+                const logoutModal = document.getElementById("logout-modal");
+                const cancelLogoutBtn = document.getElementById("cancel-logout");
+                const confirmLogoutBtn = document.getElementById("confirm-logout");
+                // Handle logout flow
+                if (logoutBtn) {
+                    logoutBtn.addEventListener("click", function () {
+                        openModal("logout-modal");
+                    });
+                }
+                if (cancelLogoutBtn) {
+                    cancelLogoutBtn.addEventListener("click", function () {
+                        closeModal(logoutModal);
+                    });
+                }
+                if (confirmLogoutBtn) {
+                    confirmLogoutBtn.addEventListener("click", function () {
+                        // Clear any session data here
+                        window.location.href = "/sales-spy/admin/logout/"; // Redirect to login page
+                    });
+                }
+                // Action buttons for user actions
+                const viewUserButtons = document.querySelectorAll(
+                    '[data-action="view"]'
+                );
+                const deleteUserButtons = document.querySelectorAll(
+                    '[data-action="delete"]'
+                );
+                const suspendUserButtons = document.querySelectorAll(
+                    '[data-action="suspend"]'
+                );
+                function openModal(modalId) {
+                    const modal = document.getElementById(modalId);
+                    if (modal) {
+                        modal.classList.add("active");
+                        document.body.style.overflow = "hidden";
+                    }
+                }
+                function closeModal(modal) {
+                    modal.classList.remove("active");
+                    document.body.style.overflow = "";
+                }
+   
+            });
+        </script>
           
             <script id="paymentActions">
               document.addEventListener('DOMContentLoaded', function () {
