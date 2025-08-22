@@ -345,6 +345,52 @@
         </div>
       </div>
     </header>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const sidebarToggle = document.getElementById("sidebar-toggle");
+        const sidebar = document.getElementById("sidebar");
+        const main = document.querySelector("main");
+        const menuIcon = sidebarToggle.querySelector("i");
+
+        function setSidebar(open) {
+          if (open) {
+            sidebar.classList.remove("-translate-x-full");
+            sidebar.classList.add("translate-x-0");
+            menuIcon.classList.remove("ri-menu-line");
+            menuIcon.classList.add("ri-close-line");
+          } else {
+            sidebar.classList.remove("translate-x-0");
+            sidebar.classList.add("-translate-x-full");
+            menuIcon.classList.remove("ri-close-line");
+            menuIcon.classList.add("ri-menu-line");
+          }
+        }
+
+        sidebarToggle.addEventListener("click", function () {
+          const isClosed = sidebar.classList.contains("-translate-x-full");
+          setSidebar(isClosed);
+        });
+
+        function handleResize() {
+          if (window.innerWidth >= 768) {
+            sidebar.classList.remove("-translate-x-full");
+            sidebar.classList.add("translate-x-0");
+            main.classList.add("md:pl-64");
+            menuIcon.classList.remove("ri-close-line");
+            menuIcon.classList.add("ri-menu-line");
+          } else {
+            sidebar.classList.remove("translate-x-0");
+            sidebar.classList.add("-translate-x-full");
+            main.classList.remove("md:pl-64");
+            menuIcon.classList.remove("ri-close-line");
+            menuIcon.classList.add("ri-menu-line");
+          }
+        }
+
+        window.addEventListener("resize", handleResize);
+        handleResize();
+      });
+    </script>
     <!-- Sidebar -->
     <aside
       id="sidebar"
@@ -364,72 +410,83 @@
             </div>
           </div>
         </div>
-        <nav class="flex-1 p-4 overflow-y-auto">
+       <nav class="flex-1 p-4 overflow-y-auto">
           <ul class="space-y-1">
             <li>
               <a
-          href="AdminUsers.html"
-          class="nav-link w-full flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-600 hover:text-primary hover:bg-blue-50"
+            href="AdminUsers.html"
+            class="nav-link w-full flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-600 hover:text-primary hover:bg-blue-50"
               >
-          <div class="w-5 h-5 flex items-center justify-center mr-3">
-            <i class="ri-user-line"></i>
-          </div>
-          <span>Users</span>
+            <div class="w-5 h-5 flex items-center justify-center mr-3">
+              <i class="ri-user-line"></i>
+            </div>
+            <span>Users</span>
               </a>
             </li>
             <li>
               <a
-          href="AdminSubscriptions.html"
-          class="nav-link w-full flex items-center px-3 py-2 text-sm font-medium rounded-md text-primary bg-blue-50"
+            href="AdminSubscriptions.html"
+            class="nav-link w-full flex items-center px-3 py-2 text-sm font-medium rounded-md text-primary bg-blue-50"
               >
-          <div class="w-5 h-5 flex items-center justify-center mr-3">
-            <i class="ri-vip-crown-line"></i>
-          </div>
-          <span>Subscriptions</span>
+            <div class="w-5 h-5 flex items-center justify-center mr-3">
+              <i class="ri-vip-crown-line"></i>
+            </div>
+            <span>Subscriptions</span>
               </a>
             </li>
             <li>
               <a
-          href="AdminWallets.html"
-          class="nav-link w-full flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-600 hover:text-primary hover:bg-blue-50"
+            href="AdminWallets.html"
+           class="nav-link w-full flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-600 hover:text-primary hover:bg-blue-50"
               >
-          <div class="w-5 h-5 flex items-center justify-center mr-3">
-            <i class="ri-wallet-3-line"></i>
-          </div>
-          <span>Wallets</span>
+            <div class="w-5 h-5 flex items-center justify-center mr-3">
+              <i class="ri-wallet-3-line"></i>
+            </div>
+            <span>Wallets</span>
               </a>
             </li>
             <li>
               <a
-          href="AdminPayments.html"
-          class="nav-link w-full flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-600 hover:text-primary hover:bg-blue-50"
+            href="AdminPlans.html"
+            class="nav-link w-full flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-600 hover:text-primary hover:bg-blue-50"
               >
-          <div class="w-5 h-5 flex items-center justify-center mr-3">
-            <i class="ri-exchange-dollar-line"></i>
-          </div>
-          <span>Payments</span>
+            <div class="w-5 h-5 flex items-center justify-center mr-3">
+              <i class="ri-list-settings-line"></i>
+            </div>
+            <span>Plans</span>
               </a>
             </li>
             <li>
               <a
-          href="AdminPending.html"
-          class="nav-link w-full flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-600 hover:text-primary hover:bg-blue-50"
+            href="AdminPayments.html"
+            class="nav-link w-full flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-600 hover:text-primary hover:bg-blue-50"
               >
-          <div class="w-5 h-5 flex items-center justify-center mr-3">
-            <i class="ri-time-line"></i>
-          </div>
-          <span>Pending Payments</span>
+            <div class="w-5 h-5 flex items-center justify-center mr-3">
+              <i class="ri-exchange-dollar-line"></i>
+            </div>
+            <span>Payments</span>
               </a>
             </li>
             <li>
               <a
-          href="AdminSettings.html"
-          class="nav-link w-full flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-600 hover:text-primary hover:bg-blue-50"
+            href="AdminPending.html"
+            class="nav-link w-full flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-600 hover:text-primary hover:bg-blue-50"
               >
-          <div class="w-5 h-5 flex items-center justify-center mr-3">
-            <i class="ri-settings-3-line"></i>
-          </div>
-          <span>Settings</span>
+            <div class="w-5 h-5 flex items-center justify-center mr-3">
+              <i class="ri-time-line"></i>
+            </div>
+            <span>Pending Payments</span>
+              </a>
+            </li>
+            <li>
+              <a
+            href="AdminSettings.html"
+            class="nav-link w-full flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-600 hover:text-primary hover:bg-blue-50"
+              >
+            <div class="w-5 h-5 flex items-center justify-center mr-3">
+              <i class="ri-settings-3-line"></i>
+            </div>
+            <span>Settings</span>
               </a>
             </li>
           </ul>
