@@ -129,12 +129,22 @@
                                 <span class="sidebar-text">E-commerce</span>
                             </a>
                         </li>
-                         <li class="mb-2">
-                <a href="Dashboard-pay.html" class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-r-lg hover:text-primary transition-colors">
-                  <div class="w-6 h-6 flex items-center justify-center mr-3"> <i class="ri-bank-card-line"></i></div>
-                  <span class="sidebar-text">Payment</span>
-                </a>
-              </li>
+                        <li class="mb-2">
+                            <a href="Dashboard-pay.html" class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-r-lg hover:text-primary transition-colors">
+                                <div class="w-6 h-6 flex items-center justify-center mr-3">
+                                    <i class="ri-bank-card-line"></i>
+                                </div>
+                                <span class="sidebar-text">Payment</span>
+                            </a>
+                        </li>
+                        <li class="mb-2">
+                            <a href="Dashboard-his.html" class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-r-lg hover:text-primary transition-colors">
+                                <div class="w-6 h-6 flex items-center justify-center mr-3">
+                                    <i class="ri-file-list-2-line"></i>
+                                </div>
+                                <span class="sidebar-text">Transaction History</span>
+                            </a>
+                        </li>
                         <li class="mb-2">
                             <a href="Dashboard-set.html" class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-r-lg hover:text-primary transition-colors">
                                 <div class="w-6 h-6 flex items-center justify-center mr-3">
@@ -149,21 +159,21 @@
                 <!-- Upgrade section -->
                 <div id="upgrade-section" class="p-4 border-t">
                     <div id="upgrade-expanded" class="bg-gray-50 rounded-lg p-4 mb-3">
-                        <p class="text-sm text-gray-600 mb-2">Credits remaining</p>
+                        <p class="text-sm text-gray-600 mb-2 sidebar-text">Credits remaining</p>
                         <div class="flex items-center justify-between">
-                            <span class="font-semibold text-lg">1,250</span>
-                            <span class="text-xs text-gray-500">of 2,000</span>
+                            <span class="font-semibold text-lg sidebar-text">1,250</span>
+                            <span class="text-xs text-gray-500 sidebar-text">of 2,000</span>
                         </div>
                         <div class="w-full bg-gray-200 rounded-full h-2 mt-2">
                             <div class="bg-primary rounded-full h-2" style="width: 62.5%"></div>
                         </div>
                     </div>
                     <a href="Dashboard-pay.html">
-                    <button id="upgrade-btn-expanded" class="w-full bg-primary text-white py-2 px-4 rounded-button flex items-center justify-center whitespace-nowrap hover:bg-blue-600 transition-colors">
+                    <button id="upgrade-btn-expanded" class="w-full bg-primary text-white py-2 px-4 rounded-button flex items-center justify-center whitespace-nowrap hover:bg-blue-600 transition-colors sidebar-text">
                         <div class="w-5 h-5 flex items-center justify-center mr-2">
                             <i class="ri-arrow-up-line"></i>
                         </div>
-                        <span>Upgrade Plan</span>
+                        <span class="sidebar-text">Upgrade Plan</span>
                     </button>
                     </a>
                     <a href="Dashboard-pay.html">
@@ -172,6 +182,70 @@
                     </button>
                     </a>
                 </div>
+                <script>
+                    document.addEventListener('DOMContentLoaded', function() {
+                        const sidebar = document.getElementById('sidebar');
+                        const upgradeExpanded = document.getElementById('upgrade-expanded');
+                        const upgradeBtnExpanded = document.getElementById('upgrade-btn-expanded');
+                        const upgradeBtnCollapsed = document.getElementById('upgrade-btn-collapsed');
+                        const logoImg = document.getElementById('sidebar-logo-img');
+                        const logoText = document.getElementById('sidebar-logo-text');
+                        const sidebarTexts = document.querySelectorAll('.sidebar-text');
+
+                        function isMobile() {
+                            return window.innerWidth < 768;
+                        }
+
+                        function updateUpgradeSection() {
+                            if (sidebar.classList.contains('sidebar-collapsed')) {
+                                upgradeExpanded.style.display = 'none';
+                                upgradeBtnExpanded.style.display = 'none';
+                                upgradeBtnCollapsed.classList.remove('hidden');
+                                // Hide texts on mobile when collapsed
+                                if (isMobile()) {
+                                    sidebarTexts.forEach(text => text.style.display = 'none');
+                                }
+                            } else {
+                                upgradeExpanded.style.display = '';
+                                upgradeBtnExpanded.style.display = '';
+                                upgradeBtnCollapsed.classList.add('hidden');
+                                // Show texts on mobile when expanded
+                                sidebarTexts.forEach(text => text.style.display = '');
+                            }
+                        }
+
+                        function updateLogo() {
+                            if (sidebar.classList.contains('sidebar-collapsed')) {
+                                logoImg.classList.remove('hidden');
+                                logoText.classList.add('hidden');
+                            } else {
+                                logoImg.classList.add('hidden');
+                                logoText.classList.remove('hidden');
+                            }
+                        }
+
+                        // Initial state
+                        updateUpgradeSection();
+                        updateLogo();
+
+                        // Listen for sidebar toggle
+                        const sidebarToggle = document.getElementById('sidebar-toggle');
+                        sidebarToggle.addEventListener('click', function() {
+                            setTimeout(() => {
+                                updateUpgradeSection();
+                                updateLogo();
+                            }, 310); // Wait for transition
+                        });
+
+                        // Also update on resize (for responsive)
+                        window.addEventListener('resize', function() {
+                            setTimeout(() => {
+                                updateUpgradeSection();
+                                updateLogo();
+                            }, 310);
+                        });
+                    });
+                </script>
                 <script>
                     document.addEventListener('DOMContentLoaded', function() {
                         const sidebar = document.getElementById('sidebar');
