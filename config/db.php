@@ -18,5 +18,5 @@ try{
 }
 
 // Mock data configuration
-define("USE_MOCK_DATA", true);
+define("USE_MOCK_DATA", false);
 

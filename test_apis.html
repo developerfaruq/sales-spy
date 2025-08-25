@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>API Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test { margin: 20px 0; padding: 15px; border: 1px solid #ccc; }
+        .success { background: #e7f5e7; border-color: #4CAF50; }
+        .error { background: #ffeaea; border-color: #f44336; }
+        button { padding: 10px 15px; margin: 5px; cursor: pointer; }
+        pre { background: #f5f5f5; padding: 10px; overflow: auto; max-height: 300px; }
+    </style>
+</head>
+<body>
+    <h1>Sales-Spy API Test</h1>
+    
+    <div class="test">
+        <h3>Test 1: Regular Stores API</h3>
+        <button onclick="testRegularAPI()">Test filter_stores.php</button>
+        <div id="regular-result"></div>
+    </div>
+    
+    <div class="test">
+        <h3>Test 2: Intelligence API</h3>
+        <button onclick="testIntelligenceAPI()">Test fetch_shopify_intelligence.php</button>
+        <div id="intelligence-result"></div>
+    </div>
+    
+    <div class="test">
+        <h3>Test 3: Intelligence API with Auto-Update</h3>
+        <button onclick="testIntelligenceAPIWithUpdate()">Test with auto_update=true</button>
+        <div id="intelligence-update-result"></div>
+    </div>
+
+    <script>
+        async function testAPI(url, resultId, description) {
+            const resultDiv = document.getElementById(resultId);
+            resultDiv.innerHTML = `<p>Testing ${description}...</p>`;
+            
+            try {
+                console.log('Testing URL:', url);
+                const response = await fetch(url);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const text = await response.text();
+                console.log('Raw response:', text.substring(0, 200));
+                
+                let data;
+                try {
+                    data = JSON.parse(text);
+                } catch (parseError) {
+                    throw new Error(`JSON Parse Error: ${parseError.message}. Response: ${text.substring(0, 200)}`);
+                }
+                
+                resultDiv.className = 'success';
+                resultDiv.innerHTML = `
+                    <h4>✅ ${description} - Success</h4>
+                    <p><strong>URL:</strong> ${url}</p>
+                    <p><strong>Status:</strong> ${response.status}</p>
+                    <p><strong>Stores Found:</strong> ${data.stores ? data.stores.length : 'N/A'}</p>
+                    <p><strong>Total Stores:</strong> ${data.pagination?.total_stores || 'N/A'}</p>
+                    <details>
+                        <summary>View Response</summary>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    </details>
+                `;
+                
+            } catch (error) {
+                console.error('API Test Error:', error);
+                resultDiv.className = 'error';
+                resultDiv.innerHTML = `
+                    <h4>❌ ${description} - Failed</h4>
+                    <p><strong>URL:</strong> ${url}</p>
+                    <p><strong>Error:</strong> ${error.message}</p>
+                `;
+            }
+        }
+        
+        function testRegularAPI() {
+            testAPI('/api/filter_stores.php?page=1&limit=5', 'regular-result', 'Regular Stores API');
+        }
+        
+        function testIntelligenceAPI() {
+            testAPI('/api/fetch_shopify_intelligence.php?page=1&limit=5', 'intelligence-result', 'Intelligence API');
+        }
+        
+        function testIntelligenceAPIWithUpdate() {
+            testAPI('/api/fetch_shopify_intelligence.php?page=1&limit=5&auto_update=true', 'intelligence-update-result', 'Intelligence API with Auto-Update');
+        }
+    </script>
+</body>
+</html>

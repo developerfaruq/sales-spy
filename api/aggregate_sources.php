@@ -163,11 +163,24 @@ function normalizeItemsFromApi(string $platform, $data): array
 
 $items = [];
 
-// Shopify: API
+// Shopify: API (your own store) + Public Scraper (other stores)
 if ($platform === '' || $platform === 'shopify') {
+    // Your own store via private API
     $resp = callLocalRaw('fetch_shopify_data.php', []);
     if ($resp['status'] === 200) {
         $items = array_merge($items, normalizeItemsFromApi('shopify', $resp['data']));
+    }
+    
+    // Public scraping of other Shopify stores
+    if ($store !== '' || $url !== '') {
+        $scrapeParams = [];
+        if ($store !== '') $scrapeParams['store'] = $store;
+        if ($url !== '') $scrapeParams['url'] = $url;
+        
+        $shopifyS = callLocalRaw('fetch_shopify_scraper.php', $scrapeParams);
+        if ($shopifyS['status'] === 200 && isset($shopifyS['data']['items'])) {
+            $items = array_merge($items, (array) $shopifyS['data']['items']);
+        }
     }
 }
 

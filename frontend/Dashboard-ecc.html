@@ -422,10 +422,33 @@
         <!-- Content -->
         <main class="flex-1 p-6">
           <div class="mb-6">
-            <h1 class="text-2xl font-bold text-primary mb-2" style="color: #1E3A8A;">E-commerce</h1>
+            <h1 class="text-2xl font-bold text-primary mb-2" style="color: #1E3A8A;">E-commerce Intelligence</h1>
             <p class="text-gray-600">
-              Search, filter, and discover <span class="font-bold " style="color: #1E3A8A;">E-commerce leads</span> for your business.
+              Discover and analyze <span class="font-bold " style="color: #1E3A8A;">competitor Shopify stores</span> for market intelligence.
             </p>
+          </div>
+          <!-- Data Source Toggle -->
+          <div class="bg-white rounded shadow-sm mb-4">
+            <div class="p-4 flex items-center justify-between">
+              <div class="flex items-center space-x-4">
+                <h2 class="text-lg font-semibold text-gray-800">Data Source</h2>
+                <div class="flex items-center space-x-2">
+                  <span class="text-sm text-gray-600">Database Data</span>
+                  <label class="custom-switch">
+                    <input type="checkbox" id="toggleIntelligenceData" />
+                    <span class="slider"></span>
+                  </label>
+                  <span class="text-sm text-gray-600">Live Competitor Data</span>
+                </div>
+              </div>
+              <div class="flex items-center space-x-2">
+                <button id="autoUpdateBtn" class="bg-green-500 text-white px-4 py-2 rounded-button text-sm hover:bg-green-600 transition-colors">
+                  <i class="ri-refresh-line mr-1"></i>
+                  Auto Update
+                </button>
+                <span id="lastUpdated" class="text-xs text-gray-500"></span>
+              </div>
+            </div>
           </div>
           <!-- Filters Section -->
           <div class="bg-white rounded shadow-sm mb-6">
@@ -459,6 +482,7 @@
                     >Platform</label
                   >
                   <select
+                    id="platformFilter"
                     class="w-full px-3 py-2 border border-gray-300 rounded text-sm custom-select pr-8"
                   >
                     <option value="">All Platforms</option>
@@ -466,6 +490,25 @@
                     <option value="woocommerce">WooCommerce</option>
                     <option value="magento">Magento</option>
                     <option value="wordpress">WordPress</option>
+                  </select>
+                </div>
+                <div id="categoryFilter" class="hidden">
+                  <label class="block text-sm font-medium text-gray-700 mb-1"
+                    >Category</label
+                  >
+                  <select
+                    id="categorySelect"
+                    class="w-full px-3 py-2 border border-gray-300 rounded text-sm custom-select pr-8"
+                  >
+                    <option value="">All Categories</option>
+                    <option value="fashion">Fashion</option>
+                    <option value="beauty">Beauty</option>
+                    <option value="home">Home</option>
+                    <option value="tech">Tech</option>
+                    <option value="fitness">Fitness</option>
+                    <option value="jewelry">Jewelry</option>
+                    <option value="food">Food</option>
+                    <option value="electronics">Electronics</option>
                   </select>
                 </div>
                 <div>
@@ -688,6 +731,7 @@
               </div>
               <div class="flex mt-6">
                 <button
+                  id="searchBtn"
                   class="bg-primary text-white px-6 py-2 rounded-button flex items-center whitespace-nowrap mr-3"
                 >
                   <div class="w-5 h-5 flex items-center justify-center mr-2">
@@ -696,6 +740,7 @@
                   Search
                 </button>
                 <button
+                  id="resetBtn"
                   class="bg-gray-100 text-gray-700 px-6 py-2 rounded-button whitespace-nowrap"
                 >
                   Reset
@@ -708,7 +753,7 @@
             <div
               class="p-4 border-b border-gray-100 flex justify-between items-center"
             >
-              <div class="text-sm text-gray-600">Found 317,455 Stores</div>
+              <div id="resultsCount" class="text-sm text-gray-600">Loading stores...</div>
               <div class="flex items-center">
                 <button
                   class="bg-gray-100 text-gray-700 px-3 py-1.5 rounded-button text-sm whitespace-nowrap mr-3"
@@ -888,1109 +933,46 @@
                     </th>
                   </tr>
                 </thead>
-                <tbody class="bg-white divide-y divide-gray-200">
-                  <tr class="hover:bg-gray-50 result-row cursor-pointer"
-                      data-domain="yamloveme.com"
-                      data-platform="Shopify"
-                      data-title="yamloveme"
-                      data-description="Trendy jewelry and accessories"
-                      data-country="US"
-                      data-productcount="1900"
-                      data-price="37.69"
-                  >
-                    <td class="px-6 py-4 whitespace-nowrap">
-                      <div class="flex items-center">
-                        <div
-                          class="w-8 h-8 flex items-center justify-center bg-red-100 rounded-full mr-3"
-                        >
-                          <i class="ri-heart-fill text-red-500"></i>
-                        </div>
-                        <div class="text-sm font-medium text-gray-900">
-                          yamloveme.com
-                        </div>
-                      </div>
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      Shopify
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      yamloveme
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      Trendy jewelry and accessories
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      EN
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      US
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      1900
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      12
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      37.69
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      USD
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      +1 555-5678
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      8
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      2019-04-12
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      2024-05-01
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      2024-06-01
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      2,100
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      5,400
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      1,200
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      800
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      <a href="#">facebook.com/yamloveme</a>
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      <a href="#">twitter.com/yamloveme</a>
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      <a href="#">instagram.com/yamloveme</a>
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      <a href="#">pinterest.com/yamloveme</a>
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      <a href="#">tiktok.com/@yamloveme</a>
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      <a href="#">youtube.com/yamloveme</a>
-                    </td>
-                  </tr>
-                  <tr class="hover:bg-gray-50 result-row cursor-pointer"
-                      data-domain="true-compress.com"
-                      data-platform="Shopify"
-                      data-title="True Compress"
-                      data-description="Compression wear for athletes"
-                      data-country="GB"
-                      data-productcount="10"
-                      data-price="42.04"
-                  >
-                    <td class="px-6 py-4 whitespace-nowrap">
-                      <div class="flex items-center">
-                        <div
-                          class="w-8 h-8 flex items-center justify-center bg-blue-100 rounded-full mr-3"
-                        >
-                          <i class="ri-compress-line text-blue-500"></i>
-                        </div>
-                        <div class="text-sm font-medium text-gray-900">
-                          true-compress.com
-                        </div>
-                      </div>
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      Shopify
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      True Compress
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      Compression wear for athletes
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      EN
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      GB
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      10
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      3
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      42.04
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      GBP
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      support@true-compress.com
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      +44 20 1234 5678
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      +44 7700 900123
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      2
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      2021-08-22
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      2024-05-15
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      2024-06-01
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      1,000
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      2,300
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      500
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      300
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      <a href="#">facebook.com/truecompress</a>
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      <a href="#">twitter.com/truecompress</a>
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      <a href="#">instagram.com/truecompress</a>
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      <a href="#">pinterest.com/truecompress</a>
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      <a href="#">tiktok.com/@truecompress</a>
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      <a href="#">youtube.com/truecompress</a>
-                    </td>
-                  </tr>
-                  <tr class="hover:bg-gray-50 result-row cursor-pointer"
-                      data-domain="www.telenaarl.com"
-                      data-platform="Shopify"
-                      data-title="TeleNaarl – Timeless Jewellery for Every Occasion"
-                      data-description="Fine jewelry for all occasions"
-                      data-country="IN"
-                      data-productcount="1185"
-                      data-price="93.04"
-                  >
-                    <td class="px-6 py-4 whitespace-nowrap">
-                      <div class="flex items-center">
-                        <div
-                          class="w-8 h-8 flex items-center justify-center bg-green-100 rounded-full mr-3"
-                        >
-                          <i class="ri-store-fill text-green-500"></i>
-                        </div>
-                        <div class="text-sm font-medium text-gray-900">
-                          dbfay.com
-                        </div>
-                      </div>
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      Shopify
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      dbfay
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      Fashion and accessories
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      FR
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      FR
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      840
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      6
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      35.56
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      EUR
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      contact@dbfay.com
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      +33 1 23 45 67 89
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      +33 6 12 34 56 78
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      3
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      2020-02-18
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      2024-05-25
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      2024-06-01
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      1,500
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      2,800
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      600
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      400
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      <a href="#">facebook.com/dbfay</a>
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      <a href="#">twitter.com/dbfay</a>
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      <a href="#">instagram.com/dbfay</a>
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      <a href="#">pinterest.com/dbfay</a>
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      <a href="#">tiktok.com/@dbfay</a>
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      <a href="#">youtube.com/dbfay</a>
-                    </td>
-                  </tr>
-                  <tr class="hover:bg-gray-50 result-row cursor-pointer"
-                      data-domain="epicfalls.legendary-laughs.shop"
-                      data-platform="Shopify"
-                      data-title="Epic Falls: Legendary Laughs!"
-                      data-description="Humor gifts and novelties"
-                      data-country="US"
-                      data-productcount="3"
-                      data-price="1623.08"
-                  >
-                    <td class="px-6 py-4 whitespace-nowrap">
-                      <div class="flex items-center">
-                        <div
-                          class="w-8 h-8 flex items-center justify-center bg-yellow-100 rounded-full mr-3"
-                        >
-                          <i class="ri-emotion-laugh-fill text-yellow-500"></i>
-                        </div>
-                        <div class="text-sm font-medium text-gray-900">
-                          epicfalls.legendary-laughs.shop
-                        </div>
-                      </div>
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      Shopify
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      Epic Falls: Legendary Laughs! – EpicFalls
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      Humor gifts and novelties
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      EN
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      US
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      3
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      1
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      1623.08
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      USD
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                     
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      +1 555-9876
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      +1 555-4321
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      1
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      2022-01-05
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      2024-05-28
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      2024-06-01
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      500
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      1,000
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      200
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      100
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      <a href="#">facebook.com/epicfalls</a>
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      <a href="#">twitter.com/epicfalls</a>
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      <a href="#">instagram.com/epicfalls</a>
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      <a href="#">pinterest.com/epicfalls</a>
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      <a href="#">tiktok.com/@epicfalls</a>
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      <a href="#">youtube.com/epicfalls</a>
-                    </td>
-                  </tr>
-                  <tr class="hover:bg-gray-50 result-row cursor-pointer"
-                      data-domain="akitada.com"
-                      data-platform="Shopify"
-                      data-title="akitada"
-                      data-description="Japanese home goods"
-                      data-country="DE"
-                      data-productcount="165"
-                      data-price="29.96"
-                  >
-                    <td class="px-6 py-4 whitespace-nowrap">
-                      <div class="flex items-center">
-                        <div
-                          class="w-8 h-8 flex items-center justify-center bg-indigo-100 rounded-full mr-3"
-                        >
-                          <i class="ri-store-2-fill text-indigo-500"></i>
-                        </div>
-                        <div class="text-sm font-medium text-gray-900">
-                          akitada.com
-                        </div>
-                      </div>
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      Shopify
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      akitada
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      Japanese home goods
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      DE
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      DE
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      165
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      4
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      29.96
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      EUR
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      kontakt@akitada.com
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      +49 30 123456
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      +49 170 1234567
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      0
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      2017-07-30
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      2024-05-30
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      2024-06-01
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      800
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      1,200
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      300
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      150
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      <a href="#">facebook.com/akitada</a>
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      <a href="#">twitter.com/akitada</a>
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      <a href="#">instagram.com/akitada</a>
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      <a href="#">pinterest.com/akitada</a>
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      <a href="#">tiktok.com/@akitada</a>
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      <a href="#">youtube.com/akitada</a>
-                    </td>
-                  </tr>
-                  <tr class="hover:bg-gray-50 result-row cursor-pointer"
-                      data-domain="avapros.com"
-                      data-platform="Shopify"
-                      data-title="avapros"
-                      data-description="Professional beauty products"
-                      data-country="ID"
-                      data-productcount="1181"
-                      data-price="35.73"
-                  >
-                    <td class="px-6 py-4 whitespace-nowrap">
-                      <div class="flex items-center">
-                        <div
-                          class="w-8 h-8 flex items-center justify-center bg-orange-100 rounded-full mr-3"
-                        >
-                          <i class="ri-fox-fill text-orange-500"></i>
-                        </div>
-                        <div class="text-sm font-medium text-gray-900">
-                          foxness.com
-                        </div>
-                      </div>
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      Shopify
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      foxness
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      Pet accessories and toys
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      NL
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      NL
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      610
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      5
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      31.95
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      EUR
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      info@foxness.com
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      +31 20 1234567
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      +31 6 12345678
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      2
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      2023-02-14
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      2024-05-29
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      2024-06-01
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      900
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      1,500
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      400
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      250
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      <a href="#">facebook.com/foxness</a>
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      <a href="#">twitter.com/foxness</a>
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      <a href="#">instagram.com/foxness</a>
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      <a href="#">pinterest.com/foxness</a>
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      <a href="#">tiktok.com/@foxness</a>
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      <a href="#">youtube.com/foxness</a>
-                    </td>
-                  </tr>
-                  <tr class="hover:bg-gray-50 result-row cursor-pointer"
-                      data-domain="cofuze.com"
-                      data-platform="Shopify"
-                      data-title="cofuze.com - CoFuze™"
-                      data-description="Coffee accessories and mugs"
-                      data-country="IN"
-                      data-productcount="90"
-                      data-price="87.64"
-                  >
-                    <td class="px-6 py-4 whitespace-nowrap">
-                      <div class="flex items-center">
-                        <div
-                          class="w-8 h-8 flex items-center justify-center bg-teal-100 rounded-full mr-3"
-                        >
-                          <i class="ri-building-2-fill text-teal-500"></i>
-                        </div>
-                        <div class="text-sm font-medium text-gray-900">
-                          cofuze.com
-                        </div>
-                      </div>
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      Shopify
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      cofuze.com - CoFuze™
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      Coffee accessories and mugs
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      EN
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      IN
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      90
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      2
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      87.64
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      INR
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      support@cofuze.com
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      +91 44 1234 5678
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      +91 90000 56789
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      0
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      2022-10-10
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      2024-05-31
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      2024-06-01
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      400
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      900
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      100
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      50
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      <a href="#">facebook.com/cofuze</a>
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      <a href="#">twitter.com/cofuze</a>
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      <a href="#">instagram.com/cofuze</a>
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      <a href="#">pinterest.com/cofuze</a>
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      <a href="#">tiktok.com/@cofuze</a>
-                    </td>
-                    <td
-                      class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
-                    >
-                      <a href="#">youtube.com/cofuze</a>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
+          <!-- Results Section -->
+          <div class="bg-white rounded shadow-sm">
             <div
-              class="px-6 py-4 flex items-center justify-between border-t border-gray-200"
+              class="p-4 border-b border-gray-100 flex justify-between items-center"
             >
+              <div id="resultsCount" class="text-sm text-gray-600">Loading stores...</div>
               <div class="flex items-center">
-                <p class="text-sm text-gray-700">
-                  Showing <span class="font-medium">1</span> to
-                  <span class="font-medium">10</span> of
-                  <span class="font-medium">317,455</span> results
-                </p>
-              </div>
-              <div class="flex items-center space-x-2">
                 <button
-                  class="bg-primary text-white w-8 h-8 rounded flex items-center justify-center"
+                  class="bg-gray-100 text-gray-700 px-3 py-1.5 rounded-button text-sm whitespace-nowrap mr-3"
                 >
-                  <span>1</span>
+                  <div class="flex items-center">
+                    <div class="w-4 h-4 flex items-center justify-center mr-1">
+                      <i class="ri-download-line"></i>
+                    </div>
+                    Export
+                  </div>
                 </button>
                 <button
-                  class="text-gray-500 hover:bg-gray-100 w-8 h-8 rounded flex items-center justify-center"
+                  id="display-columns-btn"
+                  class="bg-gray-100 text-gray-700 px-3 py-1.5 rounded-button text-sm whitespace-nowrap relative focus:outline-none"
+                  type="button"
+                  aria-haspopup="true"
+                  aria-expanded="false"
                 >
-                  <span>2</span>
-                </button>
-                <button
-                  class="text-gray-500 hover:bg-gray-100 w-8 h-8 rounded flex items-center justify-center"
-                >
-                  <span>3</span>
-                </button>
-                <span class="text-gray-500">...</span>
-                <button
-                  class="text-gray-500 hover:bg-gray-100 w-8 h-8 rounded flex items-center justify-center"
-                >
-                  <span>233</span>
-                </button>
-                <button
-                  class="text-gray-500 hover:bg-gray-100 w-8 h-8 rounded flex items-center justify-center"
-                >
-                  <span>234</span>
-                </button>
-                <button
-                  class="text-gray-500 hover:bg-gray-100 w-8 h-8 rounded flex items-center justify-center"
-                >
-                  <div class="w-4 h-4 flex items-center justify-center">
-                    <i class="ri-arrow-right-s-line"></i>
+                  <div class="flex items-center">
+                    <div class="w-4 h-4 flex items-center justify-center mr-1">
+                      <i class="ri-list-check"></i>
+                    </div>
+                    Display
                   </div>
                 </button>
               </div>
+            </div>
+            <div class="overflow-x-auto">
+              <div id="results" class="min-h-[400px]">
+                <!-- Dynamic competitive intelligence data will be loaded here by JavaScript -->
+              </div>
+            </div>
+            <div id="pagination" class="px-6 py-4 flex items-center justify-between border-t border-gray-200">
+              <!-- Pagination will be populated by JavaScript -->
             </div>
           </div>
         </main>
@@ -2850,244 +1832,371 @@
     <script>
     let currentPage = 1;
     const itemsPerPage = 10;
+    let isIntelligenceMode = false;
+    let autoUpdateInterval = null;
 
-    function fetchStores(page = 1) {
+    function fetchStores(page = 1, autoUpdate = false) {
       currentPage = page;
-      const platform = document.getElementById('platform').value;
-      const createdAfter = document.getElementById('created_after').value;
-      const createdBefore = document.getElementById('created_before').value;
+      const platformEl = document.getElementById('platformFilter');
+      const categoryEl = document.getElementById('categorySelect');
+      const createdAfterEl = document.getElementById('indexedDateFilter');
+      
+      const platform = platformEl?.value || '';
+      const category = categoryEl?.value || '';
+      const createdAfter = createdAfterEl?.value || '';
+      
       const resultsDiv = document.getElementById('results');
       const paginationDiv = document.getElementById('pagination');
+      const resultsCount = document.getElementById('resultsCount');
+      
+      // Check if required elements exist
+      if (!resultsDiv || !paginationDiv) {
+        console.error('Required DOM elements not found');
+        return;
+      }
+      
+      // Show loading state
+      if (resultsCount) resultsCount.textContent = 'Loading stores...';
 
-      // Construct URL with filters and pagination
-      const url = `../api/filter_stores.php?page=${currentPage}&limit=${itemsPerPage}&platform=${platform}&created_after=${createdAfter}&created_before=${createdBefore}`;
+      // Choose API endpoint based on mode
+      let url;
+      if (isIntelligenceMode) {
+        url = `../api/fetch_shopify_intelligence.php?page=${currentPage}&limit=${itemsPerPage}&platform=shopify&category=${encodeURIComponent(category)}&auto_update=${autoUpdate}`;
+        console.log('Using intelligence API:', url);
+      } else {
+        url = `../api/filter_stores.php?page=${currentPage}&limit=${itemsPerPage}&platform=${encodeURIComponent(platform)}&created_after=${encodeURIComponent(createdAfter)}`;
+        console.log('Using regular API:', url);
+      }
 
       fetch(url)
         .then(response => {
           if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
           }
-          return response.json();
+          return response.text(); // Get as text first to check content
+        })
+        .then(text => {
+          // Try to parse as JSON
+          let data;
+          try {
+            data = JSON.parse(text);
+          } catch (e) {
+            console.error('Invalid JSON response:', text);
+            throw new Error('Server returned invalid JSON response');
+          }
+          return data;
         })
         .then(data => {
           resultsDiv.innerHTML = ''; // Clear previous results
           paginationDiv.innerHTML = ''; // Clear previous pagination
 
-          if (data.stores && data.stores.length > 0) {
-            const table = document.createElement('table');
-            table.className = 'min-w-full divide-y divide-gray-200';
-            let tableHTML = `
-              <thead class="bg-gray-50">
-                <tr>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Domain</th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Platform</th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Title</th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Language</th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Country</th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product Count</th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Avg Price</th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Currency</th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Phone</th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">WhatsApp</th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fb Ad Count</th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Domain Reg Date</th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Latest Product Upload Date</th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Indexed Date</th>
-                </tr>
-              </thead>
-              <tbody class="bg-white divide-y divide-gray-200">
+          if (data.stores && Array.isArray(data.stores) && data.stores.length > 0) {
+            console.log('Processing stores data:', data.stores.length, 'stores found');
+            console.log('First store sample:', data.stores[0]);
+            
+            // Create table with proper structure
+            const tableHTML = `
+              <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                  <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Store</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Platform</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Title</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Country</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product Count</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Avg Price</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Currency</th>
+                  </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                  ${data.stores.map(store => {
+                    // Safe value extraction with fallbacks
+                    const domain = store.domain || store.url || store.website || 'N/A';
+                    const platform = store.platform || store.tech_stack || 'Shopify';
+                    const title = store.title || store.name || store.site_name || domain;
+                    const description = store.description || store.meta_description || 'No description available';
+                    const country = store.country || store.country_code || 'N/A';
+                    const productCount = store.product_count || store.products_count || '0';
+                    const avgPrice = store.avg_price || store.average_price || '0.00';
+                    const currency = store.currency || store.currency_code || 'USD';
+                    
+                    return `
+                      <tr class="hover:bg-gray-50 cursor-pointer" onclick="showStoreDetails('${encodeURIComponent(JSON.stringify(store))}')">
+                        <td class="px-6 py-4 whitespace-nowrap">
+                          <div class="flex items-center">
+                            <div class="w-8 h-8 flex items-center justify-center bg-blue-100 rounded-full mr-3">
+                              <i class="ri-store-2-fill text-blue-500"></i>
+                            </div>
+                            <div class="text-sm font-medium text-gray-900">${domain}</div>
+                          </div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${platform}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${title}</td>
+                        <td class="px-6 py-4 text-sm text-gray-500 max-w-xs truncate" title="${description}">${description}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${country}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${productCount}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${avgPrice}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${currency}</td>
+                      </tr>
+                    `;
+                  }).join('')}
+                </tbody>
+              </table>
             `;
-            data.stores.forEach(store => {
-              tableHTML += `
-                <tr>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-blue-600 hover:underline cursor-pointer" onclick="showStoreDetails(${encodeURIComponent(JSON.stringify(store))})">${store.domain}</td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${store.tech_stack}</td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${store.title}</td>
-                  <td class="px-6 py-4 text-sm text-gray-500 truncate max-w-xs">${store.description}</td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${store.language}</td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${store.country}</td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${store.product_count}</td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${store.avg_price}</td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${store.currency}</td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${store.contact_email}</td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${store.contact_phone}</td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${store.whatsapp_number}</td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${store.facebook_ads_count}</td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${new Date(store.date_added).toLocaleDateString()}</td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">N/A</td> <!-- Placeholder, as no such field in DB -->
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${new Date(store.date_added).toLocaleDateString()}</td>
-                </tr>
-              `;
-            });
-            tableHTML += `</tbody></table>`;
+            
             resultsDiv.innerHTML = tableHTML;
+            
+            // Update results count
+            if (resultsCount) {
+              const total = data.pagination?.total || data.stores.length;
+              const showing = data.stores.length;
+              const pageNum = data.pagination?.page || 1;
+              resultsCount.textContent = `Showing ${showing} stores (Page ${pageNum} of ${data.pagination?.total_pages || 1})`;
+            }
 
-            // Pagination controls
+            // Create pagination controls
             const pagination = data.pagination;
-            if (pagination.total_pages > 1) {
+            if (pagination && pagination.total_pages > 1) {
+              let paginationHTML = '<div class="flex items-center justify-between">';
+              
+              // Page info
+              paginationHTML += `<div class="flex items-center">`;
+              paginationHTML += `<p class="text-sm text-gray-700">`;
+              paginationHTML += `Showing <span class="font-medium">${((pagination.page - 1) * itemsPerPage) + 1}</span> to `;
+              paginationHTML += `<span class="font-medium">${Math.min(pagination.page * itemsPerPage, pagination.total)}</span> of `;
+              paginationHTML += `<span class="font-medium">${pagination.total}</span> results`;
+              paginationHTML += `</p></div>`;
+              
+              // Navigation buttons
+              paginationHTML += '<div class="flex items-center space-x-2">';
+              
+              // Previous button
               if (pagination.page > 1) {
-                const prevButton = document.createElement('button');
-                prevButton.textContent = 'Previous';
-                prevButton.className = 'bg-gray-200 p-2 rounded mr-2';
-                prevButton.onclick = () => fetchStores(pagination.page - 1);
-                paginationDiv.appendChild(prevButton);
+                paginationHTML += `<button onclick="fetchStores(${pagination.page - 1})" class="text-gray-500 hover:bg-gray-100 w-8 h-8 rounded flex items-center justify-center">`;
+                paginationHTML += '<i class="ri-arrow-left-s-line"></i></button>';
               }
-
-              // Page numbers
-              for (let i = 1; i <= pagination.total_pages; i++) {
-                const pageButton = document.createElement('button');
-                pageButton.textContent = i;
-                pageButton.className = `p-2 rounded ${i === pagination.page ? 'bg-blue-500 text-white' : 'bg-gray-200'} mr-2`;
-                pageButton.onclick = () => fetchStores(i);
-                paginationDiv.appendChild(pageButton);
+              
+              // Page numbers (show max 5 pages)
+              const startPage = Math.max(1, pagination.page - 2);
+              const endPage = Math.min(pagination.total_pages, startPage + 4);
+              
+              for (let i = startPage; i <= endPage; i++) {
+                if (i === pagination.page) {
+                  paginationHTML += `<button class="bg-primary text-white w-8 h-8 rounded flex items-center justify-center"><span>${i}</span></button>`;
+                } else {
+                  paginationHTML += `<button onclick="fetchStores(${i})" class="text-gray-500 hover:bg-gray-100 w-8 h-8 rounded flex items-center justify-center"><span>${i}</span></button>`;
+                }
               }
-
+              
+              // Show ellipsis and last page if needed
+              if (endPage < pagination.total_pages) {
+                if (endPage < pagination.total_pages - 1) {
+                  paginationHTML += '<span class="text-gray-500">...</span>';
+                }
+                paginationHTML += `<button onclick="fetchStores(${pagination.total_pages})" class="text-gray-500 hover:bg-gray-100 w-8 h-8 rounded flex items-center justify-center"><span>${pagination.total_pages}</span></button>`;
+              }
+              
               // Next button
               if (pagination.page < pagination.total_pages) {
-                const nextButton = document.createElement('button');
-                nextButton.textContent = 'Next';
-                nextButton.className = 'bg-gray-200 p-2 rounded';
-                nextButton.onclick = () => fetchStores(pagination.page + 1);
-                paginationDiv.appendChild(nextButton);
+                paginationHTML += `<button onclick="fetchStores(${pagination.page + 1})" class="text-gray-500 hover:bg-gray-100 w-8 h-8 rounded flex items-center justify-center">`;
+                paginationHTML += '<i class="ri-arrow-right-s-line"></i></button>';
               }
+              
+              paginationHTML += '</div></div>';
+              paginationDiv.innerHTML = paginationHTML;
+            } else {
+              paginationDiv.innerHTML = '';
             }
           } else {
-            resultsDiv.innerHTML = '<p class="text-gray-600">No stores found.</p>';
+            resultsDiv.innerHTML = `
+              <div class="text-center py-12">
+                <div class="w-16 h-16 mx-auto bg-gray-100 rounded-full flex items-center justify-center mb-4">
+                  <i class="ri-database-line text-2xl text-gray-400"></i>
+                </div>
+                <h3 class="text-lg font-medium text-gray-900 mb-2">No stores found</h3>
+                <p class="text-gray-500 mb-4">Try adjusting your filters or check back later for new data.</p>
+                <button onclick="fetchStores(1, true)" class="bg-primary text-white px-4 py-2 rounded-button">Refresh Data</button>
+              </div>
+            `;
+            paginationDiv.innerHTML = '';
+            if (resultsCount) resultsCount.textContent = 'No stores found';
           }
         })
         .catch(error => {
           console.error('Error fetching stores:', error);
-          resultsDiv.innerHTML = '<p class="text-red-500">Failed to load stores. Please try again later.</p>';
+          console.error('API URL was:', url);
+          console.error('Intelligence mode:', isIntelligenceMode);
+          
+          resultsDiv.innerHTML = `
+            <div class="text-center py-12">
+              <div class="w-16 h-16 mx-auto bg-red-100 rounded-full flex items-center justify-center mb-4">
+                <i class="ri-error-warning-line text-2xl text-red-400"></i>
+              </div>
+              <h3 class="text-lg font-medium text-gray-900 mb-2">Failed to load data</h3>
+              <p class="text-red-500 mb-2">${error.message}</p>
+              <p class="text-gray-500 mb-4">Check console for details. URL: ${url}</p>
+              <button onclick="fetchStores(1)" class="bg-primary text-white px-4 py-2 rounded-button">Retry</button>
+            </div>
+          `;
+          if (resultsCount) resultsCount.textContent = 'Error loading data';
         });
     }
 
-    function showStoreDetails(store) {
-      const detailsContent = document.getElementById('detailsContent');
-      detailsContent.innerHTML = `
-        <div class="p-4 md:p-8">
-          <div class="bg-white rounded-lg shadow-md p-4 md:p-6 mb-6">
-            <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-6 gap-4">
+    function showStoreDetails(storeData) {
+      let store;
+      try {
+        store = typeof storeData === 'string' ? JSON.parse(decodeURIComponent(storeData)) : storeData;
+      } catch (e) {
+        console.error('Error parsing store data:', e);
+        return;
+      }
+      
+      // Safe value extraction
+      const domain = store.domain || store.url || store.website || 'N/A';
+      const title = store.title || store.name || store.site_name || domain;
+      const description = store.description || store.meta_description || 'No description available';
+      const platform = store.platform || store.tech_stack || 'Shopify';
+      const country = store.country || store.country_code || 'N/A';
+      const language = store.language || store.language_code || 'N/A';
+      const productCount = store.product_count || store.products_count || '0';
+      const avgPrice = store.avg_price || store.average_price || '0.00';
+      const currency = store.currency || store.currency_code || 'USD';
+      const email = store.contact_email || store.email || 'N/A';
+      const phone = store.contact_phone || store.phone || 'N/A';
+      const whatsapp = store.whatsapp_number || store.whatsapp || 'N/A';
+      const dateAdded = store.date_added ? new Date(store.date_added).toLocaleDateString() : 'N/A';
+      
+      const detailsContent = `
+        <div class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50" id="detailsPanel">
+          <div class="relative top-20 mx-auto p-5 border w-11/12 md:w-3/4 lg:w-1/2 shadow-lg rounded-md bg-white">
+            <div class="flex items-center justify-between border-b border-gray-200 pb-4 mb-6">
               <div class="flex items-center">
                 <div class="w-8 h-8 bg-gray-700 rounded-full flex items-center justify-center mr-3">
                   <i class="ri-global-line text-white text-lg"></i>
                 </div>
-                <h2 class="text-xl font-semibold break-words">${store.domain || store.title || ''}</h2>
+                <h2 class="text-xl font-semibold break-words">${title}</h2>
               </div>
+              <button onclick="closeStoreDetails()" class="text-gray-400 hover:text-gray-600">
+                <i class="ri-close-line text-xl"></i>
+              </button>
             </div>
             <div class="space-y-6">
-              <h3 class="text-lg font-semibold mb-4">Website Details</h3>
+              <h3 class="text-lg font-semibold mb-4">Store Details</h3>
               <div class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-6">
                 <div>
-                  <p class="text-sm text-gray-500 mb-1">Site Name</p>
-                  <div class="font-medium break-words">${store.title || ''}</div>
-                </div>
-                <div>
                   <p class="text-sm text-gray-500 mb-1">Domain</p>
-                  <div class="font-medium break-words">${store.domain || ''}</div>
+                  <div class="font-medium break-words">${domain}</div>
                 </div>
                 <div>
-                  <p class="text-sm text-gray-500 mb-1">Language</p>
-                  <div class="font-medium break-words">${store.language || ''}</div>
+                  <p class="text-sm text-gray-500 mb-1">Platform</p>
+                  <div class="font-medium break-words">${platform}</div>
                 </div>
                 <div>
                   <p class="text-sm text-gray-500 mb-1">Country</p>
-                  <div class="font-medium break-words">${store.country || ''}</div>
+                  <div class="font-medium break-words">${country}</div>
                 </div>
                 <div>
-                  <p class="text-sm text-gray-500 mb-1">Currency</p>
-                  <div class="font-medium break-words">${store.currency || ''}</div>
+                  <p class="text-sm text-gray-500 mb-1">Language</p>
+                  <div class="font-medium break-words">${language}</div>
                 </div>
                 <div>
                   <p class="text-sm text-gray-500 mb-1">Product Count</p>
-                  <div class="font-medium break-words">${store.product_count || ''}</div>
+                  <div class="font-medium break-words">${productCount}</div>
                 </div>
                 <div>
-                  <p class="text-sm text-gray-500 mb-1">Avg Product Price</p>
-                  <div class="font-medium break-words">${store.avg_price || ''}</div>
-                </div>
-                <div>
-                  <p class="text-sm text-gray-500 mb-1">Date Added</p>
-                  <div class="font-medium break-words">${new Date(store.date_added).toLocaleDateString() || ''}</div>
-                </div>
-                <div>
-                  <p class="text-sm text-gray-500 mb-1">Technologies</p>
-                  <div class="font-medium break-words">${store.tech_stack || ''}</div>
-                </div>
-                <div>
-                  <p class="text-sm text-gray-500 mb-1">Shipping Destinations</p>
-                  <div class="font-medium break-words">${store.shipping_destinations || ''}</div>
-                </div>
-                <div>
-                  <p class="text-sm text-gray-500 mb-1">Payment Methods</p>
-                  <div class="font-medium break-words">${store.payment_methods || ''}</div>
+                  <p class="text-sm text-gray-500 mb-1">Average Price</p>
+                  <div class="font-medium break-words">${avgPrice} ${currency}</div>
                 </div>
                 <div>
                   <p class="text-sm text-gray-500 mb-1">Contact Email</p>
-                  <div class="font-medium break-words">${store.contact_email || ''}</div>
+                  <div class="font-medium break-words">${email}</div>
                 </div>
                 <div>
                   <p class="text-sm text-gray-500 mb-1">Contact Phone</p>
-                  <div class="font-medium break-words">${store.contact_phone || ''}</div>
+                  <div class="font-medium break-words">${phone}</div>
                 </div>
                 <div>
-                  <p class="text-sm text-gray-500 mb-1">WhatsApp Number</p>
-                  <div class="font-medium break-words">${store.whatsapp_number || ''}</div>
+                  <p class="text-sm text-gray-500 mb-1">WhatsApp</p>
+                  <div class="font-medium break-words">${whatsapp}</div>
                 </div>
                 <div>
-                  <p class="text-sm text-gray-500 mb-1">Facebook URL</p>
-                  <div class="font-medium break-words"><a href="${store.facebook_url}" target="_blank">${store.facebook_url || ''}</a></div>
-                </div>
-                <div>
-                  <p class="text-sm text-gray-500 mb-1">Instagram URL</p>
-                  <div class="font-medium break-words"><a href="${store.instagram_url}" target="_blank">${store.instagram_url || ''}</a></div>
-                </div>
-                <div>
-                  <p class="text-sm text-gray-500 mb-1">Twitter URL</p>
-                  <div class="font-medium break-words"><a href="${store.twitter_url}" target="_blank">${store.twitter_url || ''}</a></div>
-                </div>
-                <div>
-                  <p class="text-sm text-gray-500 mb-1">YouTube URL</p>
-                  <div class="font-medium break-words"><a href="${store.youtube_url}" target="_blank">${store.youtube_url || ''}</a></div>
-                </div>
-                <div>
-                  <p class="text-sm text-gray-500 mb-1">TikTok URL</p>
-                  <div class="font-medium break-words"><a href="${store.tiktok_url}" target="_blank">${store.tiktok_url || ''}</a></div>
-                </div>
-                <div>
-                  <p class="text-sm text-gray-500 mb-1">Pinterest URL</p>
-                  <div class="font-medium break-words"><a href="${store.pinterest_url}" target="_blank">${store.pinterest_url || ''}</a></div>
-                </div>
-                <div>
-                  <p class="text-sm text-gray-500 mb-1">Facebook Ads Count</p>
-                  <div class="font-medium break-words">${store.facebook_ads_count || ''}</div>
+                  <p class="text-sm text-gray-500 mb-1">Date Added</p>
+                  <div class="font-medium break-words">${dateAdded}</div>
                 </div>
               </div>
+              <div>
+                <p class="text-sm text-gray-500 mb-1">Description</p>
+                <div class="font-medium break-words">${description}</div>
+              </div>
+            </div>
+            <div class="mt-6 pt-4 border-t border-gray-200 flex justify-end">
+              <button onclick="closeStoreDetails()" class="bg-gray-500 text-white px-4 py-2 rounded-button mr-2">Close</button>
+              <a href="https://${domain}" target="_blank" class="bg-primary text-white px-4 py-2 rounded-button">Visit Store</a>
             </div>
           </div>
         </div>
       `;
-      document.getElementById('detailsPanel').classList.remove('translate-x-full');
-      document.getElementById('detailsPanel').classList.add('translate-x-0');
+      
+      // Remove existing details panel if any
+      const existingPanel = document.getElementById('detailsPanel');
+      if (existingPanel) {
+        existingPanel.remove();
+      }
+      
+      // Add new details panel to body
+      document.body.insertAdjacentHTML('beforeend', detailsContent);
+    }
+    
+    function closeStoreDetails() {
+      const panel = document.getElementById('detailsPanel');
+      if (panel) {
+        panel.remove();
+      }
     }
 
-
-    document.getElementById('filterButton').addEventListener('click', () => fetchStores(1));
-
-    document.getElementById('exportButton').addEventListener('click', function(e) {
-      e.preventDefault();
-      const platform = document.getElementById('platform').value;
-      const createdAfter = document.getElementById('created_after').value;
-      const createdBefore = document.getElementById('created_before').value;
-
-      // Update hidden form fields
-      document.getElementById('exportPlatform').value = platform;
-      document.getElementById('exportCreatedAfter').value = createdAfter;
-      document.getElementById('exportCreatedBefore').value = createdBefore;
-
-      // Submit the form
-      document.getElementById('exportForm').submit();
+    // Event listeners
+    document.getElementById('searchBtn').addEventListener('click', () => fetchStores(1));
+    document.getElementById('resetBtn').addEventListener('click', () => {
+      document.getElementById('platformFilter').value = '';
+      if (document.getElementById('categorySelect')) document.getElementById('categorySelect').value = '';
+      fetchStores(1);
+    });
+    
+    // Intelligence mode toggle
+    document.getElementById('toggleIntelligenceData').addEventListener('change', function() {
+      isIntelligenceMode = this.checked;
+      const categoryFilter = document.getElementById('categoryFilter');
+      
+      if (isIntelligenceMode) {
+        categoryFilter.classList.remove('hidden');
+        document.getElementById('platformFilter').value = 'shopify';
+        document.getElementById('platformFilter').disabled = true;
+      } else {
+        categoryFilter.classList.add('hidden');
+        document.getElementById('platformFilter').disabled = false;
+      }
+      
+      fetchStores(1, isIntelligenceMode);
+    });
+    
+    // Auto-update functionality
+    document.getElementById('autoUpdateBtn').addEventListener('click', function() {
+      if (autoUpdateInterval) {
+        clearInterval(autoUpdateInterval);
+        autoUpdateInterval = null;
+        this.innerHTML = '<i class="ri-refresh-line mr-1"></i>Auto Update';
+        this.classList.remove('bg-red-500', 'hover:bg-red-600');
+        this.classList.add('bg-green-500', 'hover:bg-green-600');
+      } else {
+        fetchStores(1, true);
+        autoUpdateInterval = setInterval(() => {
+          if (isIntelligenceMode) fetchStores(currentPage, true);
+        }, 3600000); // 1 hour
+        this.innerHTML = '<i class="ri-stop-line mr-1"></i>Stop Auto Update';
+        this.classList.remove('bg-green-500', 'hover:bg-green-600');
+        this.classList.add('bg-red-500', 'hover:bg-red-600');
+      }
     });
 
     document.getElementById('closePanel').addEventListener('click', function() {
@@ -3102,7 +2211,69 @@
     });
 
     // Initial load
-    fetchStores(1);
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log('DOM loaded, initializing dashboard...');
+      
+      // Since this is the E-commerce tab, enable intelligence mode by default
+      isIntelligenceMode = true;
+      const toggleSwitch = document.getElementById('toggleIntelligenceData');
+      const categoryFilter = document.getElementById('categoryFilter');
+      const platformFilter = document.getElementById('platformFilter');
+      const resultsDiv = document.getElementById('results');
+      const resultsCount = document.getElementById('resultsCount');
+      
+      console.log('Elements found:', {
+        toggleSwitch: !!toggleSwitch,
+        categoryFilter: !!categoryFilter,
+        platformFilter: !!platformFilter,
+        resultsDiv: !!resultsDiv,
+        resultsCount: !!resultsCount
+      });
+      
+      if (toggleSwitch) {
+        toggleSwitch.checked = true;
+        console.log('Toggle switch enabled');
+      }
+      
+      if (categoryFilter) {
+        categoryFilter.classList.remove('hidden');
+        console.log('Category filter shown');
+      }
+      
+      if (platformFilter) {
+        platformFilter.value = 'shopify';
+        platformFilter.disabled = true;
+        console.log('Platform filter set to Shopify');
+      }
+      
+      // Force the results count to show intelligence mode
+      if (resultsCount) {
+        resultsCount.textContent = 'Loading competitive intelligence...';
+      }
+      
+      // Ensure results div is ready
+      if (resultsDiv) {
+        resultsDiv.innerHTML = `
+          <div class="text-center py-12">
+            <div class="w-16 h-16 mx-auto bg-blue-100 rounded-full flex items-center justify-center mb-4 animate-pulse">
+              <i class="ri-refresh-line text-2xl text-blue-500"></i>
+            </div>
+            <h3 class="text-lg font-medium text-gray-900 mb-2">Loading Intelligence Data</h3>
+            <p class="text-gray-500">Fetching competitive intelligence from Shopify stores...</p>
+          </div>
+        `;
+      }
+      
+      // Wait a bit for all elements to be ready, then fetch data
+      setTimeout(() => {
+        console.log('Starting data fetch...');
+        if (resultsDiv && resultsCount) {
+          fetchStores(1, true); // Auto-update on initial load to get fresh data
+        } else {
+          console.error('Required DOM elements not found for data loading');
+        }
+      }, 500);
+    });
     </script>
   </body>
 </html>

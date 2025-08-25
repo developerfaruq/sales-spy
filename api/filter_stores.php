@@ -11,16 +11,16 @@ if (!is_logged_in()) {
 }
 
 // Sanitize and validate inputs
-$platform = isset($_GET['platform']) ? filter_var($_GET['platform'], FILTER_SANITIZE_STRING) : '';
-$created_after = isset($_GET['created_after']) ? filter_var($_GET['created_after'], FILTER_SANITIZE_STRING) : '';
-$created_before = isset($_GET['created_before']) ? filter_var($_GET['created_before'], FILTER_SANITIZE_STRING) : '';
-$keyword = isset($_GET['keyword']) ? filter_var($_GET['keyword'], FILTER_SANITIZE_STRING) : '';
-$sns_email = isset($_GET['sns_email']) ? filter_var($_GET['sns_email'], FILTER_SANITIZE_STRING) : '';
+$platform = isset($_GET['platform']) ? trim(strip_tags($_GET['platform'])) : '';
+$created_after = isset($_GET['created_after']) ? trim(strip_tags($_GET['created_after'])) : '';
+$created_before = isset($_GET['created_before']) ? trim(strip_tags($_GET['created_before'])) : '';
+$keyword = isset($_GET['keyword']) ? trim(strip_tags($_GET['keyword'])) : '';
+$sns_email = isset($_GET['sns_email']) ? trim(strip_tags($_GET['sns_email'])) : '';
 
 $page = isset($_GET['page']) ? filter_var($_GET['page'], FILTER_VALIDATE_INT) : 1;
 $limit = isset($_GET['limit']) ? filter_var($_GET['limit'], FILTER_VALIDATE_INT) : 10;
-$sort_by = isset($_GET['sort_by']) ? filter_var($_GET['sort_by'], FILTER_SANITIZE_STRING) : 'date_added';
-$order = isset($_GET['order']) ? filter_var($_GET['order'], FILTER_SANITIZE_STRING) : 'DESC';
+$sort_by = isset($_GET['sort_by']) ? trim(strip_tags($_GET['sort_by'])) : 'date_added';
+$order = isset($_GET['order']) ? trim(strip_tags($_GET['order'])) : 'DESC';
 
 // Ensure valid sort_by and order values to prevent SQL injection
 $allowedSortBy = ['domain', 'title', 'tech_stack', 'country', 'product_count', 'avg_price', 'date_added'];
@@ -167,9 +167,14 @@ try {
 
     echo json_encode([
         'stores' => $stores,
-        'total_count' => $totalStores,
-        'page' => $page,
-        'limit' => $limit
+        'pagination' => [
+            'page' => $page,
+            'limit' => $limit,
+            'total_stores' => $totalStores,
+            'total_pages' => $totalPages,
+            'has_next' => $page < $totalPages,
+            'has_prev' => $page > 1
+        ]
     ]);
 
 } catch (PDOException $e) {
