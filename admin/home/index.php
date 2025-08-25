@@ -982,7 +982,7 @@ $activeSubscriptions = $pdo->query("SELECT COUNT(*) FROM subscriptions WHERE sta
             // Check if we're in admin directory and adjust path accordingly
             const currentPath = window.location.pathname;
             if (currentPath.includes('/admin/home/') || currentPath.includes('/admin/')) {
-                apiPath = '../api/users.php';
+                apiPath = 'api/users.php';
             }
 
             console.log('Using API path:', apiPath);
@@ -1035,7 +1035,7 @@ $activeSubscriptions = $pdo->query("SELECT COUNT(*) FROM subscriptions WHERE sta
             // Adjust path based on current location
             const currentPath = window.location.pathname;
             if (currentPath.includes('/admin/home/') || currentPath.includes('/admin/')) {
-                apiPath = '../api/users.php';
+                apiPath = 'api/users.php';
             }
 
             const response = await fetch(apiPath, {
@@ -1079,7 +1079,7 @@ $activeSubscriptions = $pdo->query("SELECT COUNT(*) FROM subscriptions WHERE sta
             // Adjust path based on current location
             const currentPath = window.location.pathname;
             if (currentPath.includes('/admin/home/') || currentPath.includes('/admin/')) {
-                apiPath = '../api/users.php';
+                apiPath = 'api/users.php';
             }
 
             const response = await fetch(apiPath, {
@@ -1550,7 +1550,7 @@ $activeSubscriptions = $pdo->query("SELECT COUNT(*) FROM subscriptions WHERE sta
                 let apiPath = 'api/users.php';
                 const currentPath = window.location.pathname;
                 if (currentPath.includes('/admin/home/') || currentPath.includes('/admin/')) {
-                    apiPath = '../api/users.php';
+                    apiPath = 'api/users.php';
                 }
                 
                 // Fetch all users for export (without pagination)

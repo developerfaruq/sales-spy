@@ -225,7 +225,7 @@
 <?php endif; ?>
 <?php if (isset($_GET['status']) && $_GET['status'] === 'account_locked_pword'): ?>
   <div id="BackAlert" class="popup-alert">
-    Account locked, please try again after 5 minutes.
+    Account locked, please try again later.
   </div>
 <?php endif; ?>
 <?php if (isset($_GET['status']) && $_GET['status'] === 'invalid_credentials'): ?>
