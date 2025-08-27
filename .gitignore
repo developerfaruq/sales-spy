@@ -11,7 +11,7 @@ config.php
 *.bak
 *.tmp
 
-# Ignore vendor or dependency folders (if using Composer/NPM later)
+# Ignore vendor or dependency folders 
 vendor/
 node_modules/
 

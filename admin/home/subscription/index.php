@@ -429,6 +429,17 @@ $activeSubscriptions = $pdo->query("SELECT COUNT(*) FROM subscriptions WHERE sta
             </li>
             <li>
               <a
+                href="../plan/"
+                class="nav-link w-full flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-600 hover:text-primary hover:bg-blue-50"
+              >
+                <div class="w-5 h-5 flex items-center justify-center mr-3">
+                  <i class="ri-list-settings-line"></i>
+                </div>
+                <span>Plans</span>
+              </a>
+            </li>
+            <li>
+              <a
           href="../payment/"
           class="nav-link w-full flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-600 hover:text-primary hover:bg-blue-50"
               >

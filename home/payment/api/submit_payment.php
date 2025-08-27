@@ -72,12 +72,38 @@ if (isset($_FILES['screenshot']) && $_FILES['screenshot']['error'] === UPLOAD_ER
     exit;
 }
 
+// Function to generate order ID
+function generateOrderId($pdo) {
+    $currentYear = date('Y');
+    $prefix = "#ORD-{$currentYear}-";
+    
+    try {
+        // Get the highest order number for current year
+        $stmt = $pdo->prepare("SELECT MAX(CAST(SUBSTRING(order_id, 11) AS UNSIGNED)) as max_order 
+                               FROM transactions 
+                               WHERE order_id LIKE :prefix");
+        $stmt->execute([':prefix' => $prefix . '%']);
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        $nextOrderNumber = ($result['max_order'] ?? 0) + 1;
+        $orderId = $prefix . str_pad($nextOrderNumber, 3, '0', STR_PAD_LEFT);
+        
+        return $orderId;
+    } catch (Exception $e) {
+        // Fallback: use timestamp-based order ID if database query fails
+        return $prefix . str_pad(rand(1, 999), 3, '0', STR_PAD_LEFT);
+    }
+}
+
+// Generate order ID
+$order_id = generateOrderId($pdo);
+
 // Insert transaction into database
 try {
     $stmt = $pdo->prepare("INSERT INTO transactions 
-        (user_id, txid, payment_type, amount, status, created_at, screenshot_path) 
-        VALUES (:user_id, :txid, :payment_type, :amount, :status, :created_at, :screenshot_path)");
-    
+         (user_id, txid, payment_type, amount, status, created_at, screenshot_path, order_id) 
+         VALUES (:user_id, :txid, :payment_type, :amount, :status, :created_at, :screenshot_path, :order_id)");
+         
     $stmt->execute([
         ':user_id' => $user_id,
         ':txid' => $txid,
@@ -85,11 +111,17 @@ try {
         ':amount' => $amount,
         ':status' => $status,
         ':created_at' => $created_at,
-        ':screenshot_path' => $screenshot_path
+        ':screenshot_path' => $screenshot_path,
+        ':order_id' => $order_id
     ]);
 
-    echo json_encode(["success" => true, "message" => "Transaction submitted successfully and awaiting admin approval."]);
+    echo json_encode([
+        "success" => true, 
+        "message" => "Transaction submitted successfully and awaiting admin approval.",
+        "order_id" => $order_id
+    ]);
 } catch (Exception $e) {
     http_response_code(500);
     echo json_encode(["success" => false, "message" => "Database error: " . $e->getMessage()]);
 }
+?>

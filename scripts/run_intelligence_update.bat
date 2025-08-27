@@ -3,12 +3,12 @@ REM Shopify Intelligence Auto-Update Script for Windows
 REM This batch file should be scheduled to run every hour via Windows Task Scheduler
 
 REM Set the path to your PHP executable and sales-spy directory
-SET PHP_PATH=C:\laragon\bin\php\php-8.3.16-Win32-vs16-x64\php.exe
-SET SCRIPT_PATH=C:\laragon\www\sales-spy\api\cron_shopify_intelligence.php
-SET LOG_PATH=C:\laragon\www\sales-spy\logs\intelligence.log
+SET PHP_PATH=C:\wamp64\bin\php\php8.2.28\php.exe
+SET SCRIPT_PATH=C:\wamp64\www\sales-spy\api\cron_shopify_intelligence.php
+SET LOG_PATH=C:\wamp64\www\sales-spy\logs\intelligence.log
 
 REM Create logs directory if it doesn't exist
-IF NOT EXIST "C:\laragon\www\sales-spy\logs" mkdir "C:\laragon\www\sales-spy\logs"
+IF NOT EXIST "C:\wamp64\www\sales-spy\logs" 
 
 REM Run the intelligence collection script
 echo [%date% %time%] Starting Shopify Intelligence Auto-Update >> "%LOG_PATH%"
