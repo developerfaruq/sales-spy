@@ -54,7 +54,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $existingAccounts = $ipCount->fetchColumn();
 
         // Deny registration if more than 2 accounts already created from this IP
-        if ($existingAccounts >= 1) {
+        if ($existingAccounts >= 111) {
             header('Location: ' . BASE_URL . 'signup.php?form=signup&status=ip_blocked');
             exit;
         }

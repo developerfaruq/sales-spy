@@ -1,3 +1,26 @@
+<?php
+require '../../config/db.php';
+require '../../home/subscription/api/auth_check.php';
+
+
+if (isset($_SESSION['admin_id'])) {
+    $stmt = $pdo->prepare("SELECT name FROM admins WHERE id = ?");
+    $stmt->execute([$_SESSION['admin_id']]);
+    $admin = $stmt->fetch();
+    
+    if ($admin) {
+        $adminName = htmlspecialchars($admin['name']);
+    }
+}
+
+
+$avatarUrl = "https://ui-avatars.com/api/?name=" . 
+                 urlencode( $adminName ) . 
+                 "&background=1E3A8A&color=fff&length=1&size=128";
+
+                 
+?>
+
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -334,10 +357,10 @@
               <div
                 class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center"
               >
-                <span class="text-sm font-medium">JD</span>
+                <span class="text-sm font-medium"><img src="<?= $avatarUrl ?>" alt="ss"></span>
               </div>
               <span class="ml-2 text-sm font-medium hidden md:block"
-                >John Doe</span
+                ><?= $adminName ?></span
               >
               <i class="ri-arrow-down-s-line ml-1 text-gray-500"></i>
             </button>
@@ -345,6 +368,52 @@
         </div>
       </div>
     </header>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const sidebarToggle = document.getElementById("sidebar-toggle");
+        const sidebar = document.getElementById("sidebar");
+        const main = document.querySelector("main");
+        const menuIcon = sidebarToggle.querySelector("i");
+
+        function setSidebar(open) {
+          if (open) {
+            sidebar.classList.remove("-translate-x-full");
+            sidebar.classList.add("translate-x-0");
+            menuIcon.classList.remove("ri-menu-line");
+            menuIcon.classList.add("ri-close-line");
+          } else {
+            sidebar.classList.remove("translate-x-0");
+            sidebar.classList.add("-translate-x-full");
+            menuIcon.classList.remove("ri-close-line");
+            menuIcon.classList.add("ri-menu-line");
+          }
+        }
+
+        sidebarToggle.addEventListener("click", function () {
+          const isClosed = sidebar.classList.contains("-translate-x-full");
+          setSidebar(isClosed);
+        });
+
+        function handleResize() {
+          if (window.innerWidth >= 768) {
+            sidebar.classList.remove("-translate-x-full");
+            sidebar.classList.add("translate-x-0");
+            main.classList.add("md:pl-64");
+            menuIcon.classList.remove("ri-close-line");
+            menuIcon.classList.add("ri-menu-line");
+          } else {
+            sidebar.classList.remove("translate-x-0");
+            sidebar.classList.add("-translate-x-full");
+            main.classList.remove("md:pl-64");
+            menuIcon.classList.remove("ri-close-line");
+            menuIcon.classList.add("ri-menu-line");
+          }
+        }
+
+        window.addEventListener("resize", handleResize);
+        handleResize();
+      });
+    </script>
     <!-- Sidebar -->
     <aside
       id="sidebar"
@@ -356,10 +425,10 @@
             <div
               class="w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center"
             >
-              <span class="text-sm font-medium">JD</span>
+              <span class="text-sm font-medium"><img src="<?= $avatarUrl ?>" alt="ad"></span>
             </div>
             <div class="ml-3">
-              <p class="text-sm font-medium">John Doe</p>
+              <p class="text-sm font-medium"><?= $adminName ?></p>
               <p class="text-xs text-gray-500">Super Admin</p>
             </div>
           </div>
@@ -368,68 +437,79 @@
           <ul class="space-y-1">
             <li>
               <a
-            href="../"
-            class="nav-link w-full flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-600 hover:text-primary hover:bg-blue-50"
+                href="../"
+                class="nav-link w-full flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-600 hover:text-primary hover:bg-blue-50"
               >
-            <div class="w-5 h-5 flex items-center justify-center mr-3">
-              <i class="ri-user-line"></i>
-            </div>
-            <span>Users</span>
+                <div class="w-5 h-5 flex items-center justify-center mr-3">
+                  <i class="ri-user-line"></i>
+                </div>
+                <span>Users</span>
               </a>
             </li>
             <li>
               <a
-            href="../subscription/"
-            class="nav-link w-full flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-600 hover:text-primary hover:bg-blue-50"
+                href="../subscription/"
+                class="nav-link w-full flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-600 hover:text-primary hover:bg-blue-50"
               >
-            <div class="w-5 h-5 flex items-center justify-center mr-3">
-              <i class="ri-vip-crown-line"></i>
-            </div>
-            <span>Subscriptions</span>
+                <div class="w-5 h-5 flex items-center justify-center mr-3">
+                  <i class="ri-vip-crown-line"></i>
+                </div>
+                <span>Subscriptions</span>
               </a>
             </li>
             <li>
               <a
-            href="../wallets/"
-            class="nav-link w-full flex items-center px-3 py-2 text-sm font-medium rounded-md text-primary bg-blue-50"
+                href="../wallets/"
+                class="nav-link w-full flex items-center px-3 py-2 text-sm font-medium rounded-md text-primary bg-blue-50"
               >
-            <div class="w-5 h-5 flex items-center justify-center mr-3">
-              <i class="ri-wallet-3-line"></i>
-            </div>
-            <span>Wallets</span>
+                <div class="w-5 h-5 flex items-center justify-center mr-3">
+                  <i class="ri-wallet-3-line"></i>
+                </div>
+                <span>Wallets</span>
               </a>
             </li>
             <li>
               <a
-            href="../payment/"
-            class="nav-link w-full flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-600 hover:text-primary hover:bg-blue-50"
+                href="../plan/"
+                class="nav-link w-full flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-600 hover:text-primary hover:bg-blue-50"
               >
-            <div class="w-5 h-5 flex items-center justify-center mr-3">
-              <i class="ri-exchange-dollar-line"></i>
-            </div>
-            <span>Payments</span>
+                <div class="w-5 h-5 flex items-center justify-center mr-3">
+                  <i class="ri-list-settings-line"></i>
+                </div>
+                <span>Plans</span>
               </a>
             </li>
             <li>
               <a
-            href="../pend_payment/"
-            class="nav-link w-full flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-600 hover:text-primary hover:bg-blue-50"
+                href="../payment/"
+                class="nav-link w-full flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-600 hover:text-primary hover:bg-blue-50"
               >
-            <div class="w-5 h-5 flex items-center justify-center mr-3">
-              <i class="ri-time-line"></i>
-            </div>
-            <span>Pending Payments</span>
+                <div class="w-5 h-5 flex items-center justify-center mr-3">
+                  <i class="ri-exchange-dollar-line"></i>
+                </div>
+                <span>Payments</span>
               </a>
             </li>
             <li>
               <a
-            href="../settings/"
-            class="nav-link w-full flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-600 hover:text-primary hover:bg-blue-50"
+                href="../pend_payment/"
+                class="nav-link w-full flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-600 hover:text-primary hover:bg-blue-50"
               >
-            <div class="w-5 h-5 flex items-center justify-center mr-3">
-              <i class="ri-settings-3-line"></i>
-            </div>
-            <span>Settings</span>
+                <div class="w-5 h-5 flex items-center justify-center mr-3">
+                  <i class="ri-time-line"></i>
+                </div>
+                <span>Pending Payments</span>
+              </a>
+            </li>
+            <li>
+              <a
+                href="../settings/"
+                class="nav-link w-full flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-600 hover:text-primary hover:bg-blue-50"
+              >
+                <div class="w-5 h-5 flex items-center justify-center mr-3">
+                  <i class="ri-settings-3-line"></i>
+                </div>
+                <span>Settings</span>
               </a>
             </li>
           </ul>
@@ -479,7 +559,7 @@
 
     <main class="pt-16 md:pl-64 transition-all duration-300">
       <!-- Wallets Tab -->
-      <div id="wallets-tab" class="tab-content p-4 md:p-6">
+      <div id="wallets-tab" class="tab-content p-4 md:p-6 ">
         <div class="mb-6">
           <h1 class="text-2xl font-semibold text-gray-800">
             Wallet Management
@@ -488,10 +568,19 @@
             Manage user wallets and platform wallet settings
           </p>
         </div>
-        <div class="bg-white rounded-lg shadow-sm p-4 sm:p-6 mb-6">
+        <div class="bg-white rounded-lg shadow-sm p-4 sm:p-6 mb-6 relative">
           <h2 class="text-lg font-medium text-gray-800 mb-4">
             Platform Wallet
           </h2>
+          <!-- Edit Icon Button -->
+          <button
+            id="edit-wallet-btn"
+            class="absolute top-6 right-6 text-gray-400 hover:text-primary transition-colors"
+            type="button"
+            data-tooltip="Edit wallet info"
+          >
+            <i class="ri-edit-2-line ri-lg"></i>
+          </button>
           <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div class="lg:col-span-2">
               <div class="space-y-4">
@@ -506,6 +595,7 @@
                     id="wallet-name"
                     class="w-full px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
                     value="USDT Receiving Wallet"
+                    disabled
                   />
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -553,7 +643,7 @@
                       id="wallet-address"
                       class="w-full pl-4 pr-24 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
                       value="TVTkZq3ghDZgF8txTdDM3s8g76XM2pgiey"
-                      readonly
+                      disabled
                     />
                     <div
                       class="absolute right-2 top-1/2 transform -translate-y-1/2 flex items-center space-x-2"
@@ -566,18 +656,370 @@
                       </button>
                     </div>
                   </div>
+
+                  <script id="qr-code-script">
+                    document.addEventListener("DOMContentLoaded", function () {
+  // Wallet management variables
+  let currentWalletData = null;
+  
+  // DOM elements
+  const walletNameInput = document.getElementById("wallet-name");
+  const walletAddressInput = document.getElementById("wallet-address");
+  const blockchainSelect = document.getElementById("blockchain-select");
+  const tokenStandardSelect = document.getElementById("token-standard-select");
+  const editBtn = document.getElementById("edit-wallet-btn");
+  const cancelBtn = document.querySelector("#wallets-tab button:not([id]):not([id='download-qr'])");
+  const saveBtn = document.querySelector("#wallets-tab button.bg-primary");
+  const qrcodeContainer = document.getElementById("qrcode");
+  
+  // Modal elements
+  const confirmModal = document.getElementById("confirm-save-modal");
+  const confirmSaveBtn = document.getElementById("confirm-save-btn");
+  const cancelSaveBtn = document.getElementById("cancel-save-btn");
+  const successModal = document.getElementById("success-modal");
+  const successCloseBtn = document.getElementById("success-close-btn");
+  const toast = document.getElementById("wallet-toast-success");
+  
+  let qrcode = null;
+
+  // Load wallet data on page load
+  loadWalletData();
+
+  function loadWalletData() {
+    showLoading(true);
+    
+    fetch('api/wallet_api.php', {
+      method: 'GET',
+      credentials: 'same-origin'
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success && data.wallet) {
+        currentWalletData = data.wallet;
+        populateWalletForm(data.wallet);
+        updateQRCode(data.wallet.wallet_address || '');
+      } else {
+        showError('Failed to load wallet data');
+      }
+    })
+    .catch(error => {
+      console.error('Error loading wallet data:', error);
+      showError('Failed to load wallet data');
+    })
+    .finally(() => {
+      showLoading(false);
+    });
+  }
+
+  function populateWalletForm(wallet) {
+    // Map the database fields to form fields
+    const walletName = `${wallet.currency || 'USDT'} Receiving Wallet`;
+    const blockchain = wallet.currency || 'USDT';
+    const tokenStandard = wallet.network || 'TRC-20';
+    
+    walletNameInput.value = walletName;
+    walletAddressInput.value = wallet.wallet_address || '';
+    
+    // Update blockchain display
+    const blockchainTrigger = blockchainSelect.querySelector('.custom-select-trigger span:last-child');
+    if (blockchainTrigger) {
+      blockchainTrigger.textContent = blockchain;
+    }
+    
+    // Update token standard display
+    const tokenStandardTrigger = tokenStandardSelect.querySelector('.custom-select-trigger span');
+    if (tokenStandardTrigger) {
+      tokenStandardTrigger.textContent = tokenStandard;
+    }
+  }
+
+  function updateQRCode(address) {
+    if (!address) return;
+    
+    if (qrcodeContainer) {
+      qrcodeContainer.innerHTML = '';
+      qrcode = new QRCode(qrcodeContainer, {
+        text: address,
+        width: 192,
+        height: 192,
+        colorDark: "#000000",
+        colorLight: "#ffffff",
+        correctLevel: QRCode.CorrectLevel.H,
+      });
+    }
+  }
+
+  function setEditable(editable) {
+    walletNameInput.disabled = !editable;
+    walletAddressInput.disabled = !editable;
+    
+    if (editable) {
+      walletNameInput.classList.add("border-primary");
+      walletAddressInput.classList.add("border-primary");
+      saveBtn.classList.remove("opacity-50", "pointer-events-none");
+      cancelBtn.classList.remove("opacity-50", "pointer-events-none");
+    } else {
+      walletNameInput.classList.remove("border-primary");
+      walletAddressInput.classList.remove("border-primary");
+      saveBtn.classList.add("opacity-50", "pointer-events-none");
+      cancelBtn.classList.add("opacity-50", "pointer-events-none");
+    }
+  }
+
+  function showLoading(show) {
+    if (show) {
+      // Add loading state to the wallet section
+      const walletSection = document.querySelector('.bg-white.rounded-lg.shadow-sm');
+      if (walletSection && !walletSection.querySelector('.loading-overlay')) {
+        const loadingOverlay = document.createElement('div');
+        loadingOverlay.className = 'loading-overlay absolute inset-0 bg-white bg-opacity-75 flex items-center justify-center z-10';
+        loadingOverlay.innerHTML = '<div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>';
+        walletSection.style.position = 'relative';
+        walletSection.appendChild(loadingOverlay);
+      }
+    } else {
+      const loadingOverlay = document.querySelector('.loading-overlay');
+      if (loadingOverlay) {
+        loadingOverlay.remove();
+      }
+    }
+  }
+
+  function showError(message) {
+    // Create error toast
+    const errorToast = document.createElement('div');
+    errorToast.className = 'fixed top-6 right-6 z-50 px-4 py-2 bg-red-600 text-white rounded-lg shadow-lg flex items-center space-x-2';
+    errorToast.innerHTML = `
+      <i class="ri-error-warning-line"></i>
+      <span>${message}</span>
+    `;
+    document.body.appendChild(errorToast);
+    
+    setTimeout(() => {
+      errorToast.remove();
+    }, 5000);
+  }
+
+  function showSuccessToast(message) {
+    if (toast) {
+      const toastMessage = toast.querySelector('span');
+      if (toastMessage) {
+        toastMessage.textContent = message;
+      }
+      toast.classList.remove("translate-x-full");
+      setTimeout(() => {
+        toast.classList.add("translate-x-full");
+      }, 3000);
+    }
+  }
+
+  // Initialize form as non-editable
+  setEditable(false);
+
+  // Event listeners
+  if (editBtn) {
+    editBtn.addEventListener("click", function () {
+      setEditable(true);
+    });
+  }
+
+  if (cancelBtn) {
+    cancelBtn.addEventListener("click", function (e) {
+      e.preventDefault();
+      setEditable(false);
+      // Reset form to original values
+      if (currentWalletData) {
+        populateWalletForm(currentWalletData);
+        updateQRCode(currentWalletData.wallet_address || '');
+      }
+    });
+  }
+
+  if (saveBtn) {
+    saveBtn.addEventListener("click", function (e) {
+      if (saveBtn.classList.contains("opacity-50")) {
+        e.preventDefault();
+        return;
+      }
+      
+      // Validate form data
+      const walletName = walletNameInput.value.trim();
+      const walletAddress = walletAddressInput.value.trim();
+      
+      if (!walletName || !walletAddress) {
+        showError('Please fill in all required fields');
+        return;
+      }
+      
+      // Basic wallet address validation
+      if (walletAddress.length < 20 || walletAddress.length > 50) {
+        showError('Invalid wallet address format');
+        return;
+      }
+      
+      // Show confirmation modal
+      confirmModal.classList.add("active");
+      document.body.style.overflow = "hidden";
+    });
+  }
+
+  if (confirmSaveBtn) {
+    confirmSaveBtn.addEventListener("click", function () {
+      confirmModal.classList.remove("active");
+      document.body.style.overflow = "";
+      saveWalletData();
+    });
+  }
+
+  if (cancelSaveBtn) {
+    cancelSaveBtn.addEventListener("click", function () {
+      confirmModal.classList.remove("active");
+      document.body.style.overflow = "";
+    });
+  }
+
+  if (successCloseBtn) {
+    successCloseBtn.addEventListener("click", function () {
+      successModal.classList.remove("active");
+      document.body.style.overflow = "";
+      showSuccessToast('Wallet info saved successfully!');
+    });
+  }
+
+  function saveWalletData() {
+    const formData = {
+      wallet_name: walletNameInput.value.trim(),
+      wallet_address: walletAddressInput.value.trim(),
+      blockchain: blockchainSelect.querySelector('.custom-select-trigger span:last-child').textContent.trim(),
+      token_standard: tokenStandardSelect.querySelector('.custom-select-trigger span').textContent.trim()
+    };
+    
+    showLoading(true);
+    
+    fetch('api/wallet_api.php', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'same-origin',
+      body: JSON.stringify(formData)
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        currentWalletData = data.wallet;
+        setEditable(false);
+        updateQRCode(data.wallet.wallet_address);
+        
+        // Show success modal
+        successModal.classList.add("active");
+        document.body.style.overflow = "hidden";
+        
+        // Auto-close success modal after 1.5 seconds
+        setTimeout(() => {
+          successModal.classList.remove("active");
+          document.body.style.overflow = "";
+          showSuccessToast(data.message || 'Wallet info saved successfully!');
+        }, 1500);
+        
+      } else {
+        showError(data.error || 'Failed to save wallet information');
+      }
+    })
+    .catch(error => {
+      console.error('Error saving wallet data:', error);
+      showError('Failed to save wallet information');
+    })
+    .finally(() => {
+      showLoading(false);
+    });
+  }
+
+  // Copy address functionality
+  const copyAddressBtn = document.getElementById("copy-address");
+  if (copyAddressBtn) {
+    copyAddressBtn.addEventListener("click", function () {
+      const walletAddress = walletAddressInput.value;
+      if (!walletAddress) {
+        showError('No wallet address to copy');
+        return;
+      }
+      
+      navigator.clipboard.writeText(walletAddress).then(() => {
+        const originalIcon = this.innerHTML;
+        this.innerHTML = '<i class="ri-check-line text-green-500"></i>';
+        setTimeout(() => {
+          this.innerHTML = originalIcon;
+        }, 2000);
+      }).catch(() => {
+        showError('Failed to copy address');
+      });
+    });
+  }
+
+  // Download QR functionality
+  const downloadQRBtn = document.getElementById("download-qr");
+  if (downloadQRBtn) {
+    downloadQRBtn.addEventListener("click", function () {
+      const canvas = qrcodeContainer.querySelector("canvas");
+      if (canvas) {
+        const link = document.createElement("a");
+        link.download = "wallet-qr.png";
+        link.href = canvas.toDataURL("image/png");
+        link.click();
+      } else {
+        showError('QR code not available');
+      }
+    });
+  }
+
+  // Update QR code when address changes
+  if (walletAddressInput) {
+    walletAddressInput.addEventListener("input", function() {
+      if (this.value) {
+        updateQRCode(this.value);
+      }
+    });
+  }
+
+  // Tooltip for edit icon
+  if (editBtn) {
+    editBtn.addEventListener("mouseenter", function () {
+      const tooltip = document.createElement("div");
+      tooltip.id = "edit-tooltip";
+      tooltip.className = "fixed px-2 py-1 text-xs text-white bg-gray-900 rounded pointer-events-none opacity-0 transition-opacity duration-200 z-50";
+      tooltip.textContent = editBtn.getAttribute("data-tooltip") || "Edit wallet info";
+      document.body.appendChild(tooltip);
+      
+      const rect = editBtn.getBoundingClientRect();
+      tooltip.style.top = rect.top - 32 + "px";
+      tooltip.style.left = rect.left + rect.width / 2 - tooltip.offsetWidth / 2 + "px";
+      tooltip.style.opacity = "1";
+      editBtn._tooltip = tooltip;
+    });
+
+    editBtn.addEventListener("mouseleave", function () {
+      if (editBtn._tooltip) {
+        editBtn._tooltip.remove();
+        editBtn._tooltip = null;
+      }
+    });
+  }
+});
+                  </script>
+
                   <p class="mt-1 text-xs text-gray-500">
                     USDT TRC-20 wallet address for receiving payments
                   </p>
                 </div>
                 <div class="flex flex-wrap items-center justify-end gap-3">
                   <button
-                    class="px-4 py-2 border border-gray-200 text-gray-600 rounded-button whitespace-nowrap hover:bg-gray-50"
+                    class="px-4 py-2 border border-gray-200 text-gray-600 rounded-button whitespace-nowrap hover:bg-gray-50 opacity-50 pointer-events-none"
                   >
                     Cancel
                   </button>
                   <button
-                    class="px-4 py-2 bg-primary text-white rounded-button whitespace-nowrap"
+                    class="px-4 py-2 bg-primary text-white rounded-button whitespace-nowrap opacity-50 pointer-events-none"
                   >
                     Save Changes
                   </button>
@@ -604,46 +1046,73 @@
             </div>
           </div>
         </div>
+
+        <!-- Confirmation Modal -->
+        <div id="confirm-save-modal" class="modal">
+          <div class="modal-content max-w-sm">
+            <div class="flex items-center mb-4">
+              <div
+                class="w-12 h-12 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center mr-4"
+              >
+                <i class="ri-question-line ri-lg"></i>
+              </div>
+              <h3 class="text-lg font-medium text-gray-800">Confirm Changes</h3>
+            </div>
+            <p class="text-sm text-gray-600 mb-6">
+              Are you sure you want to save these wallet changes? This will
+              update the platform wallet info for all users.
+            </p>
+            <div class="flex items-center justify-end space-x-3">
+              <button
+                id="cancel-save-btn"
+                class="px-4 py-2 border border-gray-200 text-gray-600 rounded-button whitespace-nowrap hover:bg-gray-50"
+              >
+                Cancel
+              </button>
+              <button
+                id="confirm-save-btn"
+                class="px-4 py-2 bg-primary text-white rounded-button whitespace-nowrap hover:bg-blue-700"
+              >
+                Yes, Save
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Success Modal -->
+        <div id="success-modal" class="modal">
+          <div class="modal-content max-w-sm flex flex-col items-center">
+            <div
+              class="w-16 h-16 rounded-full bg-green-100 text-green-600 flex items-center justify-center mb-4"
+            >
+              <i class="ri-checkbox-circle-line ri-2x"></i>
+            </div>
+            <h3 class="text-lg font-medium text-gray-800 mb-2">
+              Wallet Info Updated!
+            </h3>
+            <p class="text-sm text-gray-600 mb-6 text-center">
+              The platform wallet information has been successfully updated.
+            </p>
+            <button
+              id="success-close-btn"
+              class="px-4 py-2 bg-primary text-white rounded-button whitespace-nowrap hover:bg-blue-700"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+
+        <!-- Success Toast -->
+        <div
+          id="wallet-toast-success"
+          class="fixed top-6 right-0 z-50 px-4 py-2 bg-green-600 text-white rounded-lg shadow-lg flex items-center space-x-2 transition-transform duration-300 translate-x-full"
+        >
+          <i class="ri-checkbox-circle-line"></i>
+          <span>Wallet info saved successfully!</span>
+        </div>
       </div>
     </main>
-    <script id="qr-code-script">
-      document.addEventListener("DOMContentLoaded", function () {
-        const qrcode = new QRCode(document.getElementById("qrcode"), {
-          text: "TVTkZq3ghDZgF8txTdDM3s8g76XM2pgiey",
-          width: 192,
-          height: 192,
-          colorDark: "#000000",
-          colorLight: "#ffffff",
-          correctLevel: QRCode.CorrectLevel.H,
-        });
-        // Copy address button
-        document
-          .getElementById("copy-address")
-          .addEventListener("click", function () {
-            const walletAddress =
-              document.getElementById("wallet-address").value;
-            navigator.clipboard.writeText(walletAddress).then(() => {
-              const originalIcon = this.innerHTML;
-              this.innerHTML = '<i class="ri-check-line text-green-500"></i>';
-              setTimeout(() => {
-                this.innerHTML = originalIcon;
-              }, 2000);
-            });
-          });
-        // Download QR code
-        document
-          .getElementById("download-qr")
-          .addEventListener("click", function () {
-            const canvas = document.querySelector("#qrcode canvas");
-            if (canvas) {
-              const link = document.createElement("a");
-              link.download = "wallet-qr.png";
-              link.href = canvas.toDataURL("image/png");
-              link.click();
-            }
-          });
-      });
-    </script>
+
     <script id="modal-script">
       document.addEventListener("DOMContentLoaded", function () {
         const modals = document.querySelectorAll(".modal");
@@ -741,7 +1210,7 @@
         if (confirmLogoutBtn) {
           confirmLogoutBtn.addEventListener("click", function () {
             // Clear any session data here
-            window.location.href = "/login"; // Redirect to login page
+            window.location.href = "/sales-spy/admin/logout/"; // Redirect to login page
           });
         }
         // Action buttons for user actions

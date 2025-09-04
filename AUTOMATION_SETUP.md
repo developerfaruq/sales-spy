@@ -21,8 +21,8 @@ This document explains how to set up automatic hourly data collection for Shopif
 
 ### Step 4: Set Action
 1. Select "Start a program"
-2. Program/script: `C:\laragon\www\sales-spy\scripts\run_intelligence_update.bat`
-3. Start in: `C:\laragon\www\sales-spy\scripts`
+2. Program/script: `C:\wamp64\www\sales-spy\scripts\run_intelligence_update.bat`
+3. Start in: `C:\wamp64\www\sales-spy\scripts`
 
 ### Step 5: Advanced Settings
 1. After creating the task, right-click on it and select "Properties"
@@ -46,7 +46,7 @@ If you prefer not to use Task Scheduler, you can manually trigger updates:
 
 ### Via Command Line
 ```cmd
-cd C:\laragon\www\sales-spy\scripts
+cd C:\wamp64\www\sales-spy\scripts
 run_intelligence_update.bat
 ```
 

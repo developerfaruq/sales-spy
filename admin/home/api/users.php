@@ -1,17 +1,29 @@
 <?php
 // api/users.php
 
-require '../auth/auth_check.php';
+require '../../config/db.php';
+session_start();
+
+if (!isset($_SESSION['admin_id']) && isset($_COOKIE['admin_remember'])) {
+    $_SESSION['admin_id'] = $_COOKIE['admin_remember'];
+    // Optionally fetch admin info again from DB
+}
+
+// Redirect to login if still not authenticated
+if (!isset($_SESSION['admin_id'])) {
+    header("Location: ../../");
+    exit;
+}
 
 // Include PHPMailer
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\SMTP;
 use PHPMailer\PHPMailer\Exception;
 
-require '../../vendor/autoload.php'; // Adjust path as needed
+require '../../../vendor/autoload.php'; // Adjust path as needed
 
 // Load email configuration
-$emailConfig = require '../config/email_config.php'; // Adjust path as needed
+$emailConfig = require '../../config/email_config.php'; // Adjust path as needed
 
 header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');
@@ -214,11 +226,11 @@ function suspendUser($userId, $input) {
         
         // Update user status
         if ($duration === 'indefinite') {
-            $stmt = $pdo->prepare("UPDATE users SET account_status = 'disabled', is_disabled = 1 WHERE id = ?");
+            $stmt = $pdo->prepare("UPDATE users SET account_status = 'locked', is_disabled = 1 WHERE id = ?");
             $stmt->execute([$userId]);
         } else {
             $unlockTime = calculateUnlockTime($duration);
-            $stmt = $pdo->prepare("UPDATE users SET account_status = 'disabled', is_disabled = 1, unlock_time = ? WHERE id = ?");
+            $stmt = $pdo->prepare("UPDATE users SET account_status = 'locked', is_disabled = 1, unlock_time = ? WHERE id = ?");
             $stmt->execute([$unlockTime, $userId]);
         }
         
@@ -552,7 +564,7 @@ function getSuspensionEmailTemplate($fullName, $reason, $duration) {
                 
                 <div class='alert'>
                     <strong>Reason for suspension:</strong> " . htmlspecialchars($reason) . "<br>
-                    
+                    <strong>Duration:</strong> " . htmlspecialchars($duration) ."
                 </div>
                 
                 <p>During this suspension period, you will not be able to access your account or use our services.</p>

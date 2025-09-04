@@ -5,8 +5,8 @@
 return [
     'smtp' => [
         'host' => 'smtp.ethereal.email', // Your SMTP server
-        'username' => 'carson.kessler@ethereal.email', // Your email address
-        'password' => 'e5BhuTHEfyKfbjEH6R', // app password
+        'username' => 'jessika79@ethereal.email', // Your email address
+        'password' => 'Cu6UnWh6X1M7Qz1eqN', // app password
         'port' => 587,
         'encryption' => 'tls', 
         'from_email' => 'sales-spy@gmail.com',

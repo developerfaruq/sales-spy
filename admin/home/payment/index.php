@@ -1,3 +1,28 @@
+<?php
+require '../../config/db.php';
+require '../../home/subscription/api/auth_check.php';
+
+
+if (isset($_SESSION['admin_id'])) {
+    $stmt = $pdo->prepare("SELECT name FROM admins WHERE id = ?");
+    $stmt->execute([$_SESSION['admin_id']]);
+    $admin = $stmt->fetch();
+    
+    if ($admin) {
+        $adminName = htmlspecialchars($admin['name']);
+    }
+}
+
+
+$avatarUrl = "https://ui-avatars.com/api/?name=" . 
+                 urlencode( $adminName ) . 
+                 "&background=1E3A8A&color=fff&length=1&size=128";
+
+// Get counts from DB
+$totalUsers = $pdo->query("SELECT COUNT(*) FROM users")->fetchColumn();
+$pendingTXIDs = $pdo->query("SELECT COUNT(*) FROM txid_requests WHERE status = 'pending'")->fetchColumn();
+$activeSubscriptions = $pdo->query("SELECT COUNT(*) FROM subscriptions WHERE status = 'active'")->fetchColumn();                 
+?>
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -318,10 +343,10 @@
           <div class="relative">
             <button id="user-menu-btn" class="flex items-center">
               <div class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center">
-                <span class="text-sm font-medium">JD</span>
+                <span class="text-sm font-medium"><img src="<?= $avatarUrl ?>" alt="ss"></span>
               </div>
               <span class="ml-2 text-sm font-medium hidden md:block">
-                John Doe
+                <?= $adminName ?>
               </span>
               <i class="ri-arrow-down-s-line ml-1 text-gray-500"></i>
             </button>
@@ -383,10 +408,10 @@
         <div class="p-4 border-b">
           <div class="flex items-center">
             <div class="w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center">
-              <span class="text-sm font-medium">JD</span>
+              <span class="text-sm font-medium"><img src="<?= $avatarUrl ?>" alt="ad"></span>
             </div>
             <div class="ml-3">
-              <p class="text-sm font-medium">John Doe</p>
+              <p class="text-sm font-medium"><?= $adminName ?></p>
               <p class="text-xs text-gray-500">Super Admin</p>
             </div>
           </div>
@@ -418,6 +443,17 @@
               <i class="ri-wallet-3-line"></i>
             </div>
             <span>Wallets</span>
+              </a>
+            </li>
+            <li>
+              <a
+                href="../plan/"
+                class="nav-link w-full flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-600 hover:text-primary hover:bg-blue-50"
+              >
+                <div class="w-5 h-5 flex items-center justify-center mr-3">
+                  <i class="ri-list-settings-line"></i>
+                </div>
+                <span>Plans</span>
               </a>
             </li>
             <li>
