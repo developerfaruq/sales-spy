@@ -167,6 +167,7 @@ try {
 
     echo json_encode([
         'stores' => $stores,
+        'total_count' => $totalStores, // Add this line to match frontend expectation
         'pagination' => [
             'page' => $page,
             'limit' => $limit,
