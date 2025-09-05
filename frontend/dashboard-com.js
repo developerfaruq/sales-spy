@@ -91,13 +91,15 @@ document.addEventListener("DOMContentLoaded", function () {
                 
                 // Update results count
                 if (resultsCountDiv) {
-                    resultsCountDiv.textContent = `Found ${data.total_count.toLocaleString()} Stores`;
-                }
+    const totalCount = data.pagination?.total_stores || 0;
+    resultsCountDiv.textContent = `Found ${totalCount.toLocaleString()} Stores`;
+}
                 
                 // Check if we have stores
-                if (data.stores && data.stores.length > 0) {
+                const stores = data.stores || [];
+if (stores.length > 0) {
                     // Render each store row
-                    data.stores.forEach(store => {
+                    stores.forEach(store => {
                         const row = document.createElement('tr');
                         row.className = 'hover:bg-gray-50 result-row cursor-pointer';
                         row.setAttribute('data-domain', store.domain);
@@ -180,7 +182,11 @@ document.addEventListener("DOMContentLoaded", function () {
                     });
                     
                     // Update pagination
-                    updatePagination(data.total_count, data.page, data.limit);
+                    
+const totalCount = data.pagination?.total_stores || 0;
+const currentPage = data.pagination?.page || 1;
+const limit = data.pagination?.limit || itemsPerPage;
+updatePagination(totalCount, currentPage, limit);
                 } else {
                     // No results
                     resultsTableBody.innerHTML = '<tr><td colspan="17" class="px-6 py-4 text-center">No stores found matching your criteria.</td></tr>';
