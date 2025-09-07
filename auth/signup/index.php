@@ -82,7 +82,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Insert default free subscription
         $insertSubscription = $pdo->prepare("
             INSERT INTO subscriptions (user_id, plan_name, credits_remaining, credits_total, leads_balance, is_active)
-            VALUES (?, 'free', 1000, 1000, 1000, 1)
+            VALUES (?, 'free', 100, 100, 1000, 1)
         ");
         $insertSubscription->execute([$user_id]);
 

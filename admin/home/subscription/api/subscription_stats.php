@@ -125,7 +125,7 @@ function getSubscriptionDistribution($pdo, $period) {
         FROM subscriptions s 
         WHERE {$intervalCondition}
         GROUP BY DATE_FORMAT(s.start_date, '{$dateFormat}'), s.plan_name
-        ORDER BY s.start_date
+        ORDER BY period_label
     ";
     
     $stmt = $pdo->query($sql);

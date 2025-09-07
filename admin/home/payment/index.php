@@ -752,525 +752,602 @@ $activeSubscriptions = $pdo->query("SELECT COUNT(*) FROM subscriptions WHERE sta
       </div>
       <script>
         // =========================
-        // Payments Tab JS: USDT (TRC-20) Only
-        // =========================
-        (function () {
-          // --- Mock Data for Demo (USDT TRC-20 only) ---
-          const userList = [
-            {
-              initials: "EB",
-              name: "Emma Brown",
-              color: "bg-blue-100 text-primary",
-            },
-            {
-              initials: "RJ",
-              name: "Robert Johnson",
-              color: "bg-green-100 text-green-600",
-            },
-            {
-              initials: "DM",
-              name: "David Miller",
-              color: "bg-red-100 text-red-600",
-            },
-            {
-              initials: "JT",
-              name: "Jessica Thompson",
-              color: "bg-purple-100 text-purple-600",
-            },
-            {
-              initials: "SW",
-              name: "Sarah Wilson",
-              color: "bg-orange-100 text-orange-600",
-            },
-            {
-              initials: "AL",
-              name: "Ava Lee",
-              color: "bg-pink-100 text-pink-600",
-            },
-            {
-              initials: "BC",
-              name: "Benjamin Clark",
-              color: "bg-yellow-100 text-yellow-600",
-            },
-            {
-              initials: "ML",
-              name: "Mia Lewis",
-              color: "bg-indigo-100 text-indigo-600",
-            },
-            {
-              initials: "LW",
-              name: "Lucas Walker",
-              color: "bg-teal-100 text-teal-600",
-            },
-            {
-              initials: "CH",
-              name: "Charlotte Hall",
-              color: "bg-gray-100 text-gray-600",
-            },
-            {
-              initials: "HA",
-              name: "Henry Allen",
-              color: "bg-blue-100 text-blue-600",
-            },
-            {
-              initials: "AY",
-              name: "Amelia Young",
-              color: "bg-green-100 text-green-600",
-            },
-            {
-              initials: "JK",
-              name: "Jack King",
-              color: "bg-red-100 text-red-600",
-            },
-            {
-              initials: "EW",
-              name: "Emily Wright",
-              color: "bg-purple-100 text-purple-600",
-            },
-            {
-              initials: "AS",
-              name: "Alexander Scott",
-              color: "bg-orange-100 text-orange-600",
-            },
-            {
-              initials: "EG",
-              name: "Ella Green",
-              color: "bg-pink-100 text-pink-600",
-            },
-            {
-              initials: "DA",
-              name: "Daniel Adams",
-              color: "bg-yellow-100 text-yellow-600",
-            },
-            {
-              initials: "GB",
-              name: "Grace Baker",
-              color: "bg-indigo-100 text-indigo-600",
-            },
-            {
-              initials: "MN",
-              name: "Matthew Nelson",
-              color: "bg-teal-100 text-teal-600",
-            },
-            {
-              initials: "CC",
-              name: "Chloe Carter",
-              color: "bg-gray-100 text-gray-600",
-            },
-          ];
-          const planArr = ["Basic", "Pro", "Enterprise"];
-          const planColors = {
-            Basic: "bg-orange-100 text-orange-600",
-            Pro: "bg-blue-100 text-primary",
-            Enterprise: "bg-purple-100 text-purple-600",
-          };
-          const statusArr = ["Success", "Pending", "Failed"];
-          // Generate 50 mock transactions
-          function randomTxid() {
-            const chars = "abcdef0123456789";
-            let s = "";
-            for (let i = 0; i < 64; i++)
-              s += chars[Math.floor(Math.random() * chars.length)];
-            return s;
-          }
-          function randomDate(daysBack) {
-            const now = new Date();
-            const d = new Date(now);
-            d.setDate(now.getDate() - Math.floor(Math.random() * daysBack));
-            d.setHours(Math.floor(Math.random() * 24));
-            d.setMinutes(Math.floor(Math.random() * 60));
-            d.setSeconds(Math.floor(Math.random() * 60));
-            return d;
-          }
-          const mockTransactions = [];
-          for (let i = 0; i < 50; i++) {
-            const user = userList[i % userList.length];
-            const plan = planArr[Math.floor(Math.random() * planArr.length)];
-            const status =
-              statusArr[Math.floor(Math.random() * statusArr.length)];
-            const amount =
-              plan === "Basic"
-                ? 10 + Math.floor(Math.random() * 20)
-                : plan === "Pro"
-                ? 50 + Math.floor(Math.random() * 30)
-                : 200 + Math.floor(Math.random() * 100);
-            const date = randomDate(30);
-            mockTransactions.push({
-              orderId: `ORD-${10001 + i}`,
-              user,
-              plan,
-              amount,
-              txid: randomTxid(),
-              date: date.toISOString(),
-              status,
-            });
-          }
-          // --- State ---
-          let filteredTransactions = [...mockTransactions];
-          let currentPage = 1;
-          let pageSize = 10;
-          let statusFilter = "all";
-          let dateFilter = "7days";
-          let searchQuery = "";
-          // --- DOM Elements ---
-          const tbody = document.getElementById("transactions-table-body");
-          const pageSizeSelect = document.getElementById(
-            "transaction-page-size-select"
-          );
-          const statusFilterSelect = document.getElementById(
-            "transaction-status-filter"
-          );
-          const dateFilterSelect = document.getElementById(
-            "transaction-date-filter"
-          );
-          const searchInput = document.getElementById("transaction-search");
-          const pagination = document.getElementById("transactions-pagination");
-          const prevBtn = document.getElementById("transactions-prev-page");
-          const nextBtn = document.getElementById("transactions-next-page");
-          const totalCount = document.getElementById(
-            "transactions-total-count"
-          );
-          // --- Render Table Rows ---
-          function renderTable() {
-            // Filter by status
-            filteredTransactions = mockTransactions.filter((tx) => {
-              let matchesStatus =
-                statusFilter === "all" ||
-                tx.status.toLowerCase() === statusFilter;
-              let matchesSearch =
-                !searchQuery ||
-                tx.orderId.toLowerCase().includes(searchQuery) ||
-                tx.user.name.toLowerCase().includes(searchQuery) ||
-                tx.txid.toLowerCase().includes(searchQuery);
-              // Date filter
-              let matchesDate = true;
-              if (dateFilter !== "custom") {
-                const txDate = new Date(tx.date);
-                const now = new Date();
-                if (dateFilter === "today") {
-                  matchesDate = txDate.toDateString() === now.toDateString();
-                } else if (dateFilter === "yesterday") {
-                  const yest = new Date(now);
-                  yest.setDate(now.getDate() - 1);
-                  matchesDate = txDate.toDateString() === yest.toDateString();
-                } else if (dateFilter === "7days") {
-                  const weekAgo = new Date(now);
-                  weekAgo.setDate(now.getDate() - 6);
-                  matchesDate = txDate >= weekAgo && txDate <= now;
-                } else if (dateFilter === "30days") {
-                  const monthAgo = new Date(now);
-                  monthAgo.setDate(now.getDate() - 29);
-                  matchesDate = txDate >= monthAgo && txDate <= now;
-                }
-              }
-              return matchesStatus && matchesSearch && matchesDate;
-            });
-            // Pagination
-            const total = filteredTransactions.length;
-            const totalPages = Math.max(1, Math.ceil(total / pageSize));
-            if (currentPage > totalPages) currentPage = totalPages;
-            const start = (currentPage - 1) * pageSize;
-            const end = Math.min(start + pageSize, total);
-            const txToShow = filteredTransactions.slice(start, end);
-            // Render rows
-            tbody.innerHTML = txToShow
-              .map(
-                (tx) => `
-          <tr>
+// Payments Tab JS: Real Backend Integration
+// =========================
+(function () {
+  // --- State ---
+  let currentPage = 1;
+  let pageSize = 10;
+  let statusFilter = "all";
+  let dateFilter = "7days";
+  let searchQuery = "";
+  let totalTransactions = 0;
+
+  // --- DOM Elements ---
+  const tbody = document.getElementById("transactions-table-body");
+  const pageSizeSelect = document.getElementById("transaction-page-size-select");
+  const statusFilterSelect = document.getElementById("transaction-status-filter");
+  const dateFilterSelect = document.getElementById("transaction-date-filter");
+  const searchInput = document.getElementById("transaction-search");
+  const pagination = document.getElementById("transactions-pagination");
+  const prevBtn = document.getElementById("transactions-prev-page");
+  const nextBtn = document.getElementById("transactions-next-page");
+  const totalCount = document.getElementById("transactions-total-count");
+
+  // --- Plan Colors ---
+  const planColors = {
+    free: "bg-gray-100 text-gray-600",
+    pro: "bg-blue-100 text-primary",
+    enterprise: "bg-purple-100 text-purple-600",
+  };
+
+  // --- API Functions ---
+  async function fetchTransactions() {
+    try {
+      const params = new URLSearchParams({
+        page: currentPage,
+        limit: pageSize,
+        status: statusFilter,
+        search: searchQuery,
+        date_filter: dateFilter,
+      });
+
+      const response = await fetch(`api/modal.php?action=get_transactions&${params}`);
+      const result = await response.json();
+
+      if (!result.success) {
+        throw new Error(result.error || "Failed to fetch transactions");
+      }
+
+      return result;
+    } catch (error) {
+      console.error("Error fetching transactions:", error);
+      showNotification("Error loading transactions: " + error.message, "error");
+      return { data: [], pagination: { total: 0, pages: 0 } };
+    }
+  }
+
+  async function updateTransactionStatus(transactionId, status) {
+    try {
+      const response = await fetch("api/modal.php?action=update_transaction_status", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          transaction_id: transactionId,
+          status: status,
+        }),
+      });
+
+      const result = await response.json();
+
+      if (!result.success) {
+        throw new Error(result.error || "Failed to update transaction");
+      }
+
+      showNotification("Transaction updated successfully", "success");
+      return true;
+    } catch (error) {
+      console.error("Error updating transaction:", error);
+      showNotification("Error updating transaction: " + error.message, "error");
+      return false;
+    }
+  }
+
+  async function fetchTransactionDetails(transactionId) {
+    try {
+      const response = await fetch(`api/modal.php?action=get_transaction_details&id=${transactionId}`);
+      const result = await response.json();
+
+      if (!result.success) {
+        throw new Error(result.error || "Failed to fetch transaction details");
+      }
+
+      return result.data;
+    } catch (error) {
+      console.error("Error fetching transaction details:", error);
+      showNotification("Error loading transaction details: " + error.message, "error");
+      return null;
+    }
+  }
+
+  async function exportTransactions() {
+    try {
+      const params = new URLSearchParams({
+        status: statusFilter,
+        search: searchQuery,
+        date_filter: dateFilter,
+      });
+
+      const response = await fetch(`api/modal.php?action=export_transactions&${params}`);
+      const result = await response.json();
+
+      if (!result.success) {
+        throw new Error(result.error || "Failed to export transactions");
+      }
+
+      // Create CSV content
+      let csv = "Order ID,User,Plan,Amount (USDT),TXID,Date & Time,Status\n";
+      result.data.forEach((tx) => {
+        const date = new Date(tx.created_at).toLocaleString();
+        csv += `"${tx.order_id}","${tx.user_name}","${tx.plan_name}","${tx.amount}","${tx.txid}","${date}","${tx.status}"\n`;
+      });
+
+      // Download CSV
+      const blob = new Blob([csv], { type: "text/csv" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = `transactions_${new Date().toISOString().slice(0, 10)}.csv`;
+      a.click();
+
+      showNotification("Transactions exported successfully", "success");
+    } catch (error) {
+      console.error("Error exporting transactions:", error);
+      showNotification("Error exporting transactions: " + error.message, "error");
+    }
+  }
+
+  // --- Render Functions ---
+  async function renderTable() {
+    // Show loading state
+    tbody.innerHTML = '<tr><td colspan="9" class="px-4 py-8 text-center text-gray-500">Loading transactions...</td></tr>';
+
+    const result = await fetchTransactions();
+    const transactions = result.data;
+    totalTransactions = result.pagination.total;
+
+    if (transactions.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="9" class="px-4 py-8 text-center text-gray-500">No transactions found</td></tr>';
+      totalCount.textContent = "of 0 transactions";
+      renderPagination(0);
+      return;
+    }
+
+    // Render rows
+    tbody.innerHTML = transactions
+      .map(
+        (tx) => `
+      <tr>
         <td class="px-4 py-3 whitespace-nowrap">
           <label class="custom-checkbox">
-        <input type="checkbox" class="transaction-checkbox" />
-        <span class="checkbox-mark"></span>
+            <input type="checkbox" class="transaction-checkbox" />
+            <span class="checkbox-mark"></span>
           </label>
         </td>
-        <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-600">${
-          tx.orderId
-        }</td>
+        <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-600">${tx.order_id || 'N/A'}</td>
         <td class="px-4 py-3 whitespace-nowrap">
           <div class="flex items-center">
-        <div class="w-8 h-8 rounded-full ${
-          tx.user.color
-        } flex items-center justify-center">
-          <span class="text-sm font-medium">${tx.user.initials}</span>
-        </div>
-        <div class="ml-3">
-          <p class="text-sm font-medium text-gray-800">${tx.user.name}</p>
-        </div>
+            <div class="w-8 h-8 rounded-full ${tx.user_color} flex items-center justify-center">
+              <span class="text-sm font-medium">${tx.user_initials}</span>
+            </div>
+            <div class="ml-3">
+              <p class="text-sm font-medium text-gray-800">${tx.user_name}</p>
+              <p class="text-xs text-gray-500">${tx.user_email}</p>
+            </div>
           </div>
         </td>
         <td class="px-4 py-3 whitespace-nowrap">
           <span class="px-2 py-1 text-xs font-medium ${
-            planColors[tx.plan] || "bg-gray-100 text-gray-600"
-          } rounded-full">${tx.plan}</span>
+            planColors[tx.plan_name] || "bg-gray-100 text-gray-600"
+          } rounded-full">${tx.plan_display_name}</span>
         </td>
-        <td class="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-800">${
-          tx.amount
-        } USDT</td>
+        <td class="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-800">$${parseFloat(tx.amount).toFixed(2)} USDT</td>
         <td class="px-4 py-3 whitespace-nowrap">
-          <a href="https://tronscan.org/#/transaction/${
-            tx.txid
-          }" target="_blank" class="text-primary underline break-all text-xs">${tx.txid.slice(
-                  0,
-                  10
-                )}...${tx.txid.slice(-6)}</a>
+          <a href="https://tronscan.org/#/transaction/${tx.txid}" target="_blank" 
+             class="text-primary underline break-all text-xs" title="${tx.txid}">${tx.short_txid}</a>
         </td>
-        <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-600">
-          ${new Date(tx.date).toLocaleString("en-US", {
-            month: "short",
-            day: "2-digit",
-            year: "numeric",
-            hour: "2-digit",
-            minute: "2-digit",
-          })}
-        </td>
+        <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-600">${tx.formatted_date}</td>
         <td class="px-4 py-3 whitespace-nowrap">
-          <span class="px-2 py-1 text-xs font-medium rounded-full ${
-            tx.status === "Success"
-              ? "bg-green-50 text-green-600"
-              : tx.status === "Pending"
-              ? "bg-yellow-50 text-yellow-600"
-              : "bg-red-50 text-red-600"
-          }">${tx.status}</span>
+          <div class="flex items-center space-x-2">
+            <span class="px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(tx.status)}">${getStatusText(tx.status)}</span>
+            ${getStatusActions(tx.id, tx.status)}
+          </div>
         </td>
         <td class="px-4 py-3 whitespace-nowrap text-right text-sm font-medium">
-          <button class="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-primary rounded-full hover:bg-blue-50 receipt-btn" data-idx="${mockTransactions.indexOf(
-            tx
-          )}" title="View Receipt">
-        <i class="ri-eye-line"></i>
-          </button>
-        </td>
-          </tr>
-        `
-              )
-              .join("");
-            // Update total count
-            totalCount.textContent = `of ${total} transactions`;
-            // Render pagination
-            renderPagination(totalPages);
-            // Attach receipt modal event listeners
-            setTimeout(() => {
-              document.querySelectorAll(".receipt-btn").forEach((btn) => {
-                btn.onclick = function () {
-                  // Use the filteredTransactions index, not mockTransactions
-                  const idx = parseInt(this.getAttribute("data-idx"));
-                  showReceiptModal(filteredTransactions[idx]);
-                };
-              });
-            }, 0);
-          }
-          // --- Render Pagination Buttons ---
-          function renderPagination(totalPages) {
-            // Remove old page buttons
-            pagination
-              .querySelectorAll(".transactions-page-btn")
-              .forEach((btn) => btn.remove());
-            // Insert new page buttons
-            for (let i = 1; i <= totalPages; i++) {
-              const btn = document.createElement("button");
-              btn.className =
-                "pagination-item text-gray-600 hover:bg-gray-100 transactions-page-btn";
-              btn.textContent = i;
-              btn.setAttribute("data-page", i);
-              if (i === currentPage)
-                btn.classList.add("active", "bg-blue-50", "text-primary");
-              btn.onclick = function () {
-                currentPage = i;
-                renderTable();
-              };
-              pagination.insertBefore(btn, nextBtn);
-            }
-            // Prev/next
-            prevBtn.disabled = currentPage === 1;
-            nextBtn.disabled = currentPage === totalPages;
-            prevBtn.classList.toggle("opacity-50", prevBtn.disabled);
-            prevBtn.classList.toggle("cursor-not-allowed", prevBtn.disabled);
-            nextBtn.classList.toggle("opacity-50", nextBtn.disabled);
-            nextBtn.classList.toggle("cursor-not-allowed", nextBtn.disabled);
-          }
-          // --- Event Listeners ---
-          prevBtn.onclick = function () {
-            if (currentPage > 1) {
-              currentPage--;
-              renderTable();
-            }
-          };
-          nextBtn.onclick = function () {
-            const total = filteredTransactions.length;
-            const totalPages = Math.max(1, Math.ceil(total / pageSize));
-            if (currentPage < totalPages) {
-              currentPage++;
-              renderTable();
-            }
-          };
-          // Page size select
-          pageSizeSelect.addEventListener("change", function () {
-            const value = pageSizeSelect.getAttribute("data-value");
-            if (value) {
-              pageSize = parseInt(value, 10);
-              currentPage = 1;
-              renderTable();
-            }
-          });
-          // Status filter
-          statusFilterSelect.addEventListener("change", function () {
-            statusFilter =
-              statusFilterSelect.getAttribute("data-value") || "all";
-            currentPage = 1;
-            renderTable();
-          });
-          // Date filter
-          dateFilterSelect.addEventListener("change", function () {
-            dateFilter = dateFilterSelect.getAttribute("data-value") || "7days";
-            currentPage = 1;
-            renderTable();
-          });
-          // Search
-          searchInput.addEventListener("input", function () {
-            searchQuery = searchInput.value.trim().toLowerCase();
-            currentPage = 1;
-            renderTable();
-          });
-          // Export CSV
-          document.getElementById("export-transactions-btn").onclick =
-            function () {
-              let csv =
-                "Order ID,User,Plan,Amount (USDT),TXID,Date & Time,Status\n";
-              filteredTransactions.forEach((tx) => {
-                csv += `"${tx.orderId}","${tx.user.name}","${tx.plan}","${
-                  tx.amount
-                }","${tx.txid}","${new Date(tx.date).toLocaleString()}","${
-                  tx.status
-                }"\n`;
-              });
-              const blob = new Blob([csv], { type: "text/csv" });
-              const a = document.createElement("a");
-              a.href = URL.createObjectURL(blob);
-              a.download = "transactions.csv";
-              a.click();
-            };
-          // --- Receipt Modal Logic ---
-          function showReceiptModal(tx) {
-            const modal = document.getElementById("receipt-modal");
-            const body = document.getElementById("receipt-modal-body");
-            body.innerHTML = `
-          <div>
-        <p class="text-sm text-gray-500">Order ID</p>
-        <p class="text-sm font-medium text-gray-800">${tx.orderId}</p>
+          <div class="flex items-center space-x-1">
+            <button class="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-primary rounded-full hover:bg-blue-50 receipt-btn" 
+                    data-id="${tx.id}" title="View Receipt">
+              <i class="ri-eye-line"></i>
+            </button>
+            ${tx.screenshot_path ? `
+              <button class="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-green-600 rounded-full hover:bg-green-50 screenshot-btn" 
+                      data-path="${tx.screenshot_path}" title="View Screenshot">
+                <i class="ri-image-line"></i>
+              </button>
+            ` : ''}
           </div>
-          <div>
+        </td>
+      </tr>
+    `
+      )
+      .join("");
+
+    // Update total count
+    totalCount.textContent = `of ${totalTransactions} transactions`;
+
+    // Render pagination
+    renderPagination(result.pagination.pages);
+
+    // Attach event listeners
+    attachEventListeners();
+  }
+
+  function getStatusColor(status) {
+    switch (status) {
+      case "success":
+        return "bg-green-50 text-green-600";
+      case "pending":
+        return "bg-yellow-50 text-yellow-600";
+      case "failed":
+        return "bg-red-50 text-red-600";
+      default:
+        return "bg-gray-50 text-gray-600";
+    }
+  }
+
+  function getStatusText(status) {
+    return status.charAt(0).toUpperCase() + status.slice(1);
+  }
+
+  function getStatusActions(transactionId, currentStatus) {
+    if (currentStatus === "pending") {
+      return `
+        <button class="approve-btn px-2 py-1 text-xs bg-green-100 text-green-700 hover:bg-green-200 rounded" 
+                data-id="${transactionId}" title="Approve Transaction">
+          <i class="ri-check-line"></i>
+        </button>
+        <button class="reject-btn px-2 py-1 text-xs bg-red-100 text-red-700 hover:bg-red-200 rounded" 
+                data-id="${transactionId}" title="Reject Transaction">
+          <i class="ri-close-line"></i>
+        </button>
+      `;
+    }
+    return "";
+  }
+
+  function renderPagination(totalPages) {
+    // Remove old page buttons
+    pagination.querySelectorAll(".transactions-page-btn").forEach((btn) => btn.remove());
+
+    // Insert new page buttons
+    for (let i = 1; i <= totalPages; i++) {
+      const btn = document.createElement("button");
+      btn.className = "pagination-item text-gray-600 hover:bg-gray-100 transactions-page-btn";
+      btn.textContent = i;
+      btn.setAttribute("data-page", i);
+      if (i === currentPage) btn.classList.add("active", "bg-blue-50", "text-primary");
+      btn.onclick = function () {
+        currentPage = i;
+        renderTable();
+      };
+      pagination.insertBefore(btn, nextBtn);
+    }
+
+    // Prev/next
+    prevBtn.disabled = currentPage === 1;
+    nextBtn.disabled = currentPage === totalPages || totalPages === 0;
+    prevBtn.classList.toggle("opacity-50", prevBtn.disabled);
+    prevBtn.classList.toggle("cursor-not-allowed", prevBtn.disabled);
+    nextBtn.classList.toggle("opacity-50", nextBtn.disabled);
+    nextBtn.classList.toggle("cursor-not-allowed", nextBtn.disabled);
+  }
+
+  function attachEventListeners() {
+    // Receipt buttons
+    document.querySelectorAll(".receipt-btn").forEach((btn) => {
+      btn.onclick = async function () {
+        const transactionId = this.getAttribute("data-id");
+        await showReceiptModal(transactionId);
+      };
+    });
+
+    // Screenshot buttons
+    document.querySelectorAll(".screenshot-btn").forEach((btn) => {
+      btn.onclick = function () {
+        const screenshotPath = this.getAttribute("data-path");
+        showScreenshotModal(screenshotPath);
+      };
+    });
+
+    // Approve buttons
+    document.querySelectorAll(".approve-btn").forEach((btn) => {
+      btn.onclick = async function () {
+        const transactionId = this.getAttribute("data-id");
+        if (confirm("Are you sure you want to approve this transaction?")) {
+          const success = await updateTransactionStatus(transactionId, "success");
+          if (success) {
+            renderTable();
+          }
+        }
+      };
+    });
+
+    // Reject buttons
+    document.querySelectorAll(".reject-btn").forEach((btn) => {
+      btn.onclick = async function () {
+        const transactionId = this.getAttribute("data-id");
+        if (confirm("Are you sure you want to reject this transaction?")) {
+          const success = await updateTransactionStatus(transactionId, "failed");
+          if (success) {
+            renderTable();
+          }
+        }
+      };
+    });
+  }
+
+  // --- Modal Functions ---
+  async function showReceiptModal(transactionId) {
+    const transaction = await fetchTransactionDetails(transactionId);
+    if (!transaction) return;
+
+    const modal = document.getElementById("receipt-modal");
+    const body = document.getElementById("receipt-modal-body");
+
+    // Generate user initials
+    const names = transaction.user_name.split(' ');
+    const initials = names.map(name => name.charAt(0).toUpperCase()).join('').slice(0, 2);
+    
+    // Generate user color
+    const colors = [
+      'bg-blue-100 text-blue-600', 'bg-green-100 text-green-600', 'bg-red-100 text-red-600',
+      'bg-purple-100 text-purple-600', 'bg-orange-100 text-orange-600', 'bg-pink-100 text-pink-600'
+    ];
+    const userColor = colors[transaction.user_id % colors.length];
+
+    body.innerHTML = `
+      <div>
+        <p class="text-sm text-gray-500">Order ID</p>
+        <p class="text-sm font-medium text-gray-800">${transaction.order_id || 'N/A'}</p>
+      </div>
+      <div>
         <p class="text-sm text-gray-500">User</p>
         <div class="flex items-center mt-1">
-          <div class="w-8 h-8 rounded-full ${
-            tx.user.color
-          } flex items-center justify-center">
-        <span class="text-sm font-medium">${tx.user.initials}</span>
+          <div class="w-8 h-8 rounded-full ${userColor} flex items-center justify-center">
+            <span class="text-sm font-medium">${initials}</span>
           </div>
-          <span class="ml-3 text-sm font-medium text-gray-800">${
-            tx.user.name
-          }</span>
+          <div class="ml-3">
+            <span class="text-sm font-medium text-gray-800">${transaction.user_name}</span>
+            <p class="text-xs text-gray-500">${transaction.user_email}</p>
+          </div>
         </div>
-          </div>
-          <div>
+      </div>
+      <div>
         <p class="text-sm text-gray-500">Plan</p>
-        <span class="px-2 py-1 text-xs font-medium ${
-          planColors[tx.plan] || "bg-gray-100 text-gray-600"
-        } rounded-full">${tx.plan}</span>
-          </div>
-          <div>
+        <span class="px-2 py-1 text-xs font-medium ${planColors[transaction.plan_name] || "bg-gray-100 text-gray-600"} rounded-full">
+          ${transaction.plan_name ? transaction.plan_name.charAt(0).toUpperCase() + transaction.plan_name.slice(1) : 'Free'}
+        </span>
+      </div>
+      <div>
         <p class="text-sm text-gray-500">Amount</p>
-        <p class="text-sm font-medium text-gray-800">${tx.amount} USDT</p>
-          </div>
-          <div>
+        <p class="text-sm font-medium text-gray-800">${parseFloat(transaction.amount).toFixed(2)} USDT</p>
+      </div>
+      <div>
         <p class="text-sm text-gray-500">TXID</p>
-        <a href="https://tronscan.org/#/transaction/${
-          tx.txid
-        }" target="_blank" class="text-primary underline break-all text-xs">${
-              tx.txid
-            }</a>
-          </div>
-          <div>
+        <a href="https://tronscan.org/#/transaction/${transaction.txid}" target="_blank" 
+           class="text-primary underline break-all text-xs">${transaction.txid}</a>
+      </div>
+      <div>
         <p class="text-sm text-gray-500">Date & Time</p>
-        <p class="text-sm font-medium text-gray-800">${new Date(
-          tx.date
-        ).toLocaleString("en-US", {
+        <p class="text-sm font-medium text-gray-800">${new Date(transaction.created_at).toLocaleString("en-US", {
           month: "short",
           day: "2-digit",
           year: "numeric",
           hour: "2-digit",
           minute: "2-digit",
         })}</p>
-          </div>
-          <div>
+      </div>
+      <div>
         <p class="text-sm text-gray-500">Status</p>
-        <span class="px-2 py-1 text-xs font-medium rounded-full ${
-          tx.status === "Success"
-            ? "bg-green-50 text-green-600"
-            : tx.status === "Pending"
-            ? "bg-yellow-50 text-yellow-600"
-            : "bg-red-50 text-red-600"
-        }">${tx.status}</span>
-          </div>
-        `;
-            modal.classList.add("active");
-            document.body.style.overflow = "hidden";
-            // Close modal logic
-            modal.querySelectorAll(".modal-close").forEach((btn) => {
-              btn.onclick = function () {
-                modal.classList.remove("active");
-                document.body.style.overflow = "";
-              };
-            });
-            modal.onclick = function (e) {
-              if (e.target === modal) {
-                modal.classList.remove("active");
-                document.body.style.overflow = "";
-              }
-            };
-          }
-          // --- Initial Render ---
-          renderTable();
+        <span class="px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(transaction.status)}">${getStatusText(transaction.status)}</span>
+      </div>
+      ${transaction.screenshot_path ? `
+        <div>
+          <p class="text-sm text-gray-500">Payment Screenshot</p>
+          <button onclick="showScreenshotModal('${transaction.screenshot_path}')" 
+                  class="mt-2 px-3 py-1 text-xs bg-blue-100 text-blue-700 hover:bg-blue-200 rounded">
+            <i class="ri-image-line mr-1"></i>View Screenshot
+          </button>
+        </div>
+      ` : ''}
+    `;
 
-          // --- Custom Select Patch for Filters ---
-          // Listen for custom-select changes and dispatch "change" event for vanilla JS
-          document
-            .querySelectorAll("#payments-tab .custom-select")
-            .forEach((select) => {
-              const trigger = select.querySelector(".custom-select-trigger");
-              const options = select.querySelectorAll(".custom-select-option");
-              trigger &&
-                trigger.addEventListener("click", function (e) {
-                  e.stopPropagation();
-                  document
-                    .querySelectorAll("#payments-tab .custom-select")
-                    .forEach((other) => {
-                      if (other !== select) other.classList.remove("open");
-                    });
-                  select.classList.toggle("open");
-                });
-              options.forEach((option) => {
-                option.addEventListener("click", function () {
-                  const value = this.getAttribute("data-value");
-                  select.setAttribute("data-value", value);
-                  select.classList.remove("open");
-                  // Update trigger text
-                  const triggerSpan = trigger.querySelector("span");
-                  if (triggerSpan)
-                    triggerSpan.textContent = this.textContent.trim();
-                  // Dispatch change event
-                  const event = new CustomEvent("change", {
-                    detail: { value },
-                  });
-                  select.dispatchEvent(event);
-                });
-              });
-            });
-          // Close selects when clicking outside
-          document.addEventListener("click", function () {
-            document
-              .querySelectorAll("#payments-tab .custom-select")
-              .forEach((select) => select.classList.remove("open"));
-          });
-        })();
+    modal.classList.add("active");
+    document.body.style.overflow = "hidden";
+
+    // Close modal logic
+    modal.querySelectorAll(".modal-close").forEach((btn) => {
+      btn.onclick = function () {
+        modal.classList.remove("active");
+        document.body.style.overflow = "";
+      };
+    });
+
+    modal.onclick = function (e) {
+      if (e.target === modal) {
+        modal.classList.remove("active");
+        document.body.style.overflow = "";
+      }
+    };
+  }
+
+  function showScreenshotModal(screenshotPath) {
+    // Create screenshot modal if it doesn't exist
+    let screenshotModal = document.getElementById("screenshot-modal");
+    if (!screenshotModal) {
+      screenshotModal = document.createElement("div");
+      screenshotModal.id = "screenshot-modal";
+      screenshotModal.className = "modal";
+      screenshotModal.innerHTML = `
+        <div class="modal-content max-w-2xl">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-lg font-medium text-gray-800">Payment Screenshot</h3>
+            <button class="modal-close text-gray-400 hover:text-gray-500">
+              <i class="ri-close-line ri-lg"></i>
+            </button>
+          </div>
+          <div class="text-center">
+            <img id="screenshot-image" src="" alt="Payment Screenshot" class="max-w-full h-auto rounded-lg shadow-lg">
+          </div>
+        </div>
+      `;
+      document.body.appendChild(screenshotModal);
+    }
+
+    const image = screenshotModal.querySelector("#screenshot-image");
+    image.src = "../../../home/payment/api/" + screenshotPath; // Adjust path as needed
+
+    screenshotModal.classList.add("active");
+    document.body.style.overflow = "hidden";
+
+    // Close modal logic
+    screenshotModal.querySelectorAll(".modal-close").forEach((btn) => {
+      btn.onclick = function () {
+        screenshotModal.classList.remove("active");
+        document.body.style.overflow = "";
+      };
+    });
+
+    screenshotModal.onclick = function (e) {
+      if (e.target === screenshotModal) {
+        screenshotModal.classList.remove("active");
+        document.body.style.overflow = "";
+      }
+    };
+  }
+
+  // --- Utility Functions ---
+  function showNotification(message, type = "info") {
+    // Create notification element
+    const notification = document.createElement("div");
+    notification.className = `fixed top-4 right-4 z-50 px-4 py-3 rounded-lg shadow-lg transform transition-transform duration-300 translate-x-full ${
+      type === "success" ? "bg-green-500 text-white" : 
+      type === "error" ? "bg-red-500 text-white" : 
+      "bg-blue-500 text-white"
+    }`;
+    notification.textContent = message;
+
+    document.body.appendChild(notification);
+
+    // Show notification
+    setTimeout(() => {
+      notification.classList.remove("translate-x-full");
+    }, 100);
+
+    // Hide and remove notification
+    setTimeout(() => {
+      notification.classList.add("translate-x-full");
+      setTimeout(() => {
+        document.body.removeChild(notification);
+      }, 300);
+    }, 3000);
+  }
+
+  // --- Event Listeners ---
+  prevBtn.onclick = function () {
+    if (currentPage > 1) {
+      currentPage--;
+      renderTable();
+    }
+  };
+
+  nextBtn.onclick = function () {
+    const totalPages = Math.ceil(totalTransactions / pageSize);
+    if (currentPage < totalPages) {
+      currentPage++;
+      renderTable();
+    }
+  };
+
+  // Page size select
+  pageSizeSelect.addEventListener("change", function () {
+    const value = pageSizeSelect.getAttribute("data-value");
+    if (value) {
+      pageSize = parseInt(value, 10);
+      currentPage = 1;
+      renderTable();
+    }
+  });
+
+  // Status filter
+  statusFilterSelect.addEventListener("change", function () {
+    statusFilter = statusFilterSelect.getAttribute("data-value") || "all";
+    currentPage = 1;
+    renderTable();
+  });
+
+  // Date filter
+  dateFilterSelect.addEventListener("change", function () {
+    dateFilter = dateFilterSelect.getAttribute("data-value") || "7days";
+    currentPage = 1;
+    renderTable();
+  });
+
+  // Search
+  let searchTimeout;
+  searchInput.addEventListener("input", function () {
+    clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(() => {
+      searchQuery = searchInput.value.trim().toLowerCase();
+      currentPage = 1;
+      renderTable();
+    }, 500); // Debounce search
+  });
+
+  // Export CSV
+  document.getElementById("export-transactions-btn").onclick = exportTransactions;
+
+  // Select all checkbox
+  document.getElementById("select-all-transactions").addEventListener("change", function () {
+    const checkboxes = document.querySelectorAll(".transaction-checkbox");
+    checkboxes.forEach((checkbox) => {
+      checkbox.checked = this.checked;
+    });
+  });
+
+  // --- Custom Select Enhancement ---
+  document.querySelectorAll("#payments-tab .custom-select").forEach((select) => {
+    const trigger = select.querySelector(".custom-select-trigger");
+    const options = select.querySelectorAll(".custom-select-option");
+
+    if (trigger) {
+      trigger.addEventListener("click", function (e) {
+        e.stopPropagation();
+        document.querySelectorAll("#payments-tab .custom-select").forEach((other) => {
+          if (other !== select) other.classList.remove("open");
+        });
+        select.classList.toggle("open");
+      });
+    }
+
+    options.forEach((option) => {
+      option.addEventListener("click", function () {
+        const value = this.getAttribute("data-value");
+        select.setAttribute("data-value", value);
+        select.classList.remove("open");
+
+        // Update trigger text
+        const triggerSpan = trigger.querySelector("span");
+        if (triggerSpan) triggerSpan.textContent = this.textContent.trim();
+
+        // Dispatch change event
+        const event = new CustomEvent("change", { detail: { value } });
+        select.dispatchEvent(event);
+      });
+    });
+  });
+
+  // Close selects when clicking outside
+  document.addEventListener("click", function () {
+    document.querySelectorAll("#payments-tab .custom-select").forEach((select) => 
+      select.classList.remove("open")
+    );
+  });
+
+  // --- Initialize ---
+  renderTable();
+})();
         // =========================
         // End Payments Tab JS
         // =========================
