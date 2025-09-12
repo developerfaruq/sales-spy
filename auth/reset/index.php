@@ -18,7 +18,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $stmt = $pdo->prepare("UPDATE users SET password = ?, reset_token = NULL, reset_token_expiry = NULL WHERE reset_token = ?");
     $stmt->execute([$hashed, $token]);
 
-    echo "✅ Password reset successfully. <a href= 'http://localhost/sales/signup.html?form=login'>Login</a>";
+    echo "✅ Password reset successfully. <a href= 'https://sales-spy.test/signup.php?form=login'>Login</a>";
     exit;
 }
 

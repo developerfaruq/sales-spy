@@ -458,6 +458,8 @@ function sendSuspensionEmail($email, $fullName, $reason, $duration) {
         configureMailer($mail);
         
         // Recipients
+        
+
         $mail->setFrom($emailConfig['smtp']['from_email'], $emailConfig['smtp']['from_name']);
         $mail->addAddress($email, $fullName);
         
@@ -489,6 +491,8 @@ function sendUnsuspensionEmail($email, $fullName, $reason) {
         configureMailer($mail);
         
         // Recipients
+        
+
         $mail->setFrom($emailConfig['smtp']['from_email'], $emailConfig['smtp']['from_name']);
         $mail->addAddress($email, $fullName);
         

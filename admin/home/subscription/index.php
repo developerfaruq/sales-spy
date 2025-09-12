@@ -625,6 +625,9 @@ $activeSubscriptions = $pdo->query("SELECT COUNT(*) FROM subscriptions WHERE sta
                     <div class="custom-select-option" data-value="all">
                       All Plans
                     </div>
+                    <div class="custom-select-option" data-value="free">
+                      Free
+                    </div>
                     <div class="custom-select-option" data-value="basic">
                       Basic
                     </div>
@@ -817,7 +820,13 @@ $activeSubscriptions = $pdo->query("SELECT COUNT(*) FROM subscriptions WHERE sta
                         <div class="custom-select-options">
                             <div class="custom-select-option" data-value="free">
                                 <div class="flex items-center justify-between">
-                                    <span>Free Plan</span>
+                                    <span>free Plan</span>
+                                    <span class="text-xs text-gray-500">100 credits</span>
+                                </div>
+                            </div>
+                            <div class="custom-select-option" data-value="Basic">
+                                <div class="flex items-center justify-between">
+                                    <span>Basic Plan</span>
                                     <span class="text-xs text-gray-500">1,000 credits</span>
                                 </div>
                             </div>

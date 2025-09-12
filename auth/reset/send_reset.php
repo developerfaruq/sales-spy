@@ -5,6 +5,8 @@ require '../../vendor/autoload.php';
 
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
+// Load email configuration
+$emailConfig = require '../../admin/config/email_config.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = trim($_POST['email']);
@@ -17,13 +19,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($user) {
         // Generate reset token and expiry
         $token = bin2hex(random_bytes(32));
-        $expiry = date('Y-m-d H:i:s', strtotime('+1 hour'));
+        $expiry = date('Y-m-d H:i:s', strtotime('+2 hour'));
 
         // Save token and expiry
         $stmt = $pdo->prepare("UPDATE users SET reset_token = ?, reset_token_expiry = ? WHERE email = ?");
         $stmt->execute([$token, $expiry, $email]);
 
-        $resetLink = "http://localhost/sales/auth/reset/index.php?token=$token";
+        $resetLink = "https://sales-spy.test/auth/reset/index.php?token=$token";
 
         // Send email with Mailtrap
         $mail = new PHPMailer(true);
@@ -31,16 +33,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         try {
             //SMTP configuration
             $mail->isSMTP();
-            $mail->Host = 'smtp.ethereal.email';
+            $mail->Host = $emailConfig['smtp']['host'];
             $mail->SMTPAuth = true;
 
-            $mail->Username = 'brendon72@ethereal.email'; // Replace with your Mailtrap username
-            $mail->Password = 'zf9MGMUxmef9ssgvem'; // Replace with your Mailtrap password
+            $mail->Username = $emailConfig['smtp']['username']; // Replace with your Mailtrap username
+            $mail->Password = $emailConfig['smtp']['password']; // Replace with your Mailtrap password
 
-            $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
-            $mail->Port = 587;
+            $mail->SMTPSecure = $emailConfig['smtp']['encryption'];
+            $mail->Port = $emailConfig['smtp']['port'];
 
-            $mail->setFrom('no-reply@sales-spy.com', 'Sales-Spy');
+            $mail->setFrom(
+                $emailConfig['smtp']['from_email'], 
+                $emailConfig['smtp']['from_name']
+            );
             $mail->addAddress($email, $user['full_name']);
             $mail->isHTML(true);
             $mail->Subject = 'Reset Your Sales-Spy Password';

@@ -14,6 +14,6 @@ session_unset();
 session_destroy();
 
 // Redirect to login/signup page
-header('Location: http://localhost/sales-spy/signup.php');
+header('Location: ../signup.php');
 exit;
 ?>

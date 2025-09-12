@@ -6,7 +6,7 @@ $dbname = "sales_spy";
 
 
 // Defining base url
-define ("BASE_URL", "http://localhost/sales-spy/");
+define ("BASE_URL", "https://sales-spy.test/");
 
 // Database connection
 try{
