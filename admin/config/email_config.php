@@ -1,28 +1,28 @@
 <?php
-// config/email_config.php
+require 'smtp_details.php';// smtp details
 
 return [
     'smtp' => [
         'host' => 'smtp.gmail.com',
-        'username' => 'developerfaruq@gmail.com', // mail
-        'password' => 'rinf vyyn yvrc ckwf',   // 16-digit app password
+        'username' => $mails, // mail
+        'password' => $passs,   // 16-digit app password
         'port' => 587,
         'encryption' => 'tls',
-        'from_email' => 'developerfaruq@gmail.com',
+        'from_email' => $mails,
         'from_name' => 'Sales-Spy Admin'
     ],
 
     'templates' => [
         'suspension' => [
             'subject' => 'Account Suspension Notice - Sales-Spy',
-            'support_email' => 'developerfaruq@gmail.com',
+            'support_email' => $mails,
             'company_name' => 'Sales-Spy',
             'website_url' => 'https://sales-spy.test/'  //  update to HTTPS
         ],
         'unsuspension' => [
             'subject' => 'Account Reactivated - Sales-Spy',
             'login_url' => 'https://sales-spy.test/signup.php?form=login',
-            'support_email' => 'developerfaruq@gmail.com',
+            'support_email' => $mails,
             'company_name' => 'Sales-Spy',
             'website_url' => 'https://sales-spy.test/'  //  update to HTTPS
         ]
