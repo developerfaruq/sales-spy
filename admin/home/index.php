@@ -544,6 +544,9 @@ $activeSubscriptions = $pdo->query("SELECT COUNT(*) FROM subscriptions WHERE sta
                                     <div class="custom-select-option" data-value="suspended">
                                         Suspended
                                     </div>
+                                    <div class="custom-select-option" data-value="deleted">
+                                        deleted
+                                    </div>
                                 </div>
                             </div>
                             <button

@@ -5,7 +5,7 @@ Thumbs.db
 # Ignore sensitive or environment files
 .env
 config.php
-.admin/config/smtp_details.php
+admin/config/smtp_details.php
 
 # Ignore log and backup files
 *.log

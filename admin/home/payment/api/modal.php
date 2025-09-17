@@ -1,5 +1,5 @@
 <?php
-// payments_api.php - UPDATED VERSION FOR DYNAMIC PLANS
+// modal.php - UPDATED VERSION FOR DYNAMIC PLANS
 require '../../../config/db.php';
 require '../../../home/subscription/api/auth_check.php';
 
@@ -125,7 +125,7 @@ function getTransactions($pdo) {
         $transaction['short_txid'] = substr($transaction['txid'], 0, 10) . '...' . substr($transaction['txid'], -6);
         
         // Generate user initials
-        $names = explode(' ', $transaction['user_name']);
+        $names = explode(' ', $transaction['user_name'] ?? '');
         $initials = '';
         foreach ($names as $name) {
             $initials .= strtoupper(substr($name, 0, 1));

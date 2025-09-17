@@ -10,6 +10,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = trim($_POST['email']);
     $password = $_POST['password'];
 
+
     if (empty($email) || empty($password)) {
         header('Location:' . BASE_URL . 'signup.php?form=login&status=empty_fields');
         exit;
@@ -27,8 +28,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($user) {
         $now = new DateTime('now', new DateTimeZone('UTC'));
 
-        // Check if account is disabled
-        if ($user['account_status'] === 'disabled') {
+        // Check if account is disabled or deleted
+        if ($user['account_status'] === 'deleted') {
+            header('Location:' . BASE_URL . 'signup.php?form=login&status=account_deleted');
+            exit;
+        }elseif ($user['account_status'] === 'disabled') {
             header('Location:' . BASE_URL . 'signup.php?form=login&status=account_disabled');
             exit;
         }

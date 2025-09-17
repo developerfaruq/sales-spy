@@ -1078,79 +1078,90 @@ $activeSubscriptions = $pdo->query("SELECT COUNT(*) FROM subscriptions WHERE sta
   }
 
   // --- Modal Functions ---
-  async function showReceiptModal(transactionId) {
+  // Replace the showReceiptModal function in your JavaScript with this fixed version:
+
+async function showReceiptModal(transactionId) {
     const transaction = await fetchTransactionDetails(transactionId);
     if (!transaction) return;
 
     const modal = document.getElementById("receipt-modal");
     const body = document.getElementById("receipt-modal-body");
 
-    // Generate user initials
-    const names = transaction.user_name.split(' ');
-    const initials = names.map(name => name.charAt(0).toUpperCase()).join('').slice(0, 2);
+    // Handle null user_name safely
+    const userName = transaction.user_name || 'Unknown User';
+    const userEmail = transaction.user_email || 'No email';
+    
+    // Generate user initials safely
+    let initials = 'UN'; // Default initials
+    if (userName && userName !== 'Unknown User') {
+        const names = userName.split(' ').filter(name => name.trim() !== '');
+        if (names.length > 0) {
+            initials = names.map(name => name.charAt(0).toUpperCase()).join('').slice(0, 2);
+        }
+    }
     
     // Generate user color
     const colors = [
-      'bg-blue-100 text-blue-600', 'bg-green-100 text-green-600', 'bg-red-100 text-red-600',
-      'bg-purple-100 text-purple-600', 'bg-orange-100 text-orange-600', 'bg-pink-100 text-pink-600'
+        'bg-blue-100 text-blue-600', 'bg-green-100 text-green-600', 'bg-red-100 text-red-600',
+        'bg-purple-100 text-purple-600', 'bg-orange-100 text-orange-600', 'bg-pink-100 text-pink-600'
     ];
     const userColor = colors[transaction.user_id % colors.length];
 
     body.innerHTML = `
-      <div>
-        <p class="text-sm text-gray-500">Order ID</p>
-        <p class="text-sm font-medium text-gray-800">${transaction.order_id || 'N/A'}</p>
-      </div>
-      <div>
-        <p class="text-sm text-gray-500">User</p>
-        <div class="flex items-center mt-1">
-          <div class="w-8 h-8 rounded-full ${userColor} flex items-center justify-center">
-            <span class="text-sm font-medium">${initials}</span>
-          </div>
-          <div class="ml-3">
-            <span class="text-sm font-medium text-gray-800">${transaction.user_name}</span>
-            <p class="text-xs text-gray-500">${transaction.user_email}</p>
-          </div>
-        </div>
-      </div>
-      <div>
-        <p class="text-sm text-gray-500">Plan</p>
-        <span class="px-2 py-1 text-xs font-medium ${planColors[transaction.plan_name] || "bg-gray-100 text-gray-600"} rounded-full">
-          ${transaction.plan_name ? transaction.plan_name.charAt(0).toUpperCase() + transaction.plan_name.slice(1) : 'Free'}
-        </span>
-      </div>
-      <div>
-        <p class="text-sm text-gray-500">Amount</p>
-        <p class="text-sm font-medium text-gray-800">${parseFloat(transaction.amount).toFixed(2)} USDT</p>
-      </div>
-      <div>
-        <p class="text-sm text-gray-500">TXID</p>
-        <a href="https://tronscan.org/#/transaction/${transaction.txid}" target="_blank" 
-           class="text-primary underline break-all text-xs">${transaction.txid}</a>
-      </div>
-      <div>
-        <p class="text-sm text-gray-500">Date & Time</p>
-        <p class="text-sm font-medium text-gray-800">${new Date(transaction.created_at).toLocaleString("en-US", {
-          month: "short",
-          day: "2-digit",
-          year: "numeric",
-          hour: "2-digit",
-          minute: "2-digit",
-        })}</p>
-      </div>
-      <div>
-        <p class="text-sm text-gray-500">Status</p>
-        <span class="px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(transaction.status)}">${getStatusText(transaction.status)}</span>
-      </div>
-      ${transaction.screenshot_path ? `
         <div>
-          <p class="text-sm text-gray-500">Payment Screenshot</p>
-          <button onclick="showScreenshotModal('${transaction.screenshot_path}')" 
-                  class="mt-2 px-3 py-1 text-xs bg-blue-100 text-blue-700 hover:bg-blue-200 rounded">
-            <i class="ri-image-line mr-1"></i>View Screenshot
-          </button>
+            <p class="text-sm text-gray-500">Order ID</p>
+            <p class="text-sm font-medium text-gray-800">${transaction.order_id || 'N/A'}</p>
         </div>
-      ` : ''}
+        <div>
+            <p class="text-sm text-gray-500">User</p>
+            <div class="flex items-center mt-1">
+                <div class="w-8 h-8 rounded-full ${userColor} flex items-center justify-center">
+                    <span class="text-sm font-medium">${initials}</span>
+                </div>
+                <div class="ml-3">
+                    <span class="text-sm font-medium text-gray-800">${userName}</span>
+                    <p class="text-xs text-gray-500">${userEmail}</p>
+                </div>
+            </div>
+        </div>
+        <div>
+            <p class="text-sm text-gray-500">Plan</p>
+            <span class="px-2 py-1 text-xs font-medium ${planColors[transaction.plan_name?.toLowerCase()] || "bg-gray-100 text-gray-600"} rounded-full">
+                ${transaction.plan_name ? transaction.plan_name.charAt(0).toUpperCase() + transaction.plan_name.slice(1) : 'Free'}
+            </span>
+        </div>
+        <div>
+            <p class="text-sm text-gray-500">Amount</p>
+            <p class="text-sm font-medium text-gray-800">${parseFloat(transaction.amount).toFixed(2)} USDT</p>
+        </div>
+        <div>
+            <p class="text-sm text-gray-500">TXID</p>
+            <a href="https://tronscan.org/#/transaction/${transaction.txid}" target="_blank" 
+               class="text-primary underline break-all text-xs">${transaction.txid}</a>
+        </div>
+        <div>
+            <p class="text-sm text-gray-500">Date & Time</p>
+            <p class="text-sm font-medium text-gray-800">${new Date(transaction.created_at).toLocaleString("en-US", {
+                month: "short",
+                day: "2-digit",
+                year: "numeric",
+                hour: "2-digit",
+                minute: "2-digit",
+            })}</p>
+        </div>
+        <div>
+            <p class="text-sm text-gray-500">Status</p>
+            <span class="px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(transaction.status)}">${getStatusText(transaction.status)}</span>
+        </div>
+        ${transaction.screenshot_path ? `
+            <div>
+                <p class="text-sm text-gray-500">Payment Screenshot</p>
+                <button onclick="showScreenshotModal('${transaction.screenshot_path}')" 
+                        class="mt-2 px-3 py-1 text-xs bg-blue-100 text-blue-700 hover:bg-blue-200 rounded">
+                    <i class="ri-image-line mr-1"></i>View Screenshot
+                </button>
+            </div>
+        ` : ''}
     `;
 
     modal.classList.add("active");
@@ -1158,20 +1169,19 @@ $activeSubscriptions = $pdo->query("SELECT COUNT(*) FROM subscriptions WHERE sta
 
     // Close modal logic
     modal.querySelectorAll(".modal-close").forEach((btn) => {
-      btn.onclick = function () {
-        modal.classList.remove("active");
-        document.body.style.overflow = "";
-      };
+        btn.onclick = function () {
+            modal.classList.remove("active");
+            document.body.style.overflow = "";
+        };
     });
 
     modal.onclick = function (e) {
-      if (e.target === modal) {
-        modal.classList.remove("active");
-        document.body.style.overflow = "";
-      }
+        if (e.target === modal) {
+            modal.classList.remove("active");
+            document.body.style.overflow = "";
+        }
     };
-  }
-
+}
   function showScreenshotModal(screenshotPath) {
     // Create screenshot modal if it doesn't exist
     let screenshotModal = document.getElementById("screenshot-modal");

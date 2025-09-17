@@ -198,6 +198,11 @@
     Account unlocked please login again.
   </div>
 <?php endif; ?>
+<?php if (isset($_GET['status']) && $_GET['status'] === 'account_deleted'): ?>
+  <div id="BackAlert" class="popup-alert">
+    Account deleted.
+  </div>
+<?php endif; ?>
  <?php if (isset($_GET['status']) && $_GET['status'] === 'ip_blocked'): ?>
   <div id="BackAlert" class="popup-alert">
     🚫 Only <strong>1 accounts</strong> are allowed per user. Further registrations are blocked for security reasons, please contact support for help.

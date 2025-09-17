@@ -86,7 +86,9 @@ function handleGetUsers() {
             $whereConditions[] = "(u.account_status = 'active' OR u.account_status IS NULL) AND (u.is_disabled = 0 OR u.is_disabled IS NULL)";
         } elseif ($statusFilter === 'suspended') {
             $whereConditions[] = "(u.account_status = 'locked' OR u.is_disabled = 1)";
-        }
+        }elseif ($statusFilter === 'deleted') {
+        $whereConditions[] = "u.account_status = 'deleted'";
+    }
     }
     
     $whereClause = !empty($whereConditions) ? 'WHERE ' . implode(' AND ', $whereConditions) : '';
@@ -108,21 +110,23 @@ function handleGetUsers() {
     
     // Get users with pagination
     $sql = "SELECT DISTINCT u.id, u.full_name, u.email, u.phone, u.created_at, 
-                   COALESCE(u.account_status, 'active') as account_status, 
-                   COALESCE(u.is_disabled, 0) as is_disabled, 
-                   u.profile_picture,
-                   COALESCE(s.plan_name, 'free') as plan_name, 
-                   s.status as subscription_status, 
-                   COALESCE(s.leads_balance, 0) as leads_balance,
-                   CASE 
-                       WHEN (COALESCE(u.account_status, 'active') = 'active' AND COALESCE(u.is_disabled, 0) = 0) THEN 'active'
-                       ELSE 'suspended'
-                   END as user_status
-            FROM users u 
-            LEFT JOIN subscriptions s ON u.id = s.user_id AND s.status = 'active'
-            $whereClause
-            ORDER BY u.created_at DESC 
-            LIMIT $offset, $limit";
+       COALESCE(u.account_status, 'active') as account_status, 
+       COALESCE(u.is_disabled, 0) as is_disabled, 
+       u.profile_picture,
+       COALESCE(s.plan_name, 'free') as plan_name, 
+       s.status as subscription_status, 
+       COALESCE(s.leads_balance, 0) as leads_balance,
+       CASE 
+           WHEN (COALESCE(u.account_status, 'active') = 'active' AND COALESCE(u.is_disabled, 0) = 0) THEN 'active'
+           WHEN (u.account_status = 'deleted') THEN 'deleted'
+           ELSE 'suspended'
+       END as user_status
+FROM users u 
+LEFT JOIN subscriptions s ON u.id = s.user_id AND s.status = 'active'
+$whereClause
+ORDER BY u.created_at DESC 
+LIMIT $offset, $limit
+";
     
     try {
         $stmt = $pdo->prepare($sql);
@@ -352,38 +356,23 @@ function deleteUser($userId, $input) {
                 return;
             }
         } catch (Exception $e) {
-            // Continue if table doesn't exist
+            // Continue if subscriptions table doesn't exist
         }
         
-        // Delete related data first
-        $tables = [
-            'user_sessions', 'security_logs', 'search_logs', 'exports', 
-            'leads', 'campaigns', 'api_keys', 'subscriptions', 
-            'user_2fa', 'user_stats', 'user_tokens'
-        ];
-        
-        foreach ($tables as $table) {
-            try {
-                $stmt = $pdo->prepare("DELETE FROM $table WHERE user_id = ?");
-                $stmt->execute([$userId]);
-            } catch (Exception $e) {
-                // Continue if table doesn't exist
-            }
-        }
-        
-        // Finally delete the user
-        $stmt = $pdo->prepare("DELETE FROM users WHERE id = ?");
+        // Instead of deleting everything, just mark user as deleted
+        $stmt = $pdo->prepare("UPDATE users SET account_status = 'deleted', is_disabled = 1 WHERE id = ?");
         $stmt->execute([$userId]);
         
         $pdo->commit();
         
-        echo json_encode(['success' => true, 'message' => 'User deleted successfully']);
+        echo json_encode(['success' => true, 'message' => 'User marked as deleted successfully']);
     } catch (Exception $e) {
         $pdo->rollback();
         http_response_code(500);
         echo json_encode(['error' => $e->getMessage()]);
     }
 }
+
 
 function getUserDetails($userId) {
     global $pdo;
