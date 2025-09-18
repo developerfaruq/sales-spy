@@ -1,3 +1,29 @@
+<?php
+require '../../config/db.php';
+require '../../home/subscription/api/auth_check.php';
+
+
+if (isset($_SESSION['admin_id'])) {
+    $stmt = $pdo->prepare("SELECT name FROM admins WHERE id = ?");
+    $stmt->execute([$_SESSION['admin_id']]);
+    $admin = $stmt->fetch();
+    
+    if ($admin) {
+        $adminName = htmlspecialchars($admin['name']);
+    }
+}
+
+
+$avatarUrl = "https://ui-avatars.com/api/?name=" . 
+                 urlencode( $adminName ) . 
+                 "&background=1E3A8A&color=fff&length=1&size=128";
+
+// Get counts from DB
+$totalUsers = $pdo->query("SELECT COUNT(*) FROM users")->fetchColumn();
+$pendingTXIDs = $pdo->query("SELECT COUNT(*) FROM txid_requests WHERE status = 'pending'")->fetchColumn();
+$activeSubscriptions = $pdo->query("SELECT COUNT(*) FROM subscriptions WHERE status = 'active'")->fetchColumn();                 
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -317,9 +343,9 @@
           <div class="relative">
             <button id="user-menu-btn" class="flex items-center">
               <div class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center">
-                <span class="text-sm font-medium">JD</span>
+                <span class="text-sm font-medium"><img src="<?= $avatarUrl ?>" alt="ss"></span>
               </div>
-              <span class="ml-2 text-sm font-medium hidden md:block">John Doe</span>
+              <span class="ml-2 text-sm font-medium hidden md:block"><?= $adminName ?></span>
               <i class="ri-arrow-down-s-line ml-1 text-gray-500"></i>
             </button>
           </div>
@@ -380,10 +406,10 @@
         <div class="p-4 border-b">
           <div class="flex items-center">
             <div class="w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center">
-              <span class="text-sm font-medium">JD</span>
+              <span class="text-sm font-medium"><img src="<?= $avatarUrl ?>" alt="ss"></span>
             </div>
             <div class="ml-3">
-              <p class="text-sm font-medium">John Doe</p>
+              <p class="text-sm font-medium"><?= $adminName ?></p>
               <p class="text-xs text-gray-500">Super Admin</p>
             </div>
           </div>
@@ -924,263 +950,331 @@
 
 
             <script id="modalHandler">
-        document.addEventListener('DOMContentLoaded', function () {
-          const modal = document.getElementById('modal');
-          const closeModalBtn = document.getElementById('closeModal');
-          const viewBtns = document.querySelectorAll('.view-btn');
-          let currentPaymentData = null;
-          viewBtns.forEach(btn => {
-            btn.addEventListener('click', function () {
-              currentPaymentData = JSON.parse(this.dataset.payment);
-              openModal(currentPaymentData);
+       document.addEventListener('DOMContentLoaded', function () {
+    const paymentsContainer = document.getElementById('paymentsContainer');
+    const emptyState = document.getElementById('emptyState');
+    const modal = document.getElementById('modal');
+    const closeModalBtn = document.getElementById('closeModal');
+    let currentTransactionId = null;
+
+    // Load pending payments on page load
+    loadPendingPayments();
+
+    // Auto-refresh every 30 seconds
+    setInterval(loadPendingPayments, 30000);
+
+    // Modal event listeners
+    closeModalBtn.addEventListener('click', closeModal);
+    modal.addEventListener('click', function (e) {
+        if (e.target === modal) {
+            closeModal();
+        }
+    });
+
+    // Modal action buttons
+    document.getElementById('modalApproveBtn').addEventListener('click', function () {
+        if (currentTransactionId) {
+            handlePaymentAction('approve', this, currentTransactionId);
+        }
+    });
+
+    document.getElementById('modalDeclineBtn').addEventListener('click', function () {
+        if (currentTransactionId) {
+            handlePaymentAction('decline', this, currentTransactionId);
+        }
+    });
+
+    async function loadPendingPayments() {
+        try {
+            const response = await fetch('api/get_pend.php', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
             });
-          });
-          closeModalBtn.addEventListener('click', closeModal);
-          modal.addEventListener('click', function (e) {
-            if (e.target === modal) {
-              closeModal();
-            }
-          });
-          function openModal(paymentData) {
-            document.getElementById('modalUserInitials').textContent = paymentData.userId;
-            document.getElementById('modalUserName').textContent = paymentData.userName;
-            document.getElementById('modalUserId').textContent = `User ID: ${paymentData.userId}`;
-            document.getElementById('modalOrderId').textContent = paymentData.orderId;
-            document.getElementById('modalPaymentMethod').textContent = paymentData.paymentMethod;
-            document.getElementById('modalAmount').textContent = paymentData.amount;
-            document.getElementById('modalDate').textContent = paymentData.date;
-            document.getElementById('modalTransactionId').textContent = paymentData.transactionId;
-            document.getElementById('modalScreenshot').src = paymentData.screenshot;
-            const paymentIcon = document.getElementById('modalPaymentIcon');
-            if (paymentData.paymentMethod === 'Crypto') {
-              paymentIcon.className = 'ri-btc-line text-orange-400';
+
+            const data = await response.json();
+
+            if (data.success) {
+                renderPayments(data.transactions);
             } else {
-              paymentIcon.className = 'ri-bank-card-line text-blue-400';
+                showToast('Failed to load payments: ' + data.message, 'error');
             }
-            modal.classList.remove('hidden');
-          }
-          function closeModal() {
-            modal.classList.add('hidden');
-            currentPaymentData = null;
-          }
-          document.getElementById('modalApproveBtn').addEventListener('click', function () {
-            if (currentPaymentData) {
-              handlePaymentAction('approve', this, currentPaymentData);
-            }
-          });
-          document.getElementById('modalDeclineBtn').addEventListener('click', function () {
-            if (currentPaymentData) {
-              handlePaymentAction('decline', this, currentPaymentData);
-            }
-          });
+        } catch (error) {
+            console.error('Error loading payments:', error);
+            showToast('Failed to load payments', 'error');
+        }
+    }
+
+    function renderPayments(transactions) {
+        paymentsContainer.innerHTML = '';
+
+        if (transactions.length === 0) {
+            paymentsContainer.classList.add('hidden');
+            emptyState.classList.remove('hidden');
+            return;
+        }
+
+        paymentsContainer.classList.remove('hidden');
+        emptyState.classList.add('hidden');
+
+        transactions.forEach(transaction => {
+            const paymentCard = createPaymentCard(transaction);
+            paymentsContainer.appendChild(paymentCard);
         });
-        
-            </script>
+    }
 
-<script id="modal-script">
-            document.addEventListener("DOMContentLoaded", function () {
-                const modals = document.querySelectorAll(".modal");
-                const modalCloseButtons = document.querySelectorAll(".modal-close");
-                const toast = document.getElementById("toast-success");
+    function createPaymentCard(transaction) {
+        const div = document.createElement('div');
+        div.className = 'payment-card glass rounded-lg px-3 py-2 sm:px-4 sm:py-3';
+        div.setAttribute('data-transaction-id', transaction.id);
 
-                function showToast() {
-                    toast.classList.remove("translate-x-full");
-                    setTimeout(() => {
-                        toast.classList.add("translate-x-full");
-                    }, 3000);
-                }
+        // Generate gradient colors based on user initials
+        const gradientColors = generateGradientColors(transaction.userId);
+        const paymentIcon = transaction.paymentMethod === 'Crypto' ? 'ri-btc-line text-orange-400' : 'ri-bank-card-line text-blue-400';
 
-                // Handle wallet verification
-                const verifyWalletButtons = document.querySelectorAll(
-                    '[data-action="verify"]'
-                );
-                const verifyWalletModal = document.getElementById(
-                    "verify-wallet-modal"
-                );
-                const confirmVerifyWalletBtn = document.getElementById(
-                    "confirm-verify-wallet"
-                );
+        div.innerHTML = `
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-2 md:gap-4">
+                <div class="flex-1">
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:space-x-3 gap-1 sm:gap-2">
+                        <div class="flex items-center gap-2">
+                            <div class="w-7 h-7 sm:w-8 sm:h-8 ${gradientColors} rounded-full flex items-center justify-center">
+                                <span class="text-[10px] sm:text-xs font-semibold text-white">${transaction.userId}</span>
+                            </div>
+                            <div>
+                                <p class="font-medium text-gray-900 text-xs sm:text-sm">${transaction.userName}</p>
+                                <p class="text-[10px] sm:text-xs text-slate-600 font-mono">${transaction.orderId}</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2 sm:gap-3">
+                            <div class="flex items-center gap-1">
+                                <div class="w-3.5 h-3.5 sm:w-4 sm:h-4 flex items-center justify-center">
+                                    <i class="${paymentIcon} text-sm sm:text-base"></i>
+                                </div>
+                                <span class="text-[10px] sm:text-xs text-slate-600">${transaction.paymentMethod}</span>
+                            </div>
+                            <div class="text-sm sm:text-base font-bold text-green-500">${transaction.amount}</div>
+                            <div class="text-[10px] sm:text-xs text-slate-600">${transaction.date}</div>
+                            <div class="text-[10px] sm:text-xs text-blue-600 font-medium">${transaction.planName}</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex items-center gap-1 sm:gap-2">
+                    <button class="view-btn w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center glass rounded-lg hover:bg-slate-600/50 transition-colors">
+                        <i class="ri-eye-line text-slate-300"></i>
+                    </button>
+                    <button class="approve-btn !rounded-button bg-green-600 hover:bg-green-700 px-3 py-1.5 text-xs font-medium whitespace-nowrap transition-colors">
+                        <span class="btn-text">Approve</span>
+                        <div class="btn-spinner hidden">
+                            <div class="w-4 h-4 border-2 border-white border-t-transparent rounded-full spinner"></div>
+                        </div>
+                    </button>
+                    <button class="decline-btn !rounded-button bg-red-600 hover:bg-red-700 px-3 py-1.5 text-xs font-medium whitespace-nowrap transition-colors">
+                        <span class="btn-text">Decline</span>
+                        <div class="btn-spinner hidden">
+                            <div class="w-4 h-4 border-2 border-white border-t-transparent rounded-full spinner"></div>
+                        </div>
+                    </button>
+                </div>
+            </div>
+        `;
 
-                verifyWalletButtons.forEach((button) => {
-                    button.addEventListener("click", function () {
-                        const row = this.closest("tr");
-                        const userName = row.querySelector(
-                            ".text-sm.font-medium.text-gray-800"
-                        ).textContent;
-                        const blockchain = row.querySelector(
-                            ".text-sm.text-gray-600"
-                        ).textContent;
-                        const walletAddress = row.querySelector(
-                            ".text-sm.text-gray-600:nth-child(2)"
-                        ).textContent;
+        // Add event listeners
+        const viewBtn = div.querySelector('.view-btn');
+        const approveBtn = div.querySelector('.approve-btn');
+        const declineBtn = div.querySelector('.decline-btn');
 
-                        document.getElementById("verify-wallet-user").textContent =
-                            userName;
-                        document.getElementById("verify-wallet-blockchain").textContent =
-                            blockchain;
-                        document.getElementById("verify-wallet-address").textContent =
-                            walletAddress;
+        viewBtn.addEventListener('click', () => openModal(transaction));
+        approveBtn.addEventListener('click', () => handlePaymentAction('approve', approveBtn, transaction.id, div));
+        declineBtn.addEventListener('click', () => handlePaymentAction('decline', declineBtn, transaction.id, div));
 
-                        openModal("verify-wallet-modal");
-                    });
-                });
+        return div;
+    }
 
-                if (confirmVerifyWalletBtn) {
-                    confirmVerifyWalletBtn.addEventListener("click", function () {
-                        const walletAddress = document.getElementById(
-                            "verify-wallet-address"
-                        ).textContent;
-                        const statusElements = document.querySelectorAll(
-                            "td:nth-child(6) span"
-                        );
+    function generateGradientColors(initials) {
+        const gradients = [
+            'bg-gradient-to-r from-blue-500 to-purple-600',
+            'bg-gradient-to-r from-green-500 to-teal-600',
+            'bg-gradient-to-r from-purple-500 to-pink-600',
+            'bg-gradient-to-r from-orange-500 to-red-600',
+            'bg-gradient-to-r from-indigo-500 to-blue-600',
+            'bg-gradient-to-r from-pink-500 to-rose-600',
+            'bg-gradient-to-r from-teal-500 to-cyan-600',
+            'bg-gradient-to-r from-yellow-500 to-orange-600'
+        ];
+        const index = initials.charCodeAt(0) % gradients.length;
+        return gradients[index];
+    }
 
-                        statusElements.forEach((element) => {
-                            if (
-                                element
-                                    .closest("tr")
-                                    .querySelector(".text-sm.text-gray-600:nth-child(2)")
-                                    .textContent === walletAddress
-                            ) {
-                                element.className =
-                                    "px-2 py-1 text-xs font-medium bg-green-50 text-green-600 rounded-full";
-                                element.textContent = "Valid";
-                            }
-                        });
+    function openModal(transaction) {
+        currentTransactionId = transaction.id;
 
-                        closeModal(verifyWalletModal);
-                        showToast();
-                    });
-                }
-                // Add tooltip container to body
-                const tooltip = document.createElement("div");
-                tooltip.className =
-                    "fixed px-2 py-1 text-xs text-white bg-gray-900 rounded pointer-events-none opacity-0 transition-opacity duration-200 z-50";
-                document.body.appendChild(tooltip);
-                const logoutBtn = document.getElementById("logout-btn");
-                const logoutModal = document.getElementById("logout-modal");
-                const cancelLogoutBtn = document.getElementById("cancel-logout");
-                const confirmLogoutBtn = document.getElementById("confirm-logout");
-                // Handle logout flow
-                if (logoutBtn) {
-                    logoutBtn.addEventListener("click", function () {
-                        openModal("logout-modal");
-                    });
-                }
-                if (cancelLogoutBtn) {
-                    cancelLogoutBtn.addEventListener("click", function () {
-                        closeModal(logoutModal);
-                    });
-                }
-                if (confirmLogoutBtn) {
-                    confirmLogoutBtn.addEventListener("click", function () {
-                        // Clear any session data here
-                        window.location.href = "/sales-spy/admin/logout/"; // Redirect to login page
-                    });
-                }
-                // Action buttons for user actions
-                const viewUserButtons = document.querySelectorAll(
-                    '[data-action="view"]'
-                );
-                const deleteUserButtons = document.querySelectorAll(
-                    '[data-action="delete"]'
-                );
-                const suspendUserButtons = document.querySelectorAll(
-                    '[data-action="suspend"]'
-                );
-                function openModal(modalId) {
-                    const modal = document.getElementById(modalId);
-                    if (modal) {
-                        modal.classList.add("active");
-                        document.body.style.overflow = "hidden";
-                    }
-                }
-                function closeModal(modal) {
-                    modal.classList.remove("active");
-                    document.body.style.overflow = "";
-                }
-   
+        // Populate modal with transaction data
+        document.getElementById('modalUserInitials').textContent = transaction.userId;
+        document.getElementById('modalUserName').textContent = transaction.userName;
+        document.getElementById('modalUserId').textContent = `User ID: ${transaction.userId}`;
+        document.getElementById('modalOrderId').textContent = transaction.orderId;
+        document.getElementById('modalPaymentMethod').textContent = transaction.paymentMethod;
+        document.getElementById('modalAmount').textContent = transaction.amount;
+        document.getElementById('modalDate').textContent = transaction.date;
+        document.getElementById('modalTransactionId').textContent = transaction.transactionId;
+
+        // Set payment icon
+        const paymentIcon = document.getElementById('modalPaymentIcon');
+        if (transaction.paymentMethod === 'Crypto') {
+            paymentIcon.className = 'ri-btc-line text-orange-400';
+        } else {
+            paymentIcon.className = 'ri-bank-card-line text-blue-400';
+        }
+
+        // Set screenshot
+        const screenshot = document.getElementById('modalScreenshot');
+        if (transaction.screenshot) {
+            screenshot.src = transaction.screenshot;
+            screenshot.alt = 'Payment Screenshot';
+        } else {
+            screenshot.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjNmNGY2Ii8+CiAgPHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxOCIgZmlsbD0iIzZiNzI4MCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPk5vIFNjcmVlbnNob3QgUHJvdmlkZWQ8L3RleHQ+Cjwvc3ZnPgo=';
+            screenshot.alt = 'No Screenshot';
+        }
+
+        // Set user avatar gradient
+        const userAvatar = document.getElementById('modalUserAvatar');
+        const gradientColors = generateGradientColors(transaction.userId);
+        userAvatar.className = `w-12 h-12 ${gradientColors} rounded-full flex items-center justify-center`;
+
+        modal.classList.remove('hidden');
+    }
+
+    function closeModal() {
+        modal.classList.add('hidden');
+        currentTransactionId = null;
+    }
+
+    async function handlePaymentAction(action, button, transactionId, paymentCard = null) {
+        const btnText = button.querySelector('.btn-text');
+        const btnSpinner = button.querySelector('.btn-spinner');
+
+        // Show loading state
+        btnText.classList.add('hidden');
+        btnSpinner.classList.remove('hidden');
+        button.disabled = true;
+
+        try {
+            const response = await fetch('api/modal.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    transaction_id: transactionId,
+                    action: action
+                })
             });
-        </script>
-          
-            <script id="paymentActions">
-              document.addEventListener('DOMContentLoaded', function () {
-                const approveBtns = document.querySelectorAll('.approve-btn');
-                const declineBtns = document.querySelectorAll('.decline-btn');
-                approveBtns.forEach(btn => {
-                  btn.addEventListener('click', function () {
-                    const paymentCard = this.closest('.payment-card');
-                    handlePaymentAction('approve', this, null, paymentCard);
-                  });
-                });
-                declineBtns.forEach(btn => {
-                  btn.addEventListener('click', function () {
-                    const paymentCard = this.closest('.payment-card');
-                    handlePaymentAction('decline', this, null, paymentCard);
-                  });
-                });
-              });
-              async function handlePaymentAction(action, button, paymentData = null, paymentCard = null) {
-                const btnText = button.querySelector('.btn-text');
-                const btnSpinner = button.querySelector('.btn-spinner');
-                btnText.classList.add('hidden');
-                btnSpinner.classList.remove('hidden');
-                button.disabled = true;
-                try {
-                  await new Promise(resolve => setTimeout(resolve, 1500));
-                  const actionText = action === 'approve' ? 'approved' : 'declined';
-                  const toastType = action === 'approve' ? 'success' : 'error';
-                  showToast(
-                    action === 'approve'
-                      ? '✅ Payment approved successfully'
-                      : '❌ Payment declined',
+
+            const data = await response.json();
+
+            if (data.success) {
+                const actionText = action === 'approve' ? 'approved' : 'declined';
+                const toastType = action === 'approve' ? 'success' : 'error';
+                const toastIcon = action === 'approve' ? '✅' : '❌';
+                
+                showToast(
+                    `${toastIcon} Payment ${actionText} successfully`,
                     toastType
-                  );
-                  if (paymentCard) {
+                );
+
+                // Remove payment card with animation
+                if (paymentCard) {
                     paymentCard.style.opacity = '0';
                     paymentCard.style.transform = 'translateX(100%)';
                     setTimeout(() => {
-                      paymentCard.remove();
-                      checkEmptyState();
+                        paymentCard.remove();
+                        checkEmptyState();
                     }, 300);
-                  }
-                  const modal = document.getElementById('modal');
-                  if (!modal.classList.contains('hidden')) {
-                    modal.classList.add('hidden');
-                  }
-                } catch (error) {
-                  showToast('❌ Failed to process payment', 'error');
-                  btnText.classList.remove('hidden');
-                  btnSpinner.classList.add('hidden');
-                  button.disabled = false;
                 }
-              }
-              function showToast(message, type) {
-                const toastContainer = document.getElementById('toastContainer');
-                const toast = document.createElement('div');
-                let toastClass = 'toast glass px-4 py-3 rounded-lg shadow-lg max-w-sm';
-                if (type === 'success') {
-                  toastClass += ' toast-success';
-                } else if (type === 'error') {
-                  toastClass += ' toast-error';
+
+                // Close modal if open
+                if (!modal.classList.contains('hidden')) {
+                    closeModal();
                 }
-                toast.className = toastClass;
-                toast.textContent = message;
-                toastContainer.appendChild(toast);
-                setTimeout(() => {
-                  toast.style.opacity = '0';
-                  toast.style.transform = 'translateX(100%)';
-                  setTimeout(() => toast.remove(), 300);
-                }, 3000);
-              }
-              function checkEmptyState() {
-                const paymentsContainer = document.getElementById('paymentsContainer');
-                const emptyState = document.getElementById('emptyState');
-                const paymentCards = paymentsContainer.querySelectorAll('.payment-card');
-                if (paymentCards.length === 0) {
-                  paymentsContainer.classList.add('hidden');
-                  emptyState.classList.remove('hidden');
+
+                // Refresh the payments list after a short delay
+                setTimeout(loadPendingPayments, 1000);
+
+            } else {
+                throw new Error(data.message || 'Failed to process payment');
+            }
+
+        } catch (error) {
+            console.error(`Error ${action}ing payment:`, error);
+            showToast(`❌ Failed to ${action} payment: ${error.message}`, 'error');
+            
+            // Reset button state
+            btnText.classList.remove('hidden');
+            btnSpinner.classList.add('hidden');
+            button.disabled = false;
+        }
+    }
+
+    function showToast(message, type = 'info') {
+        const toastContainer = document.getElementById('toastContainer');
+        const toast = document.createElement('div');
+        
+        let toastClass = 'toast glass px-4 py-3 rounded-lg shadow-lg max-w-sm';
+        if (type === 'success') {
+            toastClass += ' toast-success';
+        } else if (type === 'error') {
+            toastClass += ' toast-error';
+        }
+
+        toast.className = toastClass;
+        toast.textContent = message;
+        toastContainer.appendChild(toast);
+
+        // Auto remove after 5 seconds
+        setTimeout(() => {
+            toast.style.opacity = '0';
+            toast.style.transform = 'translateX(100%)';
+            setTimeout(() => {
+                if (toast.parentNode) {
+                    toast.remove();
                 }
-              }
+            }, 300);
+        }, 5000);
+    }
+
+    function checkEmptyState() {
+        const paymentCards = paymentsContainer.querySelectorAll('.payment-card');
+        if (paymentCards.length === 0) {
+            paymentsContainer.classList.add('hidden');
+            emptyState.classList.remove('hidden');
+        }
+    }
+
+    // Handle logout functionality
+    const logoutBtn = document.getElementById('logout-btn');
+    const logoutModal = document.getElementById('logout-modal');
+    const cancelLogoutBtn = document.getElementById('cancel-logout');
+    const confirmLogoutBtn = document.getElementById('confirm-logout');
+
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', function () {
+            logoutModal.classList.add('active');
+        });
+    }
+
+    if (cancelLogoutBtn) {
+        cancelLogoutBtn.addEventListener('click', function () {
+            logoutModal.classList.remove('active');
+        });
+    }
+
+    if (confirmLogoutBtn) {
+        confirmLogoutBtn.addEventListener('click', function () {
+            window.location.href = '/admin/logout/';
+        });
+    }
+});
             </script>
     </body>
 
