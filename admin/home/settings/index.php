@@ -1,3 +1,26 @@
+<?php
+require '../../config/db.php';
+require '../../home/subscription/api/auth_check.php';
+
+if (!isset($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+if (isset($_SESSION['admin_id'])) {
+    $stmt = $pdo->prepare("SELECT name FROM admins WHERE id = ?");
+    $stmt->execute([$_SESSION['admin_id']]);
+    $admin = $stmt->fetch();
+    
+    if ($admin) {
+        $adminName = htmlspecialchars($admin['name']);
+    }
+}
+
+
+$avatarUrl = "https://ui-avatars.com/api/?name=" . 
+                 urlencode( $adminName ) . 
+                 "&background=1E3A8A&color=fff&length=1&size=128";
+
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -35,6 +58,7 @@
         <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet" />
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" />
         <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.5.0/echarts.min.js"></script>
+        <meta name="csrf-token" content="<?= htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES) ?>" />
         <style>
             :where([class^="ri-"])::before {
                 content: "\f3c2";
@@ -303,7 +327,7 @@
                         class="w-10 h-10 flex items-center justify-center text-gray-500 hover:text-primary mr-2">
                         <i class="ri-menu-line ri-lg"></i>
                     </button>
-                    <div class="font-['Pacifico'] text-xl text-primary">Sales-Spy</div>
+                    <div class="font-['Pacifico'] text-xl text-primary">Sales-Sp</div>
                     <span class="ml-4 text-lg font-medium hidden md:block">Admin Dashboard</span>
                 </div>
                 <div class="flex items-center space-x-4">
@@ -317,9 +341,9 @@
                     <div class="relative">
                         <button id="user-menu-btn" class="flex items-center">
                             <div class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center">
-                                <span class="text-sm font-medium">JD</span>
+                                <span class="text-sm font-medium"><img src="<?= $avatarUrl ?>" alt="ss"></span>
                             </div>
-                            <span class="ml-2 text-sm font-medium hidden md:block">John Doe</span>
+                            <span class="ml-2 text-sm font-medium hidden md:block"><?= $adminName ?></span>
                             <i class="ri-arrow-down-s-line ml-1 text-gray-500"></i>
                         </button>
                     </div>
@@ -380,10 +404,10 @@
                 <div class="p-4 border-b">
                     <div class="flex items-center">
                         <div class="w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center">
-                            <span class="text-sm font-medium">JD</span>
+                            <span class="text-sm font-medium"><img src="<?= $avatarUrl ?>" alt="ss"></span>
                         </div>
                         <div class="ml-3">
-                            <p class="text-sm font-medium">John Doe</p>
+                            <p class="text-sm font-medium"><?= $adminName ?></p>
                             <p class="text-xs text-gray-500">Super Admin</p>
                         </div>
                     </div>
@@ -521,7 +545,7 @@
                                     <div class="flex items-center">
                                         <div
                                             class="w-16 h-16 rounded-lg bg-gray-100 flex items-center justify-center mr-4">
-                                            <img src="https://res.cloudinary.com/dtrn8j0sz/image/upload/v1749075914/SS_s4jkfw.jpg"
+                                            <img id="platform-logo" src="https://res.cloudinary.com/dtrn8j0sz/image/upload/v1749075914/SS_s4jkfw.jpg"
                                                 alt="Logo" />
                                         </div>
                                         <div>
@@ -542,8 +566,8 @@
                                     <div class="flex items-center">
                                         <div
                                             class="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center mr-4">
-                                            <img src="https://res.cloudinary.com/dtrn8j0sz/image/upload/v1749075914/SS_s4jkfw.jpg"
-                                                alt="Logo" />
+                                            <img id="platform-favicon" src="https://res.cloudinary.com/dtrn8j0sz/image/upload/v1749075914/SS_s4jkfw.jpg"
+                                                alt="Favicon" />
                                         </div>
                                         <div>
                                             <button id="upload-favicon-btn"
@@ -781,32 +805,13 @@
                             <h2 class="text-lg font-medium text-gray-800 mb-4">
                                 Admin Activity Log
                             </h2>
-                            <div class="space-y-3">
-                                <div class="border-l-2 border-primary pl-3">
-                                    <p class="text-sm font-medium text-gray-800">
-                                        User suspended
-                                    </p>
-                                    <p class="text-xs text-gray-500">Jun 25, 2025 10:30 AM</p>
-                                </div>
-                                <div class="border-l-2 border-primary pl-3">
-                                    <p class="text-sm font-medium text-gray-800">
-                                        Wallet settings updated
-                                    </p>
-                                    <p class="text-xs text-gray-500">Jun 24, 2025 3:45 PM</p>
-                                </div>
-                                <div class="border-l-2 border-primary pl-3">
-                                    <p class="text-sm font-medium text-gray-800">
-                                        Subscription plan modified
-                                    </p>
-                                    <p class="text-xs text-gray-500">Jun 23, 2025 11:20 AM</p>
-                                </div>
-                                <div class="mt-4">
-                                    <button id="view-log-btn"
-                                        class="w-full px-4 py-2 border border-gray-200 text-gray-600 rounded-button whitespace-nowrap hover:bg-gray-50"
-                                        data-tooltip="View the full admin activity log">
-                                        View Full Log
-                                    </button>
-                                </div>
+                            <div id="activity-list" class="space-y-3"></div>
+                            <div class="mt-4">
+                                <button id="view-log-btn"
+                                    class="w-full px-4 py-2 border border-gray-200 text-gray-600 rounded-button whitespace-nowrap hover:bg-gray-50"
+                                    data-tooltip="View the full admin activity log">
+                                    View Full Log
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -868,22 +873,7 @@
         <div id="view-log-modal" class="modal">
             <div class="modal-content">
                 <h3 class="text-lg font-medium mb-4">Admin Activity Log</h3>
-                <div class="max-h-64 overflow-y-auto mb-4">
-                    <!-- Example log entries -->
-                    <div class="border-l-2 border-primary pl-3 mb-2">
-                        <p class="text-sm font-medium text-gray-800">User suspended</p>
-                        <p class="text-xs text-gray-500">Jun 25, 2025 10:30 AM</p>
-                    </div>
-                    <div class="border-l-2 border-primary pl-3 mb-2">
-                        <p class="text-sm font-medium text-gray-800">Wallet settings updated</p>
-                        <p class="text-xs text-gray-500">Jun 24, 2025 3:45 PM</p>
-                    </div>
-                    <div class="border-l-2 border-primary pl-3 mb-2">
-                        <p class="text-sm font-medium text-gray-800">Subscription plan modified</p>
-                        <p class="text-xs text-gray-500">Jun 23, 2025 11:20 AM</p>
-                    </div>
-                    <!-- ...more logs... -->
-                </div>
+                <div id="activity-modal-list" class="max-h-64 overflow-y-auto mb-4"></div>
                 <div class="flex justify-end">
                     <button class="modal-close px-4 py-2 border rounded-button">Close</button>
                 </div>
@@ -918,6 +908,8 @@
         </div>
         <script id="modal-script">
             document.addEventListener("DOMContentLoaded", function () {
+                const CSRF_TOKEN = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+                const apiBase = 'api/settings_api.php';
                 const modals = document.querySelectorAll(".modal");
                 const modalCloseButtons = document.querySelectorAll(".modal-close");
                 const toast = document.getElementById("toast-success");
@@ -1013,7 +1005,7 @@
                 if (confirmLogoutBtn) {
                     confirmLogoutBtn.addEventListener("click", function () {
                         // Clear any session data here
-                        window.location.href = "/sales-spy/admin/logout/"; // Redirect to login page
+                        window.location.href = "/admin/logout/"; // Redirect to login page
                     });
                 }
                 // Action buttons for user actions
@@ -1037,6 +1029,20 @@
                     modal.classList.remove("active");
                     document.body.style.overflow = "";
                 }
+                // Bind close buttons and overlay click to close modals
+                modalCloseButtons.forEach((btn) => {
+                    btn.addEventListener("click", function () {
+                        const modal = btn.closest(".modal");
+                        if (modal) closeModal(modal);
+                    });
+                });
+                modals.forEach((modal) => {
+                    modal.addEventListener("click", function (e) {
+                        if (e.target === modal) {
+                            closeModal(modal);
+                        }
+                    });
+                });
                 // Toast logic
                 function showToast(message) {
                     const toast = document.getElementById("toast-success");
@@ -1067,28 +1073,53 @@
                 document.getElementById("upload-logo-btn").addEventListener("click", function () {
                     openModal("upload-logo-modal");
                 });
-                document.getElementById("confirm-upload-logo").addEventListener("click", function () {
+                document.getElementById("confirm-upload-logo").addEventListener("click", async function () {
+                    const fileInput = document.getElementById('logo-file');
+                    if (!fileInput.files.length) { showToast("Please choose a file"); return; }
+                    const form = new FormData();
+                    form.append('action', 'upload_logo');
+                    form.append('csrf_token', CSRF_TOKEN);
+                    form.append('file', fileInput.files[0]);
+                    const res = await fetch(apiBase, { method: 'POST', body: form, credentials: 'same-origin' });
+                    const data = await res.json();
+                    if (data.success) { showToast("Logo uploaded successfully!"); } else { showToast(data.error || 'Upload failed'); }
                     closeModal(document.getElementById("upload-logo-modal"));
-                    showToast("Logo uploaded successfully!");
                 });
 
                 // Upload Favicon
                 document.getElementById("upload-favicon-btn").addEventListener("click", function () {
                     openModal("upload-favicon-modal");
                 });
-                document.getElementById("confirm-upload-favicon").addEventListener("click", function () {
+                document.getElementById("confirm-upload-favicon").addEventListener("click", async function () {
+                    const fileInput = document.getElementById('favicon-file');
+                    if (!fileInput.files.length) { showToast("Please choose a file"); return; }
+                    const form = new FormData();
+                    form.append('action', 'upload_favicon');
+                    form.append('csrf_token', CSRF_TOKEN);
+                    form.append('file', fileInput.files[0]);
+                    const res = await fetch(apiBase, { method: 'POST', body: form, credentials: 'same-origin' });
+                    const data = await res.json();
+                    if (data.success) { showToast("Favicon uploaded successfully!"); } else { showToast(data.error || 'Upload failed'); }
                     closeModal(document.getElementById("upload-favicon-modal"));
-                    showToast("Favicon uploaded successfully!");
                 });
 
                 // Change Password
                 document.getElementById("change-password-btn").addEventListener("click", function () {
                     openModal("change-password-modal");
                 });
-                document.getElementById("confirm-change-password").addEventListener("click", function () {
-                    // Add password validation if needed
+                document.getElementById("confirm-change-password").addEventListener("click", async function () {
+                    const pwd = document.getElementById('new-password').value.trim();
+                    const cpwd = document.getElementById('confirm-password').value.trim();
+                    if (!pwd || pwd !== cpwd) { showToast('Passwords do not match'); return; }
+                    const res = await fetch(apiBase, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        credentials: 'same-origin',
+                        body: JSON.stringify({ action: 'change_password', csrf_token: CSRF_TOKEN, newPassword: pwd })
+                    });
+                    const data = await res.json();
+                    if (data.success) { showToast("Password changed successfully!"); } else { showToast(data.error || 'Failed to change password'); }
                     closeModal(document.getElementById("change-password-modal"));
-                    showToast("Password changed successfully!");
                 });
 
                 // View Full Log
@@ -1100,26 +1131,107 @@
                 document.getElementById("reset-defaults-btn").addEventListener("click", function () {
                     openModal("reset-defaults-modal");
                 });
-                document.getElementById("confirm-reset-defaults").addEventListener("click", function () {
+                document.getElementById("confirm-reset-defaults").addEventListener("click", async function () {
+                    const res = await fetch(apiBase, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        credentials: 'same-origin',
+                        body: JSON.stringify({ action: 'reset_defaults', csrf_token: CSRF_TOKEN })
+                    });
+                    const data = await res.json();
+                    if (data.success) { loadSettings(); showToast("Settings reset to defaults!"); } else { showToast(data.error || 'Reset failed'); }
                     closeModal(document.getElementById("reset-defaults-modal"));
-                    showToast("Settings reset to defaults!");
                 });
 
                 // Save All Changes
                 document.getElementById("save-changes-btn").addEventListener("click", function () {
                     openModal("save-changes-modal");
                 });
-                document.getElementById("confirm-save-changes").addEventListener("click", function () {
+                document.getElementById("confirm-save-changes").addEventListener("click", async function () {
+                    const payload = {
+                        action: 'save_settings',
+                        csrf_token: CSRF_TOKEN,
+                        platform_name: document.getElementById('platform-name').value.trim(),
+                        payment_crypto_only: document.querySelectorAll('input[type="checkbox"]')[0].checked ? 1 : 0,
+                        payment_multiple_wallets: document.querySelectorAll('input[type="checkbox"]')[1].checked ? 1 : 0,
+                        payment_require_verification: document.querySelectorAll('input[type="checkbox"]')[2].checked ? 1 : 0,
+                        notify_payment_success: document.querySelectorAll('input[type="checkbox"]')[3].checked ? 1 : 0,
+                        notify_payment_failed: document.querySelectorAll('input[type="checkbox"]')[4].checked ? 1 : 0,
+                        notify_subscription_renewal: document.querySelectorAll('input[type="checkbox"]')[5].checked ? 1 : 0,
+                        notify_wallet_connection: document.querySelectorAll('input[type="checkbox"]')[6].checked ? 1 : 0,
+                        system_maintenance_mode: document.querySelectorAll('input[type="checkbox"]')[7].checked ? 1 : 0,
+                        system_allow_registration: document.querySelectorAll('input[type="checkbox"]')[8].checked ? 1 : 0,
+                        admin_session_timeout: parseInt(document.getElementById('session-timeout').value || '30', 10),
+                        security_require_2fa: document.querySelectorAll('input[type="checkbox"]')[9].checked ? 1 : 0,
+                        security_ip_restriction: document.querySelectorAll('input[type="checkbox"]')[10].checked ? 1 : 0,
+                    };
+                    const res = await fetch(apiBase, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        credentials: 'same-origin',
+                        body: JSON.stringify(payload)
+                    });
+                    const data = await res.json();
+                    if (data.success) { showToast("All changes saved!"); } else { showToast(data.error || 'Save failed'); }
                     closeModal(document.getElementById("save-changes-modal"));
-                    showToast("All changes saved!");
                 });
 
-                // Modal close buttons
-                document.querySelectorAll(".modal-close").forEach((btn) => {
-                    btn.addEventListener("click", function () {
-                        closeModal(btn.closest(".modal"));
-                    });
-                });
+                async function loadActivity() {
+                    try {
+                        const res = await fetch(`${apiBase}?action=get_activity`, { credentials: 'same-origin' });
+                        const data = await res.json();
+                        if (!data.success) return;
+                        const list = document.getElementById('activity-list');
+                        const modalList = document.getElementById('activity-modal-list');
+                        if (list) list.innerHTML = '';
+                        if (modalList) modalList.innerHTML = '';
+                        (data.activity || []).forEach(item => {
+                            const when = new Date(item.created_at).toLocaleString();
+                            const line = document.createElement('div');
+                            line.className = 'border-l-2 border-primary pl-3';
+                            line.innerHTML = `<p class="text-sm font-medium text-gray-800">${item.action}</p><p class="text-xs text-gray-500">${when}</p>`;
+                            if (list && list.childElementCount < 3) list.appendChild(line.cloneNode(true));
+                            if (modalList) modalList.appendChild(line);
+                        });
+                    } catch (e) { /* silent */ }
+                }
+
+                async function loadSettings() {
+                    try {
+                        const res = await fetch(`${apiBase}?action=get_settings`, { credentials: 'same-origin' });
+                        const data = await res.json();
+                        if (!data.success) return;
+                        const s = data.settings;
+                        document.getElementById('platform-name').value = s.platform_name || 'Sales-Spy';
+                        if (s.logo_path) {
+                            const logoImg = document.getElementById('platform-logo');
+                            if (logoImg) logoImg.src = s.logo_path;
+                        }
+                        if (s.favicon_path) {
+                            const favImg = document.getElementById('platform-favicon');
+                            if (favImg) favImg.src = s.favicon_path;
+                        }
+                        const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+                        const values = [
+                            s.payment_crypto_only,
+                            s.payment_multiple_wallets,
+                            s.payment_require_verification,
+                            s.notify_payment_success,
+                            s.notify_payment_failed,
+                            s.notify_subscription_renewal,
+                            s.notify_wallet_connection,
+                            s.system_maintenance_mode,
+                            s.system_allow_registration,
+                            s.security_require_2fa,
+                            s.security_ip_restriction,
+                        ];
+                        checkboxes.forEach((cb, idx) => { if (typeof values[idx] !== 'undefined') cb.checked = !!Number(values[idx]); });
+                        document.getElementById('session-timeout').value = s.admin_session_timeout || 30;
+                        loadActivity();
+                    } catch (e) { /* silent */ }
+                }
+
+                loadSettings();
             });
         </script>
     </body>

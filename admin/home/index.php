@@ -1200,11 +1200,14 @@ $activeSubscriptions = $pdo->query("SELECT COUNT(*) FROM subscriptions WHERE sta
 
         tbody.innerHTML = users
             .map(
-                (user) => `
-            <tr class="hover:bg-gray-50">
+                (user) => {
+            const isDeleted = (user.status || '').toLowerCase() === 'deleted';
+            const rowClass = isDeleted ? 'opacity-50 pointer-events-none select-none' : 'hover:bg-gray-50';
+            return `
+            <tr class="${rowClass}">
                 <td class="px-4 py-3 whitespace-nowrap">
                     <label class="custom-checkbox">
-                        <input type="checkbox" class="user-checkbox" data-user-id="${user.id}">
+                        <input type="checkbox" class="user-checkbox" data-user-id="${user.id}" ${isDeleted ? 'disabled' : ''}>
                         <span class="checkbox-mark"></span>
                     </label>
                 </td>
@@ -1233,29 +1236,26 @@ $activeSubscriptions = $pdo->query("SELECT COUNT(*) FROM subscriptions WHERE sta
                     <span class="px-2 py-1 text-xs font-medium ${user.statusColor} rounded-full">${user.status}</span>
                 </td>
                 <td class="px-4 py-3 whitespace-nowrap text-right text-sm font-medium">
-                    <div class="flex items-center justify-end space-x-2">
-                        <button class="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-primary rounded-full hover:bg-blue-50" 
-                                data-action="view" data-user-id="${user.id}" title="View Details">
-                            <i class="ri-eye-line"></i>
+                    ${isDeleted ? `<div class=\"text-xs text-gray-400 italic\">Deleted account</div>` : `
+                    <div class=\"flex items-center justify-end space-x-2\">
+                        <button class=\"w-8 h-8 flex items-center justify-center text-gray-500 hover:text-primary rounded-full hover:bg-blue-50\" 
+                                data-action=\"view\" data-user-id=\"${user.id}\" title=\"View Details\">
+                            <i class=\"ri-eye-line\"></i>
                         </button>
                         ${user.status === "Suspended"
-                            ? `<button class="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-green-500 rounded-full hover:bg-green-50" 
-                                       data-action="unsuspend" data-user-id="${user.id}" title="Unsuspend User">
-                                    <i class="ri-play-circle-line"></i>
-                                </button>`
-                            : `<button class="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-yellow-500 rounded-full hover:bg-yellow-50" 
-                                       data-action="suspend" data-user-id="${user.id}" title="Suspend User">
-                                    <i class="ri-pause-circle-line"></i>
-                                </button>`
+                            ? `<button class=\\"w-8 h-8 flex items-center justify-center text-gray-500 hover:text-green-500 rounded-full hover:bg-green-50\\" 
+                                       data-action=\\"unsuspend\\" data-user-id=\\"${user.id}\\" title=\\"Unsuspend User\\">\n                                    <i class=\\"ri-play-circle-line\\"></i>\n                                </button>`
+                            : `<button class=\\"w-8 h-8 flex items-center justify-center text-gray-500 hover:text-yellow-500 rounded-full hover:bg-yellow-50\\" 
+                                       data-action=\\"suspend\\" data-user-id=\\"${user.id}\\" title=\\"Suspend User\\">\n                                    <i class=\\"ri-pause-circle-line\\"></i>\n                                </button>`
                         }
-                        <button class="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-red-500 rounded-full hover:bg-red-50" 
-                                data-action="delete" data-user-id="${user.id}" title="Delete User">
-                            <i class="ri-delete-bin-line"></i>
+                        <button class=\"w-8 h-8 flex items-center justify-center text-gray-500 hover:text-red-500 rounded-full hover:bg-red-50\" 
+                                data-action=\"delete\" data-user-id=\"${user.id}\" title=\"Delete User\">\n                            <i class=\"ri-delete-bin-line\"></i>
                         </button>
-                    </div>
+                    </div>`}
                 </td>
             </tr>
         `
+            }
             )
             .join("");
 

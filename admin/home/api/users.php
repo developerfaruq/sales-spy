@@ -152,7 +152,11 @@ LIMIT $offset, $limit
             'walletColor' => 'text-gray-600 bg-gray-100',
             'joined' => date('M d, Y', strtotime($user['created_at'])),
             'status' => ucfirst($user['user_status']),
-            'statusColor' => $user['user_status'] === 'active' ? 'bg-green-50 text-green-600' : 'bg-yellow-50 text-yellow-600',
+            'statusColor' => $user['user_status'] === 'active'
+                ? 'bg-green-50 text-green-600'
+                : ($user['user_status'] === 'deleted'
+                    ? 'bg-gray-100 text-gray-500'
+                    : 'bg-yellow-50 text-yellow-600'),
             'initials' => $initials,
             'profile_picture' => $user['profile_picture'],
             'leads_balance' => $user['leads_balance']

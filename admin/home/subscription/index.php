@@ -1276,7 +1276,7 @@ $activeSubscriptions = $pdo->query("SELECT COUNT(*) FROM subscriptions WHERE sta
       </div>
       <div class="flex items-center">
         <label class="custom-checkbox">
-          <input type="checkbox" checked />
+          <input type="checkbox" id="pause-send-email" />
           <span class="checkbox-mark"></span>
         </label>
         <span class="ml-2 text-sm text-gray-600">Send email notification to user</span>
@@ -1344,7 +1344,7 @@ $activeSubscriptions = $pdo->query("SELECT COUNT(*) FROM subscriptions WHERE sta
       </div>
       <div class="flex items-center">
         <label class="custom-checkbox">
-          <input type="checkbox" checked />
+          <input type="checkbox" id="cancel-send-email" />
           <span class="checkbox-mark"></span>
         </label>
         <span class="ml-2 text-sm text-gray-600">Send email notification to user</span>
@@ -1383,13 +1383,14 @@ document.addEventListener('DOMContentLoaded', function() {
             const reason = document.getElementById('pause-reason')?.value || '';
             const durationSelect = document.getElementById('pause-duration-select');
             const duration = durationSelect?.getAttribute('data-value') || '1month';
+            const sendEmail = document.getElementById('pause-send-email')?.checked || false;
             
             if (userId) {
                 // Show loading state
                 this.disabled = true;
                 this.textContent = 'Processing...';
                 
-                pauseSubscription(userId, reason, duration).finally(() => {
+                pauseSubscription(userId, reason, duration, sendEmail).finally(() => {
                     this.disabled = false;
                     this.textContent = 'Pause Subscription';
                 });
@@ -1423,7 +1424,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     
-    async function pauseSubscription(userId, reason, duration) {
+    async function pauseSubscription(userId, reason, duration, sendEmail) {
         try {
             const response = await fetch('api/update_subscription.php', {
                 method: 'POST',
@@ -1434,7 +1435,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     user_id: userId,
                     action: 'pause',
                     reason: reason,
-                    duration: duration
+                    duration: duration,
+                    send_email: sendEmail
                 })
             });
 
@@ -1454,6 +1456,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     async function cancelSubscription(userId, reason) {
+            const sendEmail = document.getElementById('cancel-send-email')?.checked || false;
         try {
             const response = await fetch('api/update_subscription.php', {
                 method: 'POST',
@@ -1463,7 +1466,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 body: JSON.stringify({
                     user_id: userId,
                     action: 'cancel',
-                    reason: reason
+                    reason: reason,
+                    send_email: sendEmail
                 })
             });
 
@@ -1479,6 +1483,32 @@ document.addEventListener('DOMContentLoaded', function() {
         } catch (error) {
             console.error('Error cancelling subscription:', error);
             showToast('Error cancelling subscription', 'error');
+        }
+    }
+    
+    async function resumeSubscription(userId) {
+        try {
+            const response = await fetch('api/update_subscription.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    user_id: userId,
+                    action: 'resume'
+                })
+            });
+
+            const data = await response.json();
+            if (data.success) {
+                showToast('Subscription resumed successfully');
+                fetchSubscriptions();
+            } else {
+                showToast(data.message || 'Failed to resume subscription', 'error');
+            }
+        } catch (error) {
+            console.error('Error resuming subscription:', error);
+            showToast('Error resuming subscription', 'error');
         }
     }
     
@@ -2550,11 +2580,12 @@ document.addEventListener('DOMContentLoaded', function() {
                                 data-action="history" data-user-id="${sub.user_id}" data-tooltip="View subscription history">
                             <i class="ri-history-line"></i>
                         </button>
-                        <button class="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-yellow-500 rounded-full hover:bg-yellow-50 subscription-action" 
-                                data-action="pause" data-user-id="${sub.user_id}" data-tooltip="Pause subscription"
-                                ${sub.status === 'paused' ? 'disabled style="opacity: 0.5;"' : ''}>
-                            <i class="ri-pause-circle-line"></i>
-                        </button>
+                        ${sub.status === 'paused' 
+                            ? `<button class=\"w-8 h-8 flex items-center justify-center text-gray-500 hover:text-green-600 rounded-full hover:bg-green-50 subscription-action\" 
+                                       data-action=\"resume\" data-user-id=\"${sub.user_id}\" data-tooltip=\"Resume subscription\">\n                                    <i class=\"ri-play-circle-line\"></i>\n                               </button>`
+                            : `<button class=\"w-8 h-8 flex items-center justify-center text-gray-500 hover:text-yellow-500 rounded-full hover:bg-yellow-50 subscription-action\" 
+                                       data-action=\"pause\" data-user-id=\"${sub.user_id}\" data-tooltip=\"Pause subscription\">\n                                    <i class=\"ri-pause-circle-line\"></i>\n                               </button>`
+                        }
                         <button class="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-red-500 rounded-full hover:bg-red-50 subscription-action" 
                                 data-action="cancel" data-user-id="${sub.user_id}" data-tooltip="Cancel subscription"
                                 ${sub.status === 'cancelled' ? 'disabled style="opacity: 0.5;"' : ''}>
@@ -2605,6 +2636,9 @@ document.addEventListener('DOMContentLoaded', function() {
                             document.getElementById('pause-subscription-modal').setAttribute('data-user-id', userId);
                             openModal('pause-subscription-modal');
                         }
+                        break;
+                    case 'resume':
+                        resumeSubscription(userId);
                         break;
                     case 'cancel':
                         if (!this.disabled) {

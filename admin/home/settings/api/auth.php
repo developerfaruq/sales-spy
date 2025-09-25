@@ -1,9 +1,9 @@
 <?php
-require '../config/db.php';
+
+
+
+require __DIR__ . '.../../../../config/db.php';
 session_start();
-
-require __DIR__ . '/../config/db.php';
-
 if (!isset($_SESSION['admin_id']) && isset($_COOKIE['admin_remember'])) {
     $_SESSION['admin_id'] = $_COOKIE['admin_remember'];
     // Optionally fetch admin info again from DB

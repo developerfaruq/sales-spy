@@ -6,7 +6,7 @@ $dbname = "sales_spy";
 
 
 // Defining base url
-define ("BASE_URL", "http://localhost/sales-spy/");
+define ("BASE_URL", "http://sales-spy.test/");
 
 // Database connection
 try{
@@ -18,5 +18,5 @@ try{
 }
 
 // Mock data configuration
-define("USE_MOCK_DATA", false);
+//define("USE_MOCK_DATA", false);
 

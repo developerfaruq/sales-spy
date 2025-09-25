@@ -1,8 +1,62 @@
 <?php
 require '../../../config/db.php';
 require 'auth_check.php';
+// Email
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+require '../../../../vendor/autoload.php';
+function sendSubscriptionEmail($toEmail, $toName, $type, $details = []) {
+    $config = require '../../config/email_config.php';
+    try {
+        $mail = new PHPMailer(true);
+        $mail->isSMTP();
+        $mail->Host = $config['smtp']['host'];
+        $mail->SMTPAuth = true;
+        $mail->Username = $config['smtp']['username'];
+        $mail->Password = $config['smtp']['password'];
+        $mail->SMTPSecure = $config['smtp']['encryption'];
+        $mail->Port = $config['smtp']['port'];
+        $mail->CharSet = $config['settings']['charset'];
+        $mail->Timeout = $config['settings']['timeout'];
+        $mail->WordWrap = $config['settings']['word_wrap'];
+        $mail->setFrom($config['smtp']['from_email'], $config['smtp']['from_name']);
+        $mail->addAddress($toEmail, $toName);
+        $mail->isHTML(true);
+        switch ($type) {
+            case 'paused':
+                $mail->Subject = 'Your subscription has been paused';
+                $mail->Body = '<p>Hi ' . htmlspecialchars($toName) . ',</p><p>Your subscription has been paused.'
+                    . (!empty($details['reason']) ? '<br>Reason: ' . htmlspecialchars($details['reason']) : '')
+                    . (!empty($details['duration']) ? '<br>Duration: ' . htmlspecialchars($details['duration']) : '')
+                    . '</p>';
+                break;
+            case 'resumed':
+                $mail->Subject = 'Your subscription has been resumed';
+                $mail->Body = '<p>Hi ' . htmlspecialchars($toName) . ',</p><p>Your subscription is now active again.</p>';
+                break;
+            case 'cancelled':
+                $mail->Subject = 'Your subscription has been cancelled';
+                $mail->Body = '<p>Hi ' . htmlspecialchars($toName) . ',</p><p>Your subscription was cancelled.'
+                    . (!empty($details['reason']) ? '<br>Reason: ' . htmlspecialchars($details['reason']) : '')
+                    . '</p>';
+                break;
+        }
+        $mail->AltBody = strip_tags($mail->Body);
+        $mail->send();
+        return true;
+    } catch (Exception $e) {
+        error_log('Subscription email error: ' . $e->getMessage());
+        return false;
+    }
+}
 
 header('Content-Type: application/json');
+if (!isset($_SESSION['admin_id'])) {
+	http_response_code(401);
+	echo json_encode(['success' => false, 'error' => 'Unauthorized']);
+	exit;
+}
+
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);
@@ -111,6 +165,7 @@ try {
         case 'pause':
             $reason = $input['reason'] ?? '';
             $duration = $input['duration'] ?? '1month';
+            $send_email = !empty($input['send_email']);
             
             // Calculate pause end date
             $pause_end = date('Y-m-d H:i:s');
@@ -163,10 +218,14 @@ try {
             $stmt->execute([$user_id, 'paused', $details, $admin_id]);
             
             $message = "Subscription paused successfully";
+            if ($send_email) {
+                sendSubscriptionEmail($user_email, $user_name, 'paused', ['reason' => $reason, 'duration' => $duration]);
+            }
             break;
             
         case 'cancel':
             $reason = $input['reason'] ?? '';
+            $send_email = !empty($input['send_email']);
             
             // Update subscription status
             $stmt = $pdo->prepare("UPDATE subscriptions SET status = 'cancelled', is_active = 0 WHERE user_id = ?");
@@ -200,6 +259,9 @@ try {
             $stmt->execute([$user_id, 'cancelled', $details, $admin_id]);
             
             $message = "Subscription cancelled successfully";
+            if ($send_email) {
+                sendSubscriptionEmail($user_email, $user_name, 'cancelled', ['reason' => $reason]);
+            }
             break;
             
         case 'resume':
@@ -234,6 +296,10 @@ try {
             $stmt->execute([$user_id, 'resumed', $details, $admin_id]);
             
             $message = "Subscription resumed successfully";
+            // Always notify resume silently? Keep optional via send_email if provided
+            if (!empty($input['send_email'])) {
+                sendSubscriptionEmail($user_email, $user_name, 'resumed');
+            }
             break;
             
         default:
