@@ -31,7 +31,33 @@ $activeSubscriptions = $pdo->query("SELECT COUNT(*) FROM subscriptions WHERE sta
     <title>Admin Dashboard</title>
     <script src="https://cdn.tailwindcss.com/3.4.16"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-    <script>
+  <!-- Resume Subscription Modal -->
+  <div id="resume-subscription-modal" class="modal">
+    <div class="modal-content">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="text-lg font-medium text-gray-800">Resume Subscription</h3>
+        <button class="modal-close text-gray-400 hover:text-gray-500">
+          <i class="ri-close-line ri-lg"></i>
+        </button>
+      </div>
+      <div class="space-y-4">
+        <div class="flex items-center">
+          <div class="w-12 h-12 rounded-full bg-green-100 text-green-600 flex items-center justify-center">
+            <i class="ri-play-circle-line ri-lg"></i>
+          </div>
+          <div class="ml-4">
+            <h4 class="text-lg font-medium text-gray-800">Resume this subscription?</h4>
+            <p class="text-sm text-gray-500">The user will regain access to premium features immediately.</p>
+          </div>
+        </div>
+        <div class="flex items-center justify-end space-x-3 pt-4 border-t">
+          <button type="button" class="px-4 py-2 border border-gray-200 text-gray-600 rounded-button whitespace-nowrap hover:bg-gray-50 modal-close">Cancel</button>
+          <button type="button" id="confirm-resume-subscription" class="px-4 py-2 bg-green-600 text-white rounded-button whitespace-nowrap hover:bg-green-700">Resume Subscription</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
       tailwind.config = {
         theme: {
           extend: {
@@ -2638,7 +2664,10 @@ document.addEventListener('DOMContentLoaded', function() {
                         }
                         break;
                     case 'resume':
-                        resumeSubscription(userId);
+                        if (!this.disabled) {
+                            document.getElementById('resume-subscription-modal').setAttribute('data-user-id', userId);
+                            openModal('resume-subscription-modal');
+                        }
                         break;
                     case 'cancel':
                         if (!this.disabled) {
@@ -2667,7 +2696,33 @@ document.addEventListener('DOMContentLoaded', function() {
             };
         });
     }
+async function resumeSubscription(userId) {
+    try {
+        const response = await fetch('api/update_subscription.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                user_id: userId,
+                action: 'resume'
+            })
+        });
 
+        const data = await response.json();
+        
+        if (data.success) {
+            showToast('Subscription resumed successfully');
+            fetchSubscriptions();
+            closeAllModals();
+        } else {
+            showToast(data.message || 'Failed to resume subscription', 'error');
+        }
+    } catch (error) {
+        console.error('Error resuming subscription:', error);
+        showToast('Error resuming subscription', 'error');
+    }
+}
     function renderSubsPagination(totalPages) {
         // Remove old page buttons
         subsPagination.querySelectorAll(".subscriptions-page-btn").forEach((btn) => btn.remove());
@@ -2708,6 +2763,23 @@ document.addEventListener('DOMContentLoaded', function() {
         document.querySelectorAll("#subscriptions-tab .custom-select").forEach((select) => 
             select.classList.remove("open")
         );
+      });
+
+    document.getElementById('confirm-resume-subscription')?.addEventListener('click', async function() {
+        const modal = document.getElementById('resume-subscription-modal');
+        const userId = modal.getAttribute('data-user-id');
+        const btn = this;
+        const originalText = btn.textContent;
+        btn.disabled = true;
+        btn.classList.add('opacity-70', 'cursor-not-allowed');
+        btn.textContent = 'Resuming...';
+        try {
+            await resumeSubscription(userId);
+        } finally {
+            btn.disabled = false;
+            btn.classList.remove('opacity-70', 'cursor-not-allowed');
+            btn.textContent = originalText;
+        }
     });
 
     // Event listeners for filters and pagination

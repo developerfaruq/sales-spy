@@ -6,7 +6,7 @@ use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 require '../../../../vendor/autoload.php';
 function sendSubscriptionEmail($toEmail, $toName, $type, $details = []) {
-    $config = require '../../config/email_config.php';
+    $config = require '../../../config/email_config.php';
     try {
         $mail = new PHPMailer(true);
         $mail->isSMTP();
@@ -165,7 +165,7 @@ try {
         case 'pause':
             $reason = $input['reason'] ?? '';
             $duration = $input['duration'] ?? '1month';
-            $send_email = !empty($input['send_email']);
+            $send_email = array_key_exists('send_email', $input) ? !empty($input['send_email']) : true;
             
             // Calculate pause end date
             $pause_end = date('Y-m-d H:i:s');
@@ -219,13 +219,17 @@ try {
             
             $message = "Subscription paused successfully";
             if ($send_email) {
-                sendSubscriptionEmail($user_email, $user_name, 'paused', ['reason' => $reason, 'duration' => $duration]);
+                try {
+                    sendSubscriptionEmail($user_email, $user_name, 'paused', ['reason' => $reason, 'duration' => $duration]);
+                } catch (Exception $e) {
+                    error_log('Pause email error: ' . $e->getMessage());
+                }
             }
             break;
             
         case 'cancel':
             $reason = $input['reason'] ?? '';
-            $send_email = !empty($input['send_email']);
+            $send_email = array_key_exists('send_email', $input) ? !empty($input['send_email']) : true;
             
             // Update subscription status
             $stmt = $pdo->prepare("UPDATE subscriptions SET status = 'cancelled', is_active = 0 WHERE user_id = ?");
@@ -260,7 +264,11 @@ try {
             
             $message = "Subscription cancelled successfully";
             if ($send_email) {
-                sendSubscriptionEmail($user_email, $user_name, 'cancelled', ['reason' => $reason]);
+                try {
+                    sendSubscriptionEmail($user_email, $user_name, 'cancelled', ['reason' => $reason]);
+                } catch (Exception $e) {
+                    error_log('Cancel email error: ' . $e->getMessage());
+                }
             }
             break;
             
@@ -296,9 +304,13 @@ try {
             $stmt->execute([$user_id, 'resumed', $details, $admin_id]);
             
             $message = "Subscription resumed successfully";
-            // Always notify resume silently? Keep optional via send_email if provided
-            if (!empty($input['send_email'])) {
-                sendSubscriptionEmail($user_email, $user_name, 'resumed');
+            $send_email = array_key_exists('send_email', $input) ? !empty($input['send_email']) : true;
+            if ($send_email) {
+                try {
+                    sendSubscriptionEmail($user_email, $user_name, 'resumed');
+                } catch (Exception $e) {
+                    error_log('Resume email error: ' . $e->getMessage());
+                }
             }
             break;
             
