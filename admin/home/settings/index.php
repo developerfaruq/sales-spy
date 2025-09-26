@@ -871,9 +871,14 @@ $avatarUrl = "https://ui-avatars.com/api/?name=" .
             </div>
         </div>
         <div id="view-log-modal" class="modal">
-            <div class="modal-content">
-                <h3 class="text-lg font-medium mb-4">Admin Activity Log</h3>
-                <div id="activity-modal-list" class="max-h-64 overflow-y-auto mb-4"></div>
+            <div class="modal-content max-w-4xl">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-medium">Admin Activity Log</h3>
+                    <button class="modal-close text-gray-400 hover:text-gray-500">
+                        <i class="ri-close-line ri-lg"></i>
+                    </button>
+                </div>
+                <div id="activity-modal-list" class="max-h-96 overflow-y-auto mb-4 space-y-3"></div>
                 <div class="flex justify-end">
                     <button class="modal-close px-4 py-2 border rounded-button">Close</button>
                 </div>
@@ -1187,13 +1192,60 @@ $avatarUrl = "https://ui-avatars.com/api/?name=" .
                         if (modalList) modalList.innerHTML = '';
                         (data.activity || []).forEach(item => {
                             const when = new Date(item.created_at).toLocaleString();
+                            
+                            // Create enhanced activity item
                             const line = document.createElement('div');
-                            line.className = 'border-l-2 border-primary pl-3';
-                            line.innerHTML = `<p class="text-sm font-medium text-gray-800">${item.action}</p><p class="text-xs text-gray-500">${when}</p>`;
+                            line.className = 'border-l-2 border-primary pl-3 mb-3';
+                            
+                            // Get action icon and color
+                            const actionConfig = getActionConfig(item.action);
+                            
+                            line.innerHTML = `
+                                <div class="flex items-start space-x-3">
+                                    <div class="flex-shrink-0 w-8 h-8 rounded-full ${actionConfig.bgColor} flex items-center justify-center">
+                                        <i class="${actionConfig.icon} text-sm ${actionConfig.textColor}"></i>
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <p class="text-sm font-medium text-gray-800">${item.description}</p>
+                                        <p class="text-xs text-gray-500">by ${item.admin_name} • ${when}</p>
+                                        ${item.additional_info && item.additional_info.length > 0 ? `
+                                            <div class="mt-1 space-y-1">
+                                                ${item.additional_info.slice(0, 3).map(info => `
+                                                    <span class="inline-block px-2 py-1 text-xs bg-gray-100 text-gray-600 rounded mr-1">${info}</span>
+                                                `).join('')}
+                                                ${item.additional_info.length > 3 ? `<span class="text-xs text-gray-400">+${item.additional_info.length - 3} more</span>` : ''}
+                                            </div>
+                                        ` : ''}
+                                        ${item.browser ? `<p class="text-xs text-gray-400 mt-1">${item.browser}</p>` : ''}
+                                    </div>
+                                </div>
+                            `;
+                            
                             if (list && list.childElementCount < 3) list.appendChild(line.cloneNode(true));
                             if (modalList) modalList.appendChild(line);
                         });
                     } catch (e) { /* silent */ }
+                }
+                
+                function getActionConfig(action) {
+                    const configs = {
+                        'subscription_created': { icon: 'ri-add-circle-line', bgColor: 'bg-green-100', textColor: 'text-green-600' },
+                        'subscription_paused': { icon: 'ri-pause-circle-line', bgColor: 'bg-yellow-100', textColor: 'text-yellow-600' },
+                        'subscription_resumed': { icon: 'ri-play-circle-line', bgColor: 'bg-green-100', textColor: 'text-green-600' },
+                        'subscription_cancelled': { icon: 'ri-close-circle-line', bgColor: 'bg-red-100', textColor: 'text-red-600' },
+                        'subscription_plan_changed': { icon: 'ri-exchange-line', bgColor: 'bg-blue-100', textColor: 'text-blue-600' },
+                        'transaction_approved': { icon: 'ri-check-circle-line', bgColor: 'bg-green-100', textColor: 'text-green-600' },
+                        'transaction_declined': { icon: 'ri-close-circle-line', bgColor: 'bg-red-100', textColor: 'text-red-600' },
+                        'wallet_updated': { icon: 'ri-wallet-line', bgColor: 'bg-purple-100', textColor: 'text-purple-600' },
+                        'user_created': { icon: 'ri-user-add-line', bgColor: 'bg-blue-100', textColor: 'text-blue-600' },
+                        'user_suspended': { icon: 'ri-user-unfollow-line', bgColor: 'bg-red-100', textColor: 'text-red-600' },
+                        'user_activated': { icon: 'ri-user-follow-line', bgColor: 'bg-green-100', textColor: 'text-green-600' },
+                        'admin_login': { icon: 'ri-login-circle-line', bgColor: 'bg-blue-100', textColor: 'text-blue-600' },
+                        'admin_logout': { icon: 'ri-logout-circle-line', bgColor: 'bg-gray-100', textColor: 'text-gray-600' },
+                        'password_changed': { icon: 'ri-lock-password-line', bgColor: 'bg-orange-100', textColor: 'text-orange-600' },
+                        'settings_updated': { icon: 'ri-settings-3-line', bgColor: 'bg-indigo-100', textColor: 'text-indigo-600' }
+                    };
+                    return configs[action] || { icon: 'ri-information-line', bgColor: 'bg-gray-100', textColor: 'text-gray-600' };
                 }
 
                 async function loadSettings() {

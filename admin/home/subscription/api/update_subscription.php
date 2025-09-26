@@ -22,32 +22,157 @@ function sendSubscriptionEmail($toEmail, $toName, $type, $details = []) {
         $mail->setFrom($config['smtp']['from_email'], $config['smtp']['from_name']);
         $mail->addAddress($toEmail, $toName);
         $mail->isHTML(true);
-        switch ($type) {
-            case 'paused':
-                $mail->Subject = 'Your subscription has been paused';
-                $mail->Body = '<p>Hi ' . htmlspecialchars($toName) . ',</p><p>Your subscription has been paused.'
-                    . (!empty($details['reason']) ? '<br>Reason: ' . htmlspecialchars($details['reason']) : '')
-                    . (!empty($details['duration']) ? '<br>Duration: ' . htmlspecialchars($details['duration']) : '')
-                    . '</p>';
-                break;
-            case 'resumed':
-                $mail->Subject = 'Your subscription has been resumed';
-                $mail->Body = '<p>Hi ' . htmlspecialchars($toName) . ',</p><p>Your subscription is now active again.</p>';
-                break;
-            case 'cancelled':
-                $mail->Subject = 'Your subscription has been cancelled';
-                $mail->Body = '<p>Hi ' . htmlspecialchars($toName) . ',</p><p>Your subscription was cancelled.'
-                    . (!empty($details['reason']) ? '<br>Reason: ' . htmlspecialchars($details['reason']) : '')
-                    . '</p>';
-                break;
-        }
-        $mail->AltBody = strip_tags($mail->Body);
+        // Beautiful HTML and text templates similar to create_subscription email
+        $subjects = [
+            'paused' => 'Your Sales-Spy Subscription Has Been Paused',
+            'resumed' => 'Welcome Back — Your Sales-Spy Subscription Is Active Again',
+            'cancelled' => 'Confirmation: Your Sales-Spy Subscription Has Been Cancelled'
+        ];
+        $mail->Subject = $subjects[$type] ?? 'Sales-Spy Subscription Update';
+        $mail->Body = getActionEmailTemplate($toName, $type, $details, $config);
+        $mail->AltBody = getActionEmailTextTemplate($toName, $type, $details, $config);
         $mail->send();
         return true;
     } catch (Exception $e) {
         error_log('Subscription email error: ' . $e->getMessage());
         return false;
     }
+}
+
+function getActionEmailTemplate($userName, $type, $details, $config) {
+    $companyName = $config['templates']['suspension']['company_name'] ?? 'Sales-Spy';
+    $websiteUrl = $config['templates']['suspension']['website_url'] ?? '#';
+    $supportEmail = $config['templates']['suspension']['support_email'] ?? ($config['smtp']['from_email'] ?? 'support@example.com');
+    $palette = [
+        'paused' => '#3B82F6',
+        'resumed' => '#3B82F6',
+        'cancelled' => '#3B82F6'
+    ];
+    $title = [
+        'paused' => 'Your subscription is paused',
+        'resumed' => 'Your subscription is now active',
+        'cancelled' => 'Your subscription was cancelled'
+    ][$type] ?? 'Subscription update';
+    $color = $palette[$type] ?? '#3B82F6';
+
+    $reasonLine = !empty($details['reason']) ? '<div class="plan-detail"><span class="detail-label">Reason:</span><span class="detail-value">' . htmlspecialchars($details['reason']) . '</span></div>' : '';
+    $durationPretty = '';
+    if (!empty($details['duration'])) {
+        $map = [
+            '1week' => '1 Week',
+            '2weeks' => '2 Weeks',
+            '1month' => '1 Month',
+            '3months' => '3 Months',
+            '6months' => '6 Months',
+            '1year' => '1 Year'
+        ];
+        $durationPretty = '<div class="plan-detail"><span class="detail-label">Duration:</span><span class="detail-value">' . htmlspecialchars($map[$details['duration']] ?? $details['duration']) . '</span></div>';
+    }
+    $pauseEndLine = !empty($details['pause_end']) ? '<div class="plan-detail"><span class="detail-label">Pause Ends:</span><span class="detail-value">' . date('F j, Y', strtotime($details['pause_end'])) . '</span></div>' : '';
+    $resumedAtLine = !empty($details['resumed_at']) ? '<div class="plan-detail"><span class="detail-label">Resumed At:</span><span class="detail-value">' . date('F j, Y, g:i A', strtotime($details['resumed_at'])) . '</span></div>' : '';
+
+    $intro = [
+        'paused' => "Your subscription has been temporarily paused. You won't lose your data, and you can resume anytime.",
+        'resumed' => "Great news! Your subscription is active again. Welcome back to all premium features.",
+        'cancelled' => "This is a confirmation that your subscription has been cancelled. We're sorry to see you go."
+    ][$type] ?? 'Subscription status updated.';
+
+    $cta = [
+        'paused' => ['Contact Support', 'mailto:' . $supportEmail],
+        'resumed' => ['Open Sales-Spy', $websiteUrl],
+        'cancelled' => ['Visit Sales-Spy', $websiteUrl]
+    ][$type];
+
+    $emailBody = "
+    <!DOCTYPE html>
+    <html lang='en'>
+    <head>
+        <meta charset='UTF-8'>
+        <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+        <title>{$companyName} Subscription Update</title>
+        <style>
+            body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; background-color: #f8f9fa; }
+            .container { max-width: 600px; margin: 0 auto; background-color: #ffffff; }
+            .header { background: linear-gradient(135deg, #1E3A8A 0%, #3B82F6 100%); color: white; padding: 32px 20px; text-align: center; }
+            .header h1 { margin: 0; font-size: 24px; font-weight: 600; }
+            .content { padding: 32px 30px; }
+            .welcome-text { font-size: 16px; color: #374151; margin-bottom: 24px; line-height: 1.6; }
+            .plan-card { background: #f8fafc; border: 2px solid {$color}; border-radius: 12px; padding: 20px; margin: 20px 0; }
+            .plan-title { color: {$color}; font-size: 18px; font-weight: 600; margin-bottom: 12px; }
+            .plan-details { display: grid; gap: 10px; }
+            .plan-detail { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #e5e7eb; }
+            .plan-detail:last-child { border-bottom: none; }
+            .detail-label { font-weight: 500; color: #6b7280; }
+            .detail-value { font-weight: 600; color: #1f2937; }
+            .cta-section { text-align: center; margin: 28px 0; }
+            .cta-button { display: inline-block; padding: 12px 24px; background: {$color}; color: white; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 15px; }
+            .footer { background-color: #f3f4f6; padding: 24px; text-align: center; color: #6b7280; }
+            .footer a { color: {$color}; text-decoration: none; }
+        </style>
+    </head>
+    <body>
+        <div class='container'>
+            <div class='header'>
+                <h1>{$companyName} — {$title}</h1>
+            </div>
+            <div class='content'>
+                <div class='welcome-text'>
+                    <p>Hi " . htmlspecialchars($userName) . ",</p>
+                    <p>{$intro}</p>
+                </div>
+                <div class='plan-card'>
+                    <h2 class='plan-title'>Subscription Details</h2>
+                    <div class='plan-details'>
+                        {$reasonLine}
+                        {$durationPretty}
+                        {$pauseEndLine}
+                        {$resumedAtLine}
+                    </div>
+                </div>
+                <div class='cta-section'>
+                    <a href='" . htmlspecialchars($cta[1]) . "' class='cta-button'>" . htmlspecialchars($cta[0]) . "</a>
+                </div>
+                <p style='color: #6b7280; font-size: 14px; line-height: 1.6;'>
+                    Need help? Contact our team at <a href='mailto:{$supportEmail}' style='color: {$color};'>{$supportEmail}</a>.
+                </p>
+            </div>
+            <div class='footer'>
+                <p><strong>{$companyName}</strong></p>
+                <p>This email is about a subscription status change on your account.</p>
+                <p><a href='{$websiteUrl}'>Visit Website</a> | <a href='mailto:{$supportEmail}'>Contact Support</a></p>
+            </div>
+        </div>
+    </body>
+    </html>";
+
+    return $emailBody;
+}
+
+function getActionEmailTextTemplate($userName, $type, $details, $config) {
+    $title = [
+        'paused' => 'Subscription Paused',
+        'resumed' => 'Subscription Resumed',
+        'cancelled' => 'Subscription Cancelled'
+    ][$type] ?? 'Subscription Update';
+    $lines = [
+        'paused' => "Your subscription has been paused.",
+        'resumed' => "Your subscription is active again.",
+        'cancelled' => "Your subscription was cancelled."
+    ][$type] ?? 'Subscription status changed.';
+    $reason = !empty($details['reason']) ? "Reason: {$details['reason']}\n" : '';
+    $duration = !empty($details['duration']) ? "Duration: {$details['duration']}\n" : '';
+    $pauseEnd = !empty($details['pause_end']) ? "Pause Ends: " . date('F j, Y', strtotime($details['pause_end'])) . "\n" : '';
+    $resumedAt = !empty($details['resumed_at']) ? "Resumed At: " . date('F j, Y, g:i A', strtotime($details['resumed_at'])) . "\n" : '';
+
+    return "$title
+
+Hi {$userName},
+
+{$lines}
+{$reason}{$duration}{$pauseEnd}{$resumedAt}
+If you need help, reply to this email.
+
+Sales-Spy Team";
 }
 
 header('Content-Type: application/json');

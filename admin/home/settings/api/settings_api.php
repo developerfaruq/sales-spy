@@ -121,24 +121,151 @@ function change_password(PDO $pdo, array $payload) {
 }
 
 function get_activity(PDO $pdo) {
-	// Fetch latest 50 rows from admin_actions and map to UI-friendly fields
-	$stmt = $pdo->prepare("SELECT a.id, a.action_type, a.details, a.created_at, ad.name AS admin_name
+	// Fetch latest 50 rows from admin_actions with enhanced details
+	$stmt = $pdo->prepare("SELECT a.id, a.action_type, a.target_user_id, a.target_type, a.details, a.ip_address, a.user_agent, a.created_at, ad.name AS admin_name
 		FROM admin_actions a
 		LEFT JOIN admins ad ON ad.id = a.admin_id
 		ORDER BY a.created_at DESC
 		LIMIT 50");
 	$stmt->execute();
 	$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+	
 	$activity = array_map(function ($r) {
+		$details = json_decode($r['details'], true) ?: [];
 		$action = $r['action_type'];
+		
+		// Create human-readable action descriptions
+		$actionDescriptions = [
+			'subscription_created' => 'Created subscription',
+			'subscription_paused' => 'Paused subscription',
+			'subscription_resumed' => 'Resumed subscription',
+			'subscription_cancelled' => 'Cancelled subscription',
+			'subscription_plan_changed' => 'Changed subscription plan',
+			'transaction_approved' => 'Approved payment',
+			'transaction_declined' => 'Declined payment',
+			'wallet_updated' => 'Updated wallet settings',
+			'user_created' => 'Created user account',
+			'user_suspended' => 'Suspended user',
+			'user_activated' => 'Activated user',
+			'admin_login' => 'Admin login',
+			'admin_logout' => 'Admin logout',
+			'password_changed' => 'Changed password',
+			'settings_updated' => 'Updated settings'
+		];
+		
+		$actionText = $actionDescriptions[$action] ?? ucwords(str_replace('_', ' ', $action));
+		
+		// Build detailed description based on action type
+		$description = $actionText;
+		$additionalInfo = [];
+		
+		if ($r['target_user_id']) {
+			$additionalInfo[] = "User ID: {$r['target_user_id']}";
+		}
+		
+		switch ($action) {
+			case 'subscription_created':
+				$plan = $details['plan'] ?? 'Unknown';
+				$duration = $details['duration'] ?? '';
+				$credits = $details['credits'] ?? '';
+				$description = "Created {$plan} subscription";
+				if ($duration) $additionalInfo[] = "Duration: {$duration}";
+				if ($credits) $additionalInfo[] = "Credits: " . number_format($credits);
+				break;
+				
+			case 'subscription_paused':
+				$reason = $details['reason'] ?? '';
+				$duration = $details['duration'] ?? '';
+				$description = "Paused subscription";
+				if ($reason) $additionalInfo[] = "Reason: {$reason}";
+				if ($duration) $additionalInfo[] = "Duration: {$duration}";
+				break;
+				
+			case 'subscription_resumed':
+				$description = "Resumed subscription";
+				break;
+				
+			case 'subscription_cancelled':
+				$reason = $details['reason'] ?? '';
+				$description = "Cancelled subscription";
+				if ($reason) $additionalInfo[] = "Reason: {$reason}";
+				break;
+				
+			case 'subscription_plan_changed':
+				$oldPlan = $details['old_plan'] ?? 'Unknown';
+				$newPlan = $details['new_plan'] ?? 'Unknown';
+				$description = "Changed plan from {$oldPlan} to {$newPlan}";
+				break;
+				
+			case 'transaction_approved':
+				$amount = $details['amount'] ?? '';
+				$plan = $details['plan'] ?? '';
+				$description = "Approved payment";
+				if ($amount) $additionalInfo[] = "Amount: \${$amount}";
+				if ($plan) $additionalInfo[] = "Plan: {$plan}";
+				break;
+				
+			case 'transaction_declined':
+				$amount = $details['amount'] ?? '';
+				$reason = $details['reason'] ?? '';
+				$description = "Declined payment";
+				if ($amount) $additionalInfo[] = "Amount: \${$amount}";
+				if ($reason) $additionalInfo[] = "Reason: {$reason}";
+				break;
+				
+			case 'wallet_updated':
+				$walletName = $details['wallet_name'] ?? '';
+				$currency = $details['currency'] ?? '';
+				$description = "Updated wallet settings";
+				if ($walletName) $additionalInfo[] = "Wallet: {$walletName}";
+				if ($currency) $additionalInfo[] = "Currency: {$currency}";
+				break;
+		}
+		
+		// Add user info if available
+		if (isset($details['user_name'])) {
+			$additionalInfo[] = "User: {$details['user_name']}";
+		}
+		if (isset($details['user_email'])) {
+			$additionalInfo[] = "Email: {$details['user_email']}";
+		}
+		
+		// Add IP and browser info
+		if ($r['ip_address']) {
+			$additionalInfo[] = "IP: {$r['ip_address']}";
+		}
+		
+		// Parse user agent for browser info
+		$browserInfo = '';
+		if ($r['user_agent']) {
+			if (strpos($r['user_agent'], 'Chrome') !== false) {
+				$browserInfo = 'Chrome';
+			} elseif (strpos($r['user_agent'], 'Firefox') !== false) {
+				$browserInfo = 'Firefox';
+			} elseif (strpos($r['user_agent'], 'Safari') !== false) {
+				$browserInfo = 'Safari';
+			} elseif (strpos($r['user_agent'], 'Edge') !== false) {
+				$browserInfo = 'Edge';
+			} else {
+				$browserInfo = 'Unknown Browser';
+			}
+		}
+		
 		return [
 			'id' => $r['id'],
 			'admin_name' => $r['admin_name'],
 			'action' => $action,
-			'details' => $r['details'],
+			'action_text' => $actionText,
+			'description' => $description,
+			'additional_info' => $additionalInfo,
+			'browser' => $browserInfo,
+			'details' => $details,
 			'created_at' => $r['created_at'],
+			'target_type' => $r['target_type'],
+			'target_user_id' => $r['target_user_id']
 		];
 	}, $rows ?: []);
+	
 	echo json_encode(['success' => true, 'activity' => $activity]);
 }
 
