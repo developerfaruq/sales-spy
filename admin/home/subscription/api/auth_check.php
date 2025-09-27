@@ -13,4 +13,13 @@ if (!isset($_SESSION['admin_id'])) {
     exit;
 }
 
+try {
+    $stmt = $pdo->prepare("SELECT logo_path FROM platform_settings WHERE id = 1 LIMIT 1");
+    $stmt->execute();
+    $row = $stmt->fetch(PDO::FETCH_ASSOC);
+    $logoPath = '/admin/home/settings/'.$row['logo_path'];
+  } catch (PDOException $e) {
+    echo "Error: " . $e->getMessage();
+  }
+
 ?>

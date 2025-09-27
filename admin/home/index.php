@@ -12,6 +12,14 @@ if (isset($_SESSION['admin_id'])) {
     }
 }
 
+try {
+  $stmt = $pdo->prepare("SELECT logo_path FROM platform_settings WHERE id = 1 LIMIT 1");
+  $stmt->execute();
+  $row = $stmt->fetch(PDO::FETCH_ASSOC);
+  $logoPath = '/admin/home/settings/'.$row['logo_path'];
+} catch (PDOException $e) {
+  echo "Error: " . $e->getMessage();
+}
 
 $avatarUrl = "https://ui-avatars.com/api/?name=" . 
                  urlencode( $adminName ) . 
@@ -303,7 +311,7 @@ $activeSubscriptions = $pdo->query("SELECT COUNT(*) FROM subscriptions WHERE sta
             class="w-10 h-10 flex items-center justify-center text-gray-500 hover:text-primary mr-2">
             <i class="ri-menu-line ri-lg"></i>
           </button>
-          <div class="font-['Pacifico'] text-xl text-primary">Sales-Spy</div>
+          <div class="font-['Pacifico'] text-xl text-primary"><img src="<?php echo htmlspecialchars($logoPath); ?>" alt="Platform Logo" width="150"></div>
           <span class="ml-4 text-lg font-medium hidden md:block">Admin Dashboard</span>
         </div>
         <div class="flex items-center space-x-4">

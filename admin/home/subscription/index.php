@@ -31,32 +31,7 @@ $activeSubscriptions = $pdo->query("SELECT COUNT(*) FROM subscriptions WHERE sta
     <title>Admin Dashboard</title>
     <script src="https://cdn.tailwindcss.com/3.4.16"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-  <!-- Resume Subscription Modal -->
-  <div id="resume-subscription-modal" class="modal">
-    <div class="modal-content">
-      <div class="flex items-center justify-between mb-4">
-        <h3 class="text-lg font-medium text-gray-800">Resume Subscription</h3>
-        <button class="modal-close text-gray-400 hover:text-gray-500">
-          <i class="ri-close-line ri-lg"></i>
-        </button>
-      </div>
-      <div class="space-y-4">
-        <div class="flex items-center">
-          <div class="w-12 h-12 rounded-full bg-green-100 text-green-600 flex items-center justify-center">
-            <i class="ri-play-circle-line ri-lg"></i>
-          </div>
-          <div class="ml-4">
-            <h4 class="text-lg font-medium text-gray-800">Resume this subscription?</h4>
-            <p class="text-sm text-gray-500">The user will regain access to premium features immediately.</p>
-          </div>
-        </div>
-        <div class="flex items-center justify-end space-x-3 pt-4 border-t">
-          <button type="button" class="px-4 py-2 border border-gray-200 text-gray-600 rounded-button whitespace-nowrap hover:bg-gray-50 modal-close">Cancel</button>
-          <button type="button" id="confirm-resume-subscription" class="px-4 py-2 bg-green-600 text-white rounded-button whitespace-nowrap hover:bg-green-700">Resume Subscription</button>
-        </div>
-      </div>
-    </div>
-  </div>
+  
   <script>
       tailwind.config = {
         theme: {
@@ -366,7 +341,7 @@ $activeSubscriptions = $pdo->query("SELECT COUNT(*) FROM subscriptions WHERE sta
           >
             <i class="ri-menu-line ri-lg"></i>
           </button>
-          <div class="font-['Pacifico'] text-xl text-primary">Sales-Spy</div>
+          <div class="font-['Pacifico'] text-xl text-primary"><img src="<?php echo htmlspecialchars($logoPath); ?>" alt="Platform Logo" width="150"></div>
           <span class="ml-4 text-lg font-medium hidden md:block"
             >Admin Dashboard</span
           >
@@ -931,7 +906,32 @@ $activeSubscriptions = $pdo->query("SELECT COUNT(*) FROM subscriptions WHERE sta
             </form>
         </div>
     </div>
-
+    <!-- Resume Subscription Modal -->
+  <div id="resume-subscription-modal" class="modal">
+    <div class="modal-content">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="text-lg font-medium text-gray-800">Resume Subscription</h3>
+        <button class="modal-close text-gray-400 hover:text-gray-500">
+          <i class="ri-close-line ri-lg"></i>
+        </button>
+      </div>
+      <div class="space-y-4">
+        <div class="flex items-center">
+          <div class="w-12 h-12 rounded-full bg-green-100 text-green-600 flex items-center justify-center">
+            <i class="ri-play-circle-line ri-lg"></i>
+          </div>
+          <div class="ml-4">
+            <h4 class="text-lg font-medium text-gray-800">Resume this subscription?</h4>
+            <p class="text-sm text-gray-500">The user will regain access to premium features immediately.</p>
+          </div>
+        </div>
+        <div class="flex items-center justify-end space-x-3 pt-4 border-t">
+          <button type="button" class="px-4 py-2 border border-gray-200 text-gray-600 rounded-button whitespace-nowrap hover:bg-gray-50 modal-close">Cancel</button>
+          <button type="button" id="confirm-resume-subscription" class="px-4 py-2 bg-green-600 text-white rounded-button whitespace-nowrap hover:bg-green-700">Resume Subscription</button>
+        </div>
+      </div>
+    </div>
+  </div>
     <!-- Toast Notification -->
     <div id="toast-notification" class="fixed top-4 right-4 px-4 py-3 rounded-lg text-white transform transition-transform duration-300 translate-x-full z-50">
     </div>

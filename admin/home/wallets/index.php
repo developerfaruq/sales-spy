@@ -335,7 +335,7 @@ $avatarUrl = "https://ui-avatars.com/api/?name=" .
           >
             <i class="ri-menu-line ri-lg"></i>
           </button>
-          <div class="font-['Pacifico'] text-xl text-primary">Sales-Spy</div>
+          <div class="font-['Pacifico'] text-xl text-primary"><img src="<?php echo htmlspecialchars($logoPath); ?>" alt="Platform Logo" width="150"></div>
           <span class="ml-4 text-lg font-medium hidden md:block"
             >Admin Dashboard</span
           >

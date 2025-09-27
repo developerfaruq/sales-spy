@@ -1,8 +1,15 @@
 <?php
-// modal.php - UPDATED VERSION FOR DYNAMIC PLANS
+
 require '../../../config/db.php';
 require '../../../home/subscription/api/auth_check.php';
 
+ 
+    
+    
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\SMTP;
+use PHPMailer\PHPMailer\Exception;
+require_once '../../../../vendor/autoload.php';
 header('Content-Type: application/json');
 if (!isset($_SESSION['admin_id'])) {
 	http_response_code(401);
@@ -189,6 +196,9 @@ function updateTransactionStatus($pdo) {
         return;
     }
     
+    // Get platform notification settings
+    $notification_settings = getPlatformNotificationSettings($pdo);
+    
     $pdo->beginTransaction();
     
     try {
@@ -196,24 +206,31 @@ function updateTransactionStatus($pdo) {
         $stmt = $pdo->prepare("UPDATE transactions SET status = ? WHERE id = ?");
         $stmt->execute([$new_status, $transaction_id]);
         
-        // If approved, handle subscription logic
-        if ($new_status === 'success') {
-            // Get transaction details
-            $stmt = $pdo->prepare("
-                SELECT t.*, u.email, u.full_name 
-                FROM transactions t 
-                JOIN users u ON t.user_id = u.id 
-                WHERE t.id = ?
-            ");
-            $stmt->execute([$transaction_id]);
-            $transaction = $stmt->fetch(PDO::FETCH_ASSOC);
+        // Get transaction details
+        $stmt = $pdo->prepare("
+            SELECT t.*, u.email, u.full_name 
+            FROM transactions t 
+            JOIN users u ON t.user_id = u.id 
+            WHERE t.id = ?
+        ");
+        $stmt->execute([$transaction_id]);
+        $transaction = $stmt->fetch(PDO::FETCH_ASSOC);
+        
+        if ($transaction) {
+            // Determine plan based on amount from database
+            $plan_info = getPlanByAmount($pdo, $transaction['amount']);
             
-            if ($transaction) {
-                // Determine plan based on amount from database
-                $plan_info = getPlanByAmount($pdo, $transaction['amount']);
-                
+            // Handle subscription logic based on status
+            $email_sent = false;
+            
+            if ($new_status === 'success') {
                 // Update or create subscription
                 updateUserSubscription($pdo, $transaction['user_id'], $plan_info);
+                
+                // Send success notification email if enabled
+                if ($notification_settings['notify_payment_success']) {
+                    $email_sent = sendPaymentNotification($transaction, $plan_info, 'success');
+                }
                 
                 // Log admin action
                 logAdminAction($pdo, $_SESSION['admin_id'], 'transaction_approved', $transaction['user_id'], [
@@ -221,13 +238,48 @@ function updateTransactionStatus($pdo) {
                     'amount' => $transaction['amount'],
                     'plan' => $plan_info['plan_name'],
                     'user_name' => $transaction['full_name'],
-                    'user_email' => $transaction['email']
+                    'user_email' => $transaction['email'],
+                    'notification_enabled' => $notification_settings['notify_payment_success'] ? 'yes' : 'no',
+                    'notification_sent' => $email_sent ? 'yes' : 'no'
+                ]);
+            } elseif ($new_status === 'failed') {
+                // Send failure notification email if enabled
+                if ($notification_settings['notify_payment_failed']) {
+                    $email_sent = sendPaymentNotification($transaction, $plan_info, 'failed');
+                }
+                
+                // Log admin action
+                logAdminAction($pdo, $_SESSION['admin_id'], 'transaction_rejected', $transaction['user_id'], [
+                    'transaction_id' => $transaction_id,
+                    'amount' => $transaction['amount'],
+                    'plan' => $plan_info['plan_name'],
+                    'user_name' => $transaction['full_name'],
+                    'user_email' => $transaction['email'],
+                    'notification_enabled' => $notification_settings['notify_payment_failed'] ? 'yes' : 'no',
+                    'notification_sent' => $email_sent ? 'yes' : 'no'
                 ]);
             }
         }
         
         $pdo->commit();
-        echo json_encode(['success' => true, 'message' => 'Transaction updated successfully']);
+        
+        // Response message based on notification settings
+        $message = 'Transaction updated successfully';
+        if ($new_status === 'success') {
+            if ($notification_settings['notify_payment_success']) {
+                $message .= $email_sent ? ' and success notification sent to user' : ' but failed to send notification email';
+            } else {
+                $message .= ' (success notifications disabled)';
+            }
+        } elseif ($new_status === 'failed') {
+            if ($notification_settings['notify_payment_failed']) {
+                $message .= $email_sent ? ' and failure notification sent to user' : ' but failed to send notification email';
+            } else {
+                $message .= ' (failure notifications disabled)';
+            }
+        }
+        
+        echo json_encode(['success' => true, 'message' => $message]);
         
     } catch (Exception $e) {
         $pdo->rollBack();
@@ -345,7 +397,184 @@ function getDateCondition($date_filter) {
     }
 }
 
-// NEW: Dynamic plan determination based on database
+// NEW: Get platform notification settings
+function getPlatformNotificationSettings($pdo) {
+    $stmt = $pdo->prepare("
+        SELECT notify_payment_success, notify_payment_failed, platform_name
+        FROM platform_settings 
+        WHERE id = 1
+    ");
+    $stmt->execute();
+    $settings = $stmt->fetch(PDO::FETCH_ASSOC);
+    
+    // Default settings if not found
+    if (!$settings) {
+        return [
+            'notify_payment_success' => 1,
+            'notify_payment_failed' => 1,
+            'platform_name' => 'Sales-Spy'
+        ];
+    }
+    
+    return $settings;
+}
+
+
+function sendPaymentNotification($transaction, $plan_info, $status) {
+ 
+   
+    
+    try {
+        // Get platform settings for platform name
+        global $pdo;
+        $platform_settings = getPlatformNotificationSettings($pdo);
+        $platform_name = $platform_settings['platform_name'];
+        
+        // Get email configuration from database or config file
+        $email_config = getEmailConfig($pdo);
+        
+        $user_name = $transaction['full_name'];
+        $amount = $transaction['amount'];
+        $order_id = $transaction['order_id'];
+        $plan_name = ucfirst($plan_info['plan_name']);
+        
+        // Create PHPMailer instance
+        $mail = new PHPMailer(true);
+        
+        // Server settings
+        $mail->isSMTP();
+        $mail->Host       = $email_config['smtp_host'];
+        $mail->SMTPAuth   = true;
+        $mail->Username   = $email_config['smtp_username'];
+        $mail->Password   = $email_config['smtp_password'];
+        $mail->SMTPSecure = ($email_config['smtp_encryption'] === 'tls') ? PHPMailer::ENCRYPTION_STARTTLS : PHPMailer::ENCRYPTION_SMTPS;
+        $mail->Port       = $email_config['smtp_port'];
+        
+        // Recipients
+        $mail->setFrom($email_config['from_email'], $platform_name);
+        $mail->addAddress($transaction['email'], $user_name);
+        $mail->addReplyTo($email_config['reply_to_email'], $platform_name);
+        
+        // Content
+        $mail->isHTML(true);
+        
+        if ($status === 'success') {
+            $mail->Subject = "Payment Confirmed - $platform_name Subscription";
+            $mail->Body = "
+                <html>
+                <head>
+                    <title>Payment Confirmation</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+                        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+                        .header { background-color: #28a745; color: white; padding: 20px; text-align: center; }
+                        .content { padding: 20px; background-color: #f8f9fa; }
+                        .details-box { background-color: white; padding: 15px; border-left: 4px solid #28a745; margin: 20px 0; }
+                        .footer { text-align: center; padding: 20px; font-size: 12px; color: #666; }
+                    </style>
+                </head>
+                <body>
+                    <div class='container'>
+                        <div class='header'>
+                            <h2>Payment Confirmed!</h2>
+                        </div>
+                        <div class='content'>
+                            <p>Dear $user_name,</p>
+                            <p>Your payment has been successfully processed and your subscription is now active.</p>
+                            
+                            <div class='details-box'>
+                                <h3>Payment Details:</h3>
+                                <p><strong>Order ID:</strong> $order_id</p>
+                                <p><strong>Amount:</strong> $amount</p>
+                                <p><strong>Plan:</strong> $plan_name</p>
+                                <p><strong>Status:</strong> <span style='color: #28a745;'>Active</span></p>
+                            </div>
+                            
+                            <p>You can now access all features included in your $plan_name plan.</p>
+                            <p>Thank you for choosing $platform_name!</p>
+                        </div>
+                        <div class='footer'>
+                            <p>Best regards,<br>The $platform_name Team</p>
+                        </div>
+                    </div>
+                </body>
+                </html>
+            ";
+        } else { // failed
+            $mail->Subject = "Payment Failed - $platform_name";
+            $mail->Body = "
+                <html>
+                <head>
+                    <title>Payment Failed</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+                        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+                        .header { background-color: #dc3545; color: white; padding: 20px; text-align: center; }
+                        .content { padding: 20px; background-color: #f8f9fa; }
+                        .details-box { background-color: white; padding: 15px; border-left: 4px solid #dc3545; margin: 20px 0; }
+                        .footer { text-align: center; padding: 20px; font-size: 12px; color: #666; }
+                    </style>
+                </head>
+                <body>
+                    <div class='container'>
+                        <div class='header'>
+                            <h2>Payment Failed</h2>
+                        </div>
+                        <div class='content'>
+                            <p>Dear $user_name,</p>
+                            <p>Unfortunately, we were unable to process your payment for your $platform_name subscription.</p>
+                            
+                            <div class='details-box'>
+                                <h3>Payment Details:</h3>
+                                <p><strong>Order ID:</strong> $order_id</p>
+                                <p><strong>Amount:</strong> $amount</p>
+                                <p><strong>Plan:</strong> $plan_name</p>
+                                <p><strong>Status:</strong> <span style='color: #dc3545;'>Failed</span></p>
+                            </div>
+                            
+                            <p>Please check your payment details and try again, or contact our support team for assistance.</p>
+                        </div>
+                        <div class='footer'>
+                            <p>Best regards,<br>The $platform_name Team</p>
+                        </div>
+                    </div>
+                </body>
+                </html>
+            ";
+        }
+        
+        // Send the email
+        $mail->send();
+        
+        return true;
+        
+    } catch (Exception $e) {
+        // Log the error for debugging
+        error_log("Email sending failed: " . $mail->ErrorInfo);
+        return false;
+    }
+}
+
+// NEW: Get email configuration
+function getEmailConfig($pdo) {
+    // You can either store email config in database or use a config file
+    // Option 1: From database (if you have an email_settings table)
+    $config_path = '../../../config/email_config.php';
+    $emailConfig = require $config_path;
+    
+   
+    return [
+        'smtp_host' => $emailConfig['smtp']['host'], // Change to your SMTP server
+        'smtp_username' => $emailConfig['smtp']['username'], // Change to your email
+        'smtp_password' =>  $emailConfig['smtp']['password'], // Change to your password/app password
+        'smtp_port' => $emailConfig['smtp']['port'],
+        'smtp_encryption' => $emailConfig['smtp']['encryption'], // or 'ssl'
+        'from_email' => $emailConfig['smtp']['username'],
+        'reply_to_email' => 'support@yourdomain.com'
+    ];
+}
+
+// Dynamic plan determination based on database
 function getPlanByAmount($pdo, $amount) {
     $amount = floatval($amount);
     
@@ -372,7 +601,7 @@ function getPlanByAmount($pdo, $amount) {
     return $selected_plan;
 }
 
-// UPDATED: Use plan info from database
+// Use plan info from database
 function updateUserSubscription($pdo, $user_id, $plan_info) {
     if (!$plan_info) return;
     
