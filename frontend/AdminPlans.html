@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -29,18 +30,10 @@
     </script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
-      rel="stylesheet"
-    />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap"
-      rel="stylesheet"
-    />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css"
-    />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.5.0/echarts.min.js"></script>
     <style>
       :where([class^="ri-"])::before {
@@ -99,11 +92,11 @@
         border-radius: 50%;
       }
 
-      input:checked + .switch-slider {
+      input:checked+.switch-slider {
         background-color: #3366ff;
       }
 
-      input:checked + .switch-slider:before {
+      input:checked+.switch-slider:before {
         transform: translateX(20px);
       }
 
@@ -131,7 +124,7 @@
         border-radius: 4px;
       }
 
-      .custom-checkbox input:checked ~ .checkbox-mark {
+      .custom-checkbox input:checked~.checkbox-mark {
         background-color: #3366ff;
         border-color: #3366ff;
       }
@@ -142,7 +135,7 @@
         display: none;
       }
 
-      .custom-checkbox input:checked ~ .checkbox-mark:after {
+      .custom-checkbox input:checked~.checkbox-mark:after {
         display: block;
       }
 
@@ -180,7 +173,7 @@
         border-radius: 50%;
       }
 
-      .custom-radio input:checked ~ .radio-mark {
+      .custom-radio input:checked~.radio-mark {
         background-color: #fff;
         border-color: #3366ff;
       }
@@ -191,7 +184,7 @@
         display: none;
       }
 
-      .custom-radio input:checked ~ .radio-mark:after {
+      .custom-radio input:checked~.radio-mark:after {
         display: block;
       }
 
@@ -306,39 +299,176 @@
     <header class="bg-white shadow-sm fixed top-0 left-0 right-0 z-30">
       <div class="flex items-center justify-between px-4 h-16">
         <div class="flex items-center">
-          <button
-            id="sidebar-toggle"
-            class="w-10 h-10 flex items-center justify-center text-gray-500 hover:text-primary mr-2"
-          >
+          <button id="sidebar-toggle"
+            class="w-10 h-10 flex items-center justify-center text-gray-500 hover:text-primary mr-2">
             <i class="ri-menu-line ri-lg"></i>
           </button>
           <div class="font-['Pacifico'] text-xl text-primary">Sales-Spy</div>
-          <span class="ml-4 text-lg font-medium hidden md:block"
-            >Admin Dashboard</span
-          >
+          <span class="ml-4 text-lg font-medium hidden md:block">Admin Dashboard</span>
         </div>
         <div class="flex items-center space-x-4">
           <div class="relative">
-            <button
-              id="notification-btn"
-              class="w-10 h-10 flex items-center justify-center text-gray-500 hover:text-primary relative"
-            >
-              <i class="ri-notification-3-line ri-lg"></i>
-              <span
-                class="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full"
-              ></span>
-            </button>
+            <div class="relative group" id="notification-dropdown-wrapper">
+              <button id="notification-btn"
+                class="w-10 h-10 flex items-center justify-center text-gray-500 hover:text-primary relative transition-colors duration-200">
+                <i class="ri-notification-3-line ri-lg"></i>
+                <span id="notification-count"
+                  class="absolute top-1.5 right-1.5 min-w-[14px] h-4 px-0.5 bg-red-500 text-white text-[10px] font-semibold rounded-full flex items-center justify-center transition-all duration-200">0</span>
+              </button>
+              <!-- Dropdown -->
+              <div id="notification-dropdown"
+                class="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-lg border border-gray-100 z-40 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-all duration-200 translate-y-2 group-hover:translate-y-0">
+                <div class="py-2 px-4 border-b border-gray-100 flex items-center justify-between">
+                  <span class="font-medium text-gray-800 text-base">Notifications</span>
+                  <button id="mark-all-read"
+                    class="text-xs text-primary hover:underline focus:outline-none transition-colors duration-150">Mark
+                    all as read</button>
+                </div>
+                <ul id="notification-list" class="max-h-72 overflow-y-auto divide-y divide-gray-100">
+                  <!-- Notifications will be rendered here -->
+                </ul>
+                <div class="py-2 px-4 text-center">
+                  <a href="AdminNotifications.html"
+                    class="inline-block px-4 py-2 bg-primary text-white rounded-button text-sm font-medium hover:bg-blue-700 transition-colors duration-200">See
+                    more</a>
+                </div>
+              </div>
+            </div>
+            <script>
+              // Dynamic notifications array (simulate fetching from backend)
+              let notifications = [];
+
+              // Store timeouts for each notification
+              let notificationTimeouts = {};
+
+              // Simulate fetching notifications from backend (replace with real fetch in production)
+              function fetchNotifications() {
+                setTimeout(() => {
+                  notifications = [
+                    {
+                      id: 1,
+                      text: "New payment received from Emma Brown.",
+                      time: "2 min ago",
+                      read: false,
+                    },
+                    {
+                      id: 2,
+                      text: "Subscription for Robert Johnson is about to expire.",
+                      time: "10 min ago",
+                      read: false,
+                    },
+                    {
+                      id: 3,
+                      text: "David Miller upgraded to Pro plan.",
+                      time: "30 min ago",
+                      read: false,
+                    },
+                    {
+                      id: 4,
+                      text: "Jessica Thompson's payment failed.",
+                      time: "1 hour ago",
+                      read: false,
+                    },
+                    {
+                      id: 5,
+                      text: "Sarah Wilson added a new wallet.",
+                      time: "2 hours ago",
+                      read: false,
+                    },
+                    {
+                      id: 6,
+                      text: "Ava Lee requested support.",
+                      time: "3 hours ago",
+                      read: true,
+                    },
+                  ];
+                  renderNotifications();
+                }, 200);
+              }
+
+              function renderNotifications() {
+                const list = document.getElementById("notification-list");
+                const count = document.getElementById("notification-count");
+                // Only show unread or recently marked-as-read notifications (pending removal)
+                const visibleNotifications = notifications.filter(n => !n.read);
+                count.textContent = visibleNotifications.length;
+                count.style.display = visibleNotifications.length > 0 ? "flex" : "none";
+                if (visibleNotifications.length === 0) {
+                  list.innerHTML = `<li class="px-4 py-6 text-center text-gray-400 text-sm">All clear, nothing to see here</li>`;
+                  return;
+                }
+                list.innerHTML = visibleNotifications.slice(0, 5).map(n => `
+                  <li class="flex items-start gap-3 px-4 py-3 bg-white hover:bg-blue-50 transition-colors duration-150" data-id="${n.id}">
+                  <div class="flex-1">
+                  <p class="text-sm text-gray-800">${n.text}</p>
+                  <span class="text-xs text-gray-400">${n.time}</span>
+                  </div>
+                  <div class="flex flex-col gap-1 ml-2">
+                  <button class="mark-read-btn px-2 py-1 text-xs font-medium text-primary border border-primary rounded transition hover:bg-primary hover:text-white focus:outline-none" data-id="${n.id}">Mark as read</button>
+                  </div>
+                  </li>
+                `).join('');
+              }
+
+              // Dropdown hover for accessibility (also works on click for mobile)
+              const dropdown = document.getElementById("notification-dropdown");
+              const wrapper = document.getElementById("notification-dropdown-wrapper");
+              let dropdownTimeout;
+              wrapper.addEventListener("mouseenter", () => {
+                clearTimeout(dropdownTimeout);
+                dropdown.classList.add("opacity-100", "pointer-events-auto", "translate-y-0");
+                dropdown.classList.remove("opacity-0", "pointer-events-none", "translate-y-2");
+              });
+              wrapper.addEventListener("mouseleave", () => {
+                dropdownTimeout = setTimeout(() => {
+                  dropdown.classList.remove("opacity-100", "pointer-events-auto", "translate-y-0");
+                  dropdown.classList.add("opacity-0", "pointer-events-none", "translate-y-2");
+                }, 120);
+              });
+
+              // Mark as read logic with delayed removal
+              document.addEventListener("click", function (e) {
+                if (e.target.classList.contains("mark-read-btn")) {
+                  const id = +e.target.getAttribute("data-id");
+                  const n = notifications.find(n => n.id === id);
+                  if (n && !n.read) {
+                    n.read = true;
+                    renderNotifications();
+                    // Remove after 2 seconds
+                    if (notificationTimeouts[id]) clearTimeout(notificationTimeouts[id]);
+                    notificationTimeouts[id] = setTimeout(() => {
+                      notifications = notifications.filter(notif => notif.id !== id);
+                      delete notificationTimeouts[id];
+                      renderNotifications();
+                    }, 2000);
+                  }
+                }
+                if (e.target.id === "mark-all-read") {
+                  // Mark all as read and remove after 2 seconds
+                  const idsToRemove = notifications.filter(n => !n.read).map(n => n.id);
+                  notifications.forEach(n => { n.read = true; });
+                  renderNotifications();
+                  idsToRemove.forEach(id => {
+                    if (notificationTimeouts[id]) clearTimeout(notificationTimeouts[id]);
+                    notificationTimeouts[id] = setTimeout(() => {
+                      notifications = notifications.filter(notif => notif.id !== id);
+                      delete notificationTimeouts[id];
+                      renderNotifications();
+                    }, 2000);
+                  });
+                }
+              });
+
+              // Initial fetch and render
+              fetchNotifications();
+            </script>
           </div>
           <div class="relative">
             <button id="user-menu-btn" class="flex items-center">
-              <div
-                class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center"
-              >
+              <div class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center">
                 <span class="text-sm font-medium">JD</span>
               </div>
-              <span class="ml-2 text-sm font-medium hidden md:block"
-                >John Doe</span
-              >
+              <span class="ml-2 text-sm font-medium hidden md:block">John Doe</span>
               <i class="ri-arrow-down-s-line ml-1 text-gray-500"></i>
             </button>
           </div>
@@ -392,16 +522,12 @@
       });
     </script>
     <!-- Sidebar -->
-    <aside
-      id="sidebar"
-      class="fixed top-16 left-0 bottom-0 w-64 bg-white shadow-sm z-20 sidebar-transition transform md:translate-x-0 -translate-x-full"
-    >
+    <aside id="sidebar"
+      class="fixed top-16 left-0 bottom-0 w-64 bg-white shadow-sm z-20 sidebar-transition transform md:translate-x-0 -translate-x-full">
       <div class="h-full flex flex-col">
         <div class="p-4 border-b">
           <div class="flex items-center">
-            <div
-              class="w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center"
-            >
+            <div class="w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center">
               <span class="text-sm font-medium">JD</span>
             </div>
             <div class="ml-3">
@@ -413,10 +539,8 @@
         <nav class="flex-1 p-4 overflow-y-auto">
           <ul class="space-y-1">
             <li>
-              <a
-                href="AdminUsers.html"
-                class="nav-link w-full flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-600 hover:text-primary hover:bg-blue-50"
-              >
+              <a href="AdminUsers.html"
+                class="nav-link w-full flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-600 hover:text-primary hover:bg-blue-50">
                 <div class="w-5 h-5 flex items-center justify-center mr-3">
                   <i class="ri-user-line"></i>
                 </div>
@@ -424,10 +548,8 @@
               </a>
             </li>
             <li>
-              <a
-                href="AdminSubscriptions.html"
-                class="nav-link w-full flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-600 hover:text-primary hover:bg-blue-50"
-              >
+              <a href="AdminSubscriptions.html"
+                class="nav-link w-full flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-600 hover:text-primary hover:bg-blue-50">
                 <div class="w-5 h-5 flex items-center justify-center mr-3">
                   <i class="ri-vip-crown-line"></i>
                 </div>
@@ -435,10 +557,8 @@
               </a>
             </li>
             <li>
-              <a
-                href="AdminWallets.html"
-                class="nav-link w-full flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-600 hover:text-primary hover:bg-blue-50"
-              >
+              <a href="AdminWallets.html"
+                class="nav-link w-full flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-600 hover:text-primary hover:bg-blue-50">
                 <div class="w-5 h-5 flex items-center justify-center mr-3">
                   <i class="ri-wallet-3-line"></i>
                 </div>
@@ -446,10 +566,8 @@
               </a>
             </li>
             <li>
-              <a
-                href="AdminPlans.html"
-                class="nav-link w-full flex items-center px-3 py-2 text-sm font-medium rounded-md text-primary bg-blue-50"
-              >
+              <a href="AdminPlans.html"
+                class="nav-link w-full flex items-center px-3 py-2 text-sm font-medium rounded-md text-primary bg-blue-50">
                 <div class="w-5 h-5 flex items-center justify-center mr-3">
                   <i class="ri-list-settings-line"></i>
                 </div>
@@ -457,10 +575,8 @@
               </a>
             </li>
             <li>
-              <a
-                href="AdminPayments.html"
-                class="nav-link w-full flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-600 hover:text-primary hover:bg-blue-50"
-              >
+              <a href="AdminPayments.html"
+                class="nav-link w-full flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-600 hover:text-primary hover:bg-blue-50">
                 <div class="w-5 h-5 flex items-center justify-center mr-3">
                   <i class="ri-exchange-dollar-line"></i>
                 </div>
@@ -468,10 +584,8 @@
               </a>
             </li>
             <li>
-              <a
-                href="AdminPending.html"
-                class="nav-link w-full flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-600 hover:text-primary hover:bg-blue-50"
-              >
+              <a href="AdminPending.html"
+                class="nav-link w-full flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-600 hover:text-primary hover:bg-blue-50">
                 <div class="w-5 h-5 flex items-center justify-center mr-3">
                   <i class="ri-time-line"></i>
                 </div>
@@ -479,10 +593,35 @@
               </a>
             </li>
             <li>
-              <a
-                href="AdminSettings.html"
-                class="nav-link w-full flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-600 hover:text-primary hover:bg-blue-50"
-              >
+              <a href="AdminNotifications.html"
+                class="nav-link w-full flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-600 hover:text-primary hover:bg-blue-50">
+                <div class="w-5 h-5 flex items-center justify-center mr-3">
+                  <i class="ri-notification-3-line"></i>
+                </div>
+                <span>Notifications</span>
+              </a>
+            </li>
+            <li>
+              <a href="Admins.html"
+                class="nav-link w-full flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-600 hover:text-primary hover:bg-blue-50">
+                <div class="w-5 h-5 flex items-center justify-center mr-3">
+                  <i class="ri-shield-user-line"></i>
+                </div>
+                <span>Admins</span>
+              </a>
+            </li>
+            <li>
+              <a href="AdminHistory.html"
+                class="nav-link w-full flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-600 hover:text-primary hover:bg-blue-50">
+                <div class="w-5 h-5 flex items-center justify-center mr-3">
+                  <i class="ri-history-line"></i>
+                </div>
+                <span>Admin History</span>
+              </a>
+            </li>
+            <li>
+              <a href="AdminSettings.html"
+                class="nav-link w-full flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-600 hover:text-primary hover:bg-blue-50">
                 <div class="w-5 h-5 flex items-center justify-center mr-3">
                   <i class="ri-settings-3-line"></i>
                 </div>
@@ -492,10 +631,8 @@
           </ul>
         </nav>
         <div class="p-4 border-t">
-          <button
-            id="logout-btn"
-            class="w-full flex items-center px-3 py-2 text-sm font-medium rounded-md text-red-600 hover:bg-red-50"
-          >
+          <button id="logout-btn"
+            class="w-full flex items-center px-3 py-2 text-sm font-medium rounded-md text-red-600 hover:bg-red-50">
             <div class="w-5 h-5 flex items-center justify-center mr-3">
               <i class="ri-logout-box-line"></i>
             </div>
@@ -506,9 +643,7 @@
         <div id="logout-modal" class="modal">
           <div class="modal-content max-w-sm">
             <div class="flex items-center mb-4">
-              <div
-                class="w-12 h-12 rounded-full bg-red-100 text-red-600 flex items-center justify-center mr-4"
-              >
+              <div class="w-12 h-12 rounded-full bg-red-100 text-red-600 flex items-center justify-center mr-4">
                 <i class="ri-logout-box-line ri-lg"></i>
               </div>
               <h3 class="text-lg font-medium text-gray-800">
@@ -516,16 +651,12 @@
               </h3>
             </div>
             <div class="flex items-center justify-end space-x-3">
-              <button
-                id="cancel-logout"
-                class="px-4 py-2 border border-gray-200 text-gray-600 rounded-button whitespace-nowrap hover:bg-gray-50"
-              >
+              <button id="cancel-logout"
+                class="px-4 py-2 border border-gray-200 text-gray-600 rounded-button whitespace-nowrap hover:bg-gray-50">
                 Cancel
               </button>
-              <button
-                id="confirm-logout"
-                class="px-4 py-2 bg-red-600 text-white rounded-button whitespace-nowrap hover:bg-red-700"
-              >
+              <button id="confirm-logout"
+                class="px-4 py-2 bg-red-600 text-white rounded-button whitespace-nowrap hover:bg-red-700">
                 Logout
               </button>
             </div>
@@ -536,7 +667,7 @@
 
     <main class="pt-16 md:pl-64 transition-all duration-300">
       <div id="users-tab" class="tab-content p-4 md:p-6">
-      <div class="mb-6 relative">
+        <div class="mb-6 relative">
           <h1 class="text-2xl font-semibold text-gray-800">User Plans</h1>
           <p class="text-sm text-gray-500 mt-1">
             Manage all plan pricing and features
@@ -545,904 +676,701 @@
         <!-- User Plans Management Section -->
         <div class="bg-white rounded-lg shadow-sm p-4 sm:p-6 mb-8 relative">
           <!-- Edit Icon Button -->
-          
+
           <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-6 gap-3">
             <div class="flex items-center gap-2">
               <h2 class="text-lg font-semibold text-gray-800 mr-2">Plans Management</h2>
-              <button
-                type="button"
-                id="edit-plans-btn"
+              <button type="button" id="edit-plans-btn"
                 class="inline-flex items-center justify-center text-gray-400 hover:text-primary transition-colors rounded-full p-2 border border-transparent hover:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
-                title="Edit Plan cards"
-                style="height: 36px; width: 36px;"
-              >
+                title="Edit Plan cards" style="height: 36px; width: 36px;">
                 <i class="ri-edit-2-line ri-lg"></i>
               </button>
             </div>
             <div class="flex items-center gap-2">
-              <button
-                type="button"
+              <button type="button"
                 class="bg-primary text-white px-4 py-2 rounded-button hover:bg-blue-700 flex items-center gap-2 shadow-sm transition disabled:opacity-60"
-                id="add-new-plan-btn"
-                disabled
-                tabindex="-1"
-              >
+                id="add-new-plan-btn" disabled tabindex="-1">
                 <i class="ri-add-line"></i> Add New Plan
               </button>
-              <button
-                type="button"
+              <button type="button"
                 class="bg-primary text-white px-4 py-2 rounded-button hover:bg-blue-700 flex items-center gap-2 shadow-sm transition disabled:opacity-60"
-                id="add-tag-btn"
-                disabled
-                tabindex="-1"
-              >
+                id="add-tag-btn" disabled tabindex="-1">
                 <i class="ri-price-tag-3-line"></i> Add Tag
               </button>
             </div>
           </div>
           <div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="plans-container">
             <!-- Basic Plan Card -->
-            <div class="glassmorphism bg-white rounded-lg border border-gray-200 p-6 relative plan-card" id="plan-basic" data-plan="basic">
+            <div class="glassmorphism bg-white rounded-lg border border-gray-200 p-6 relative plan-card" id="plan-basic"
+              data-plan="basic">
               <div class="flex flex-wrap gap-2 absolute -top-3 left-4" id="basic-tags-container"></div>
               <!-- Editable Plan Name -->
-              <input
-          type="text"
-          class="w-full text-xl font-semibold text-gray-900 mb-2 px-2 py-1 rounded border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20"
-          value="Basic"
-          id="basic-name"
-          disabled
-              />
+              <input type="text"
+                class="w-full text-xl font-semibold text-gray-900 mb-2 px-2 py-1 rounded border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20"
+                value="Basic" id="basic-name" disabled />
               <div class="mb-4 flex items-baseline">
-          <span class="text-3xl font-bold text-primary">$20</span>
-          <span class="text-gray-500 ml-1">/mo</span>
+                <span class="text-3xl font-bold text-primary">$20</span>
+                <span class="text-gray-500 ml-1">/mo</span>
               </div>
               <ul class="space-y-2 mb-6 text-sm text-gray-600" id="basic-features">
-          <li class="flex items-center gap-2">
-            <input
-              type="text"
-              class="w-full flex-1 px-2 py-1 rounded border border-gray-300"
-              value="Up to 2,000 credits/month"
-              disabled
-            />
-            <button
-              type="button"
-              class="text-red-500 hover:text-red-700 remove-feature-btn"
-              disabled
-              tabindex="-1"
-            >
-              <i class="ri-delete-bin-line"></i>
-            </button>
-          </li>
-          <li class="flex items-center gap-2">
-            <input
-              type="text"
-              class="w-full flex-1 px-2 py-1 rounded border border-gray-300"
-              value="Email support"
-              disabled
-            />
-            <button
-              type="button"
-              class="text-red-500 hover:text-red-700 remove-feature-btn"
-              disabled
-              tabindex="-1"
-            >
-              <i class="ri-delete-bin-line"></i>
-            </button>
-          </li>
-          <li class="flex items-center gap-2">
-            <input
-              type="text"
-              class="w-full flex-1 px-2 py-1 rounded border border-gray-300"
-              value="Access to dashboard"
-              disabled
-            />
-            <button
-              type="button"
-              class="text-red-500 hover:text-red-700 remove-feature-btn"
-              disabled
-              tabindex="-1"
-            >
-              <i class="ri-delete-bin-line"></i>
-            </button>
-          </li>
-          <li class="flex items-center gap-2">
-            <input
-              type="text"
-              class="w-full flex-1 px-2 py-1 rounded border border-gray-300"
-              value="Single website integration"
-              disabled
-            />
-            <button
-              type="button"
-              class="text-red-500 hover:text-red-700 remove-feature-btn"
-              disabled
-              tabindex="-1"
-            >
-              <i class="ri-delete-bin-line"></i>
-            </button>
-          </li>
+                <li class="flex items-center gap-2">
+                  <input type="text" class="w-full flex-1 px-2 py-1 rounded border border-gray-300"
+                    value="Up to 2,000 credits/month" disabled />
+                  <button type="button" class="text-red-500 hover:text-red-700 remove-feature-btn" disabled
+                    tabindex="-1">
+                    <i class="ri-delete-bin-line"></i>
+                  </button>
+                </li>
+                <li class="flex items-center gap-2">
+                  <input type="text" class="w-full flex-1 px-2 py-1 rounded border border-gray-300"
+                    value="Email support" disabled />
+                  <button type="button" class="text-red-500 hover:text-red-700 remove-feature-btn" disabled
+                    tabindex="-1">
+                    <i class="ri-delete-bin-line"></i>
+                  </button>
+                </li>
+                <li class="flex items-center gap-2">
+                  <input type="text" class="w-full flex-1 px-2 py-1 rounded border border-gray-300"
+                    value="Access to dashboard" disabled />
+                  <button type="button" class="text-red-500 hover:text-red-700 remove-feature-btn" disabled
+                    tabindex="-1">
+                    <i class="ri-delete-bin-line"></i>
+                  </button>
+                </li>
+                <li class="flex items-center gap-2">
+                  <input type="text" class="w-full flex-1 px-2 py-1 rounded border border-gray-300"
+                    value="Single website integration" disabled />
+                  <button type="button" class="text-red-500 hover:text-red-700 remove-feature-btn" disabled
+                    tabindex="-1">
+                    <i class="ri-delete-bin-line"></i>
+                  </button>
+                </li>
               </ul>
-              <button
-          type="button"
-          class="text-primary text-xs font-medium mb-4 add-feature-btn"
-          data-target="basic-features"
-          disabled
-          tabindex="-1"
-              >
-          <i class="ri-add-line"></i> Add Feature
+              <button type="button" class="text-primary text-xs font-medium mb-4 add-feature-btn"
+                data-target="basic-features" disabled tabindex="-1">
+                <i class="ri-add-line"></i> Add Feature
               </button>
               <div class="flex flex-col gap-2">
-          <label class="block text-xs text-gray-500 mb-1">Credits</label>
-          <input
-            type="number"
-            min="0"
-            class="w-full px-3 py-2 rounded-lg border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 text-sm"
-            value="2000"
-            id="basic-credits"
-            disabled
-          />
-          <label class="block text-xs text-gray-500 mb-1"
-            >Monthly Price (USDT)</label
-          >
-          <input
-            type="number"
-            min="0"
-            class="w-full px-3 py-2 rounded-lg border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 text-sm"
-            value="20"
-            id="basic-price"
-            disabled
-          />
+                <label class="block text-xs text-gray-500 mb-1">Credits</label>
+                <input type="number" min="0"
+                  class="w-full px-3 py-2 rounded-lg border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 text-sm"
+                  value="2000" id="basic-credits" disabled />
+                <label class="block text-xs text-gray-500 mb-1">Monthly Price (USDT)</label>
+                <input type="number" min="0"
+                  class="w-full px-3 py-2 rounded-lg border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 text-sm"
+                  value="20" id="basic-price" disabled />
               </div>
               <button
-          class="mt-4 w-full py-2 bg-primary text-white rounded-button hover:bg-blue-700 transition-colors save-plan-btn"
-          data-plan="basic"
-          disabled
-          tabindex="-1"
-              >
-          Save Basic Plan
+                class="mt-4 w-full py-2 bg-primary text-white rounded-button hover:bg-blue-700 transition-colors save-plan-btn"
+                data-plan="basic" disabled tabindex="-1">
+                Save Basic Plan
               </button>
             </div>
             <!-- Pro Plan Card -->
-            <div class="glassmorphism bg-white rounded-lg border border-gray-200 p-6 relative flex flex-col plan-card" id="plan-pro" data-plan="pro">
+            <div class="glassmorphism bg-white rounded-lg border border-gray-200 p-6 relative flex flex-col plan-card"
+              id="plan-pro" data-plan="pro">
               <div class="flex flex-wrap gap-2 absolute -top-3 right-4" id="pro-tags-container"></div>
-              <input
-          type="text"
-          class="w-full text-xl font-semibold text-gray-900 mb-2 px-2 py-1 rounded border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20"
-          value="Pro"
-          id="pro-name"
-          disabled
-              />
+              <input type="text"
+                class="w-full text-xl font-semibold text-gray-900 mb-2 px-2 py-1 rounded border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20"
+                value="Pro" id="pro-name" disabled />
               <div class="mb-4 flex items-baseline">
-          <span class="text-3xl font-bold text-primary">$50</span>
-          <span class="text-gray-500 ml-1">/mo</span>
+                <span class="text-3xl font-bold text-primary">$50</span>
+                <span class="text-gray-500 ml-1">/mo</span>
               </div>
               <ul class="space-y-2 mb-6 text-sm text-gray-600" id="pro-features">
-          <li class="flex items-center gap-2">
-            <input
-              type="text"
-              class="w-full flex-1 px-2 py-1 rounded border border-gray-300"
-              value="Up to 10,000 credits/month"
-              disabled
-            />
-            <button
-              type="button"
-              class="text-red-500 hover:text-red-700 remove-feature-btn"
-              disabled
-              tabindex="-1"
-            >
-              <i class="ri-delete-bin-line"></i>
-            </button>
-          </li>
-          <li class="flex items-center gap-2">
-            <input
-              type="text"
-              class="w-full flex-1 px-2 py-1 rounded border border-gray-300"
-              value="Priority email support"
-              disabled
-            />
-            <button
-              type="button"
-              class="text-red-500 hover:text-red-700 remove-feature-btn"
-              disabled
-              tabindex="-1"
-            >
-              <i class="ri-delete-bin-line"></i>
-            </button>
-          </li>
-          <li class="flex items-center gap-2">
-            <input
-              type="text"
-              class="w-full flex-1 px-2 py-1 rounded border border-gray-300"
-              value="Multiple website integrations"
-              disabled
-            />
-            <button
-              type="button"
-              class="text-red-500 hover:text-red-700 remove-feature-btn"
-              disabled
-              tabindex="-1"
-            >
-              <i class="ri-delete-bin-line"></i>
-            </button>
-          </li>
-          <li class="flex items-center gap-2">
-            <input
-              type="text"
-              class="w-full flex-1 px-2 py-1 rounded border border-gray-300"
-              value="Advanced analytics"
-              disabled
-            />
-            <button
-              type="button"
-              class="text-red-500 hover:text-red-700 remove-feature-btn"
-              disabled
-              tabindex="-1"
-            >
-              <i class="ri-delete-bin-line"></i>
-            </button>
-          </li>
+                <li class="flex items-center gap-2">
+                  <input type="text" class="w-full flex-1 px-2 py-1 rounded border border-gray-300"
+                    value="Up to 10,000 credits/month" disabled />
+                  <button type="button" class="text-red-500 hover:text-red-700 remove-feature-btn" disabled
+                    tabindex="-1">
+                    <i class="ri-delete-bin-line"></i>
+                  </button>
+                </li>
+                <li class="flex items-center gap-2">
+                  <input type="text" class="w-full flex-1 px-2 py-1 rounded border border-gray-300"
+                    value="Priority email support" disabled />
+                  <button type="button" class="text-red-500 hover:text-red-700 remove-feature-btn" disabled
+                    tabindex="-1">
+                    <i class="ri-delete-bin-line"></i>
+                  </button>
+                </li>
+                <li class="flex items-center gap-2">
+                  <input type="text" class="w-full flex-1 px-2 py-1 rounded border border-gray-300"
+                    value="Multiple website integrations" disabled />
+                  <button type="button" class="text-red-500 hover:text-red-700 remove-feature-btn" disabled
+                    tabindex="-1">
+                    <i class="ri-delete-bin-line"></i>
+                  </button>
+                </li>
+                <li class="flex items-center gap-2">
+                  <input type="text" class="w-full flex-1 px-2 py-1 rounded border border-gray-300"
+                    value="Advanced analytics" disabled />
+                  <button type="button" class="text-red-500 hover:text-red-700 remove-feature-btn" disabled
+                    tabindex="-1">
+                    <i class="ri-delete-bin-line"></i>
+                  </button>
+                </li>
               </ul>
-              <button
-          type="button"
-          class="text-primary text-xs font-medium mb-4 add-feature-btn"
-          data-target="pro-features"
-          disabled
-          tabindex="-1"
-              >
-          <i class="ri-add-line"></i> Add Feature
+              <button type="button" class="text-primary text-xs font-medium mb-4 add-feature-btn"
+                data-target="pro-features" disabled tabindex="-1">
+                <i class="ri-add-line"></i> Add Feature
               </button>
               <div class="flex flex-col gap-2">
-          <label class="block text-xs text-gray-500 mb-1">Credits</label>
-          <input
-            type="number"
-            min="0"
-            class="w-full px-3 py-2 rounded-lg border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 text-sm"
-            value="10000"
-            id="pro-credits"
-            disabled
-          />
-          <label class="block text-xs text-gray-500 mb-1"
-            >Monthly Price (USDT)</label
-          >
-          <input
-            type="number"
-            min="0"
-            class="w-full px-3 py-2 rounded-lg border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 text-sm"
-            value="50"
-            id="pro-price"
-            disabled
-          />
+                <label class="block text-xs text-gray-500 mb-1">Credits</label>
+                <input type="number" min="0"
+                  class="w-full px-3 py-2 rounded-lg border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 text-sm"
+                  value="10000" id="pro-credits" disabled />
+                <label class="block text-xs text-gray-500 mb-1">Monthly Price (USDT)</label>
+                <input type="number" min="0"
+                  class="w-full px-3 py-2 rounded-lg border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 text-sm"
+                  value="50" id="pro-price" disabled />
               </div>
               <button
-          class="mt-4 w-full py-2 bg-primary text-white rounded-button hover:bg-blue-700 transition-colors save-plan-btn"
-          data-plan="pro"
-          disabled
-          tabindex="-1"
-              >
-          Save Pro Plan
+                class="mt-4 w-full py-2 bg-primary text-white rounded-button hover:bg-blue-700 transition-colors save-plan-btn"
+                data-plan="pro" disabled tabindex="-1">
+                Save Pro Plan
               </button>
             </div>
             <!-- Enterprise Plan Card -->
-            <div class="glassmorphism bg-white rounded-lg border border-gray-200 p-6 flex flex-col relative plan-card" id="plan-enterprise" data-plan="enterprise">
+            <div class="glassmorphism bg-white rounded-lg border border-gray-200 p-6 flex flex-col relative plan-card"
+              id="plan-enterprise" data-plan="enterprise">
               <div class="flex flex-wrap gap-2 absolute -top-3 left-4" id="enterprise-tags-container"></div>
-              <input
-          type="text"
-          class="w-full text-xl font-semibold text-gray-900 mb-2 px-2 py-1 rounded border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20"
-          value="Enterprise"
-          id="enterprise-name"
-          disabled
-              />
+              <input type="text"
+                class="w-full text-xl font-semibold text-gray-900 mb-2 px-2 py-1 rounded border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20"
+                value="Enterprise" id="enterprise-name" disabled />
               <div class="mb-4 flex items-baseline">
-          <span class="text-3xl font-bold text-primary">Custom</span>
-          <span class="text-gray-500 ml-1"></span>
+                <span class="text-3xl font-bold text-primary">Custom</span>
+                <span class="text-gray-500 ml-1"></span>
               </div>
               <ul class="space-y-2 mb-6 text-sm text-gray-600" id="enterprise-features">
-          <li class="flex items-center gap-2">
-            <input
-              type="text"
-              class="w-full flex-1 px-2 py-1 rounded border border-gray-300"
-              value="Unlimited credits"
-              disabled
-            />
-            <button
-              type="button"
-              class="text-red-500 hover:text-red-700 remove-feature-btn"
-              disabled
-              tabindex="-1"
-            >
-              <i class="ri-delete-bin-line"></i>
-            </button>
-          </li>
-          <li class="flex items-center gap-2">
-            <input
-              type="text"
-              class="w-full flex-1 px-2 py-1 rounded border border-gray-300"
-              value="Dedicated support"
-              disabled
-            />
-            <button
-              type="button"
-              class="text-red-500 hover:text-red-700 remove-feature-btn"
-              disabled
-              tabindex="-1"
-            >
-              <i class="ri-delete-bin-line"></i>
-            </button>
-          </li>
-          <li class="flex items-center gap-2">
-            <input
-              type="text"
-              class="w-full flex-1 px-2 py-1 rounded border border-gray-300"
-              value="Custom integrations"
-              disabled
-            />
-            <button
-              type="button"
-              class="text-red-500 hover:text-red-700 remove-feature-btn"
-              disabled
-              tabindex="-1"
-            >
-              <i class="ri-delete-bin-line"></i>
-            </button>
-          </li>
-          <li class="flex items-center gap-2">
-            <input
-              type="text"
-              class="w-full flex-1 px-2 py-1 rounded border border-gray-300"
-              value="Team management"
-              disabled
-            />
-            <button
-              type="button"
-              class="text-red-500 hover:text-red-700 remove-feature-btn"
-              disabled
-              tabindex="-1"
-            >
-              <i class="ri-delete-bin-line"></i>
-            </button>
-          </li>
+                <li class="flex items-center gap-2">
+                  <input type="text" class="w-full flex-1 px-2 py-1 rounded border border-gray-300"
+                    value="Unlimited credits" disabled />
+                  <button type="button" class="text-red-500 hover:text-red-700 remove-feature-btn" disabled
+                    tabindex="-1">
+                    <i class="ri-delete-bin-line"></i>
+                  </button>
+                </li>
+                <li class="flex items-center gap-2">
+                  <input type="text" class="w-full flex-1 px-2 py-1 rounded border border-gray-300"
+                    value="Dedicated support" disabled />
+                  <button type="button" class="text-red-500 hover:text-red-700 remove-feature-btn" disabled
+                    tabindex="-1">
+                    <i class="ri-delete-bin-line"></i>
+                  </button>
+                </li>
+                <li class="flex items-center gap-2">
+                  <input type="text" class="w-full flex-1 px-2 py-1 rounded border border-gray-300"
+                    value="Custom integrations" disabled />
+                  <button type="button" class="text-red-500 hover:text-red-700 remove-feature-btn" disabled
+                    tabindex="-1">
+                    <i class="ri-delete-bin-line"></i>
+                  </button>
+                </li>
+                <li class="flex items-center gap-2">
+                  <input type="text" class="w-full flex-1 px-2 py-1 rounded border border-gray-300"
+                    value="Team management" disabled />
+                  <button type="button" class="text-red-500 hover:text-red-700 remove-feature-btn" disabled
+                    tabindex="-1">
+                    <i class="ri-delete-bin-line"></i>
+                  </button>
+                </li>
               </ul>
-              <button
-          type="button"
-          class="text-primary text-xs font-medium mb-4 add-feature-btn"
-          data-target="enterprise-features"
-          disabled
-          tabindex="-1"
-              >
-          <i class="ri-add-line"></i> Add Feature
+              <button type="button" class="text-primary text-xs font-medium mb-4 add-feature-btn"
+                data-target="enterprise-features" disabled tabindex="-1">
+                <i class="ri-add-line"></i> Add Feature
               </button>
               <div class="flex flex-col gap-2">
-          <label class="block text-xs text-gray-500 mb-1">Credits</label>
-          <input
-            type="number"
-            min="0"
-            class="w-full px-3 py-2 rounded-lg border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 text-sm"
-            placeholder="Enter credits"
-            id="enterprise-credits"
-            disabled
-          />
-          <label class="block text-xs text-gray-500 mb-1"
-            >Monthly Price (USDT)</label
-          >
-          <input
-            type="number"
-            min="0"
-            class="w-full px-3 py-2 rounded-lg border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 text-sm"
-            placeholder="Custom price"
-            id="enterprise-price"
-            disabled
-          />
+                <label class="block text-xs text-gray-500 mb-1">Credits</label>
+                <input type="number" min="0"
+                  class="w-full px-3 py-2 rounded-lg border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 text-sm"
+                  placeholder="Enter credits" id="enterprise-credits" disabled />
+                <label class="block text-xs text-gray-500 mb-1">Monthly Price (USDT)</label>
+                <input type="number" min="0"
+                  class="w-full px-3 py-2 rounded-lg border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 text-sm"
+                  placeholder="Custom price" id="enterprise-price" disabled />
               </div>
               <button
-          class="mt-4 w-full py-2 bg-primary text-white rounded-button hover:bg-blue-700 transition-colors save-plan-btn"
-          data-plan="enterprise"
-          disabled
-          tabindex="-1"
-              >
-          Save Enterprise Plan
+                class="mt-4 w-full py-2 bg-primary text-white rounded-button hover:bg-blue-700 transition-colors save-plan-btn"
+                data-plan="enterprise" disabled tabindex="-1">
+                Save Enterprise Plan
               </button>
             </div>
           </div>
-            <!-- Save All Changes Button -->
-            <div class="flex justify-end mt-8"></div>
-            <button
-              id="save-all-changes-btn"
-              class="bg-green-600 text-white px-6 py-3 rounded-button hover:bg-green-700 flex items-center gap-2 font-semibold shadow transition"
-              style="display:none"
-            >
-              <i class="ri-save-3-line"></i> Save All Changes
-            </button>
-            </div>
-          </div>
+          <!-- Save All Changes Button -->
+          <div class="flex justify-end mt-8"></div>
+          <button id="save-all-changes-btn"
+            class="bg-green-600 text-white px-6 py-3 rounded-button hover:bg-green-700 flex items-center gap-2 font-semibold shadow transition"
+            style="display:none">
+            <i class="ri-save-3-line"></i> Save All Changes
+          </button>
+        </div>
+      </div>
 
-          <!-- Save All Changes Confirmation Modal -->
-          <div id="save-all-confirm-modal" class="modal">
-            <div class="modal-content max-w-lg">
-            <div class="flex items-center mb-4">
-              <div class="w-12 h-12 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center mr-4">
+      <!-- Save All Changes Confirmation Modal -->
+      <div id="save-all-confirm-modal" class="modal">
+        <div class="modal-content max-w-lg">
+          <div class="flex items-center mb-4">
+            <div class="w-12 h-12 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center mr-4">
               <i class="ri-question-line ri-lg"></i>
-              </div>
-              <h3 class="text-lg font-medium text-gray-800">
+            </div>
+            <h3 class="text-lg font-medium text-gray-800">
               Confirm All Changes
-              </h3>
-            </div>
-            <p class="text-sm text-gray-600 mb-4">
-              Please review the following changes before saving. This will update all plans for all users.
-            </p>
-            <ul id="all-changes-list" class="mb-6 text-sm text-gray-700 list-disc pl-6 max-h-60 overflow-y-auto"></ul>
-            <div class="flex items-center justify-end space-x-3">
-              <button
-              id="cancel-save-all-btn"
-              class="px-4 py-2 border border-gray-200 text-gray-600 rounded-button whitespace-nowrap hover:bg-gray-50"
-              >
-              Cancel
-              </button>
-              <button
-              id="confirm-save-all-btn"
-              class="px-4 py-2 bg-green-600 text-white rounded-button whitespace-nowrap hover:bg-green-700"
-              >
-              Yes, Save All
-              </button>
-            </div>
-            </div>
-          </div>
-          <!-- Save All Success Modal -->
-          <div id="save-all-success-modal" class="modal">
-            <div class="modal-content max-w-sm flex flex-col items-center">
-            <div class="w-16 h-16 rounded-full bg-green-100 text-green-600 flex items-center justify-center mb-4">
-              <i class="ri-checkbox-circle-line ri-2x"></i>
-            </div>
-            <h3 class="text-lg font-medium text-gray-800 mb-2">
-              All Changes Saved!
             </h3>
-            <p class="text-sm text-gray-600 mb-6 text-center">
-              All your plan changes have been successfully saved.
-            </p>
-            <button
-              id="save-all-success-close-btn"
-              class="px-4 py-2 bg-primary text-white rounded-button whitespace-nowrap hover:bg-blue-700"
-            >
-              Close
-            </button>
-            </div>
           </div>
-          <script>
-          // --- Save All Changes Logic ---
-          // Track changes in a global array
-          let allPlanChanges = [];
+          <p class="text-sm text-gray-600 mb-4">
+            Please review the following changes before saving. This will update all plans for all users.
+          </p>
+          <ul id="all-changes-list" class="mb-6 text-sm text-gray-700 list-disc pl-6 max-h-60 overflow-y-auto"></ul>
+          <div class="flex items-center justify-end space-x-3">
+            <button id="cancel-save-all-btn"
+              class="px-4 py-2 border border-gray-200 text-gray-600 rounded-button whitespace-nowrap hover:bg-gray-50">
+              Cancel
+            </button>
+            <button id="confirm-save-all-btn"
+              class="px-4 py-2 bg-green-600 text-white rounded-button whitespace-nowrap hover:bg-green-700">
+              Yes, Save All
+            </button>
+          </div>
+        </div>
+      </div>
+      <!-- Save All Success Modal -->
+      <div id="save-all-success-modal" class="modal">
+        <div class="modal-content max-w-sm flex flex-col items-center">
+          <div class="w-16 h-16 rounded-full bg-green-100 text-green-600 flex items-center justify-center mb-4">
+            <i class="ri-checkbox-circle-line ri-2x"></i>
+          </div>
+          <h3 class="text-lg font-medium text-gray-800 mb-2">
+            All Changes Saved!
+          </h3>
+          <p class="text-sm text-gray-600 mb-6 text-center">
+            All your plan changes have been successfully saved.
+          </p>
+          <button id="save-all-success-close-btn"
+            class="px-4 py-2 bg-primary text-white rounded-button whitespace-nowrap hover:bg-blue-700">
+            Close
+          </button>
+        </div>
+      </div>
+      <script>
+        // --- Save All Changes Logic ---
+        // Track changes in a global array
+        let allPlanChanges = [];
 
-          // Helper to show/hide Save All button
-          function updateSaveAllBtn() {
-            const btn = document.getElementById('save-all-changes-btn');
-            // Always show in edit mode, even if no changes, for demo
-            if (window.editMode) {
+        // Helper to show/hide Save All button
+        function updateSaveAllBtn() {
+          const btn = document.getElementById('save-all-changes-btn');
+          // Always show in edit mode, even if no changes, for demo
+          if (window.editMode) {
             btn.style.display = 'flex';
-            } else {
+          } else {
             btn.style.display = allPlanChanges.length > 0 ? 'flex' : 'none';
-            }
           }
+        }
 
-          // Helper to add a change (dedup by id+desc)
-          function addPlanChange(change) {
-            if (!allPlanChanges.some(c => c.id === change.id && c.desc === change.desc)) {
+        // Helper to add a change (dedup by id+desc)
+        function addPlanChange(change) {
+          if (!allPlanChanges.some(c => c.id === change.id && c.desc === change.desc)) {
             allPlanChanges.push(change);
             updateSaveAllBtn();
-            }
           }
-          // Helper to remove a change by id+desc
-          function removePlanChange(change) {
-            allPlanChanges = allPlanChanges.filter(c => !(c.id === change.id && c.desc === change.desc));
-            updateSaveAllBtn();
-          }
-          // Helper to clear all changes
-          function clearAllPlanChanges() {
-            allPlanChanges = [];
-            updateSaveAllBtn();
-          }
+        }
+        // Helper to remove a change by id+desc
+        function removePlanChange(change) {
+          allPlanChanges = allPlanChanges.filter(c => !(c.id === change.id && c.desc === change.desc));
+          updateSaveAllBtn();
+        }
+        // Helper to clear all changes
+        function clearAllPlanChanges() {
+          allPlanChanges = [];
+          updateSaveAllBtn();
+        }
 
-          // Listen for changes on all plan-card inputs
-          document.addEventListener('DOMContentLoaded', function () {
-            // Plan name, credits, price, features
-            document.querySelectorAll('.plan-card input, .plan-card textarea').forEach(function(input) {
-            input.addEventListener('change', function(e) {
+        // Listen for changes on all plan-card inputs
+        document.addEventListener('DOMContentLoaded', function () {
+          // Plan name, credits, price, features
+          document.querySelectorAll('.plan-card input, .plan-card textarea').forEach(function (input) {
+            input.addEventListener('change', function (e) {
               const card = input.closest('.plan-card');
               if (!card) return;
               const planId = card.id;
               let label = input.previousElementSibling && input.previousElementSibling.textContent
-              ? input.previousElementSibling.textContent
-              : input.placeholder || input.className || input.type;
+                ? input.previousElementSibling.textContent
+                : input.placeholder || input.className || input.type;
               let desc = '';
               if (input.type === 'text' && input.classList.contains('text-xl')) {
-              desc = `Plan name changed to <b>${input.value}</b>`;
+                desc = `Plan name changed to <b>${input.value}</b>`;
               } else if (input.type === 'number') {
-              desc = `${label} set to <b>${input.value}</b>`;
+                desc = `${label} set to <b>${input.value}</b>`;
               } else if (input.type === 'text') {
-              desc = `Feature changed to <b>${input.value}</b>`;
+                desc = `Feature changed to <b>${input.value}</b>`;
               }
               addPlanChange({ id: planId + '-' + input.name + '-' + input.value + '-' + input.dataset.feature, desc });
             });
-            });
-            // Features add/remove
-            document.querySelectorAll('.plan-card ul').forEach(function(ul) {
-            ul.addEventListener('click', function(e) {
+          });
+          // Features add/remove
+          document.querySelectorAll('.plan-card ul').forEach(function (ul) {
+            ul.addEventListener('click', function (e) {
               if (e.target.closest('.remove-feature-btn')) {
-              const li = e.target.closest('li');
-              if (li) {
-          const card = ul.closest('.plan-card');
-          const planId = card.id;
-          const featureInput = li.querySelector('input[type="text"]');
-          if (featureInput) {
-          addPlanChange({ id: planId + '-feature-removed-' + featureInput.value, desc: `Feature <b>${featureInput.value}</b> removed` });
-          }
-              }
+                const li = e.target.closest('li');
+                if (li) {
+                  const card = ul.closest('.plan-card');
+                  const planId = card.id;
+                  const featureInput = li.querySelector('input[type="text"]');
+                  if (featureInput) {
+                    addPlanChange({ id: planId + '-feature-removed-' + featureInput.value, desc: `Feature <b>${featureInput.value}</b> removed` });
+                  }
+                }
               }
             });
-            });
-            // Add feature
-            document.querySelectorAll('.add-feature-btn').forEach(function(btn) {
-            btn.addEventListener('click', function() {
+          });
+          // Add feature
+          document.querySelectorAll('.add-feature-btn').forEach(function (btn) {
+            btn.addEventListener('click', function () {
               const card = btn.closest('.plan-card');
               if (!card) return;
               addPlanChange({ id: card.id + '-feature-added-' + Date.now(), desc: `Feature added` });
             });
-            });
-            // Tag add/remove
-            document.addEventListener('click', function(e) {
+          });
+          // Tag add/remove
+          document.addEventListener('click', function (e) {
             if (e.target.closest('.remove-tag-btn')) {
               const card = e.target.closest('.plan-card');
               if (!card) return;
               addPlanChange({ id: card.id + '-tag-removed', desc: `Tag removed` });
             }
-            });
-            // Tag add (from tag modal)
-            document.getElementById('tag-form').addEventListener('submit', function() {
+          });
+          // Tag add (from tag modal)
+          document.getElementById('tag-form').addEventListener('submit', function () {
             const plan = document.getElementById('tag-plan').value;
             const tagName = document.getElementById('tag-name').value.trim();
             addPlanChange({ id: 'plan-' + plan + '-tag-added-' + tagName, desc: `Tag <b>${tagName}</b> added to ${plan.charAt(0).toUpperCase() + plan.slice(1)}` });
-            });
-
-            // Show Save All button in edit mode
-            window.editMode = false;
-            const editBtn = document.getElementById('edit-plans-btn');
-            editBtn.addEventListener('click', function () {
-            window.editMode = !window.editMode;
-            updateSaveAllBtn();
-            });
           });
 
-          // Save All Changes button click
-          document.getElementById('save-all-changes-btn').addEventListener('click', function() {
-            // Fill the modal with changes
-            const ul = document.getElementById('all-changes-list');
-            ul.innerHTML = '';
-            if (allPlanChanges.length === 0) {
+          // Show Save All button in edit mode
+          window.editMode = false;
+          const editBtn = document.getElementById('edit-plans-btn');
+          editBtn.addEventListener('click', function () {
+            window.editMode = !window.editMode;
+            updateSaveAllBtn();
+          });
+        });
+
+        // Save All Changes button click
+        document.getElementById('save-all-changes-btn').addEventListener('click', function () {
+          // Fill the modal with changes
+          const ul = document.getElementById('all-changes-list');
+          ul.innerHTML = '';
+          if (allPlanChanges.length === 0) {
             ul.innerHTML = '<li>No changes detected.</li>';
-            } else {
+          } else {
             allPlanChanges.forEach(change => {
               const li = document.createElement('li');
               li.innerHTML = change.desc;
               ul.appendChild(li);
             });
-            }
-            document.getElementById('save-all-confirm-modal').classList.add('active');
-            document.body.style.overflow = "hidden";
-          });
-
-          // Cancel Save All
-          document.getElementById('cancel-save-all-btn').addEventListener('click', function() {
-            document.getElementById('save-all-confirm-modal').classList.remove('active');
-            document.body.style.overflow = "";
-          });
-
-          // Confirm Save All
-          document.getElementById('confirm-save-all-btn').addEventListener('click', function() {
-            document.getElementById('save-all-confirm-modal').classList.remove('active');
-            document.getElementById('save-all-success-modal').classList.add('active');
-            document.body.style.overflow = "hidden";
-            // Simulate save, clear changes
-            clearAllPlanChanges();
-          });
-
-          // Close Success Modal
-          document.getElementById('save-all-success-close-btn').addEventListener('click', function() {
-            document.getElementById('save-all-success-modal').classList.remove('active');
-            document.body.style.overflow = "";
-          });
-
-          // If you want to also clear changes after individual plan save, you can call clearAllPlanChanges() there.
-          </script>
-        <script>
-          // Edit mode logic for plan cards
-          document.addEventListener('DOMContentLoaded', function () {
-            const editBtn = document.getElementById('edit-plans-btn');
-            const addPlanBtn = document.getElementById('add-new-plan-btn');
-            const addTagBtn = document.getElementById('add-tag-btn');
-            let editMode = false;
-            function setEditMode(enabled) {
-              // Toggle icon
-              editBtn.innerHTML = enabled
-          ? '<i class="ri-check-line ri-lg"></i>'
-          : '<i class="ri-edit-2-line ri-lg"></i>';
-              editBtn.title = enabled ? "Done Editing" : "Edit Plan cards";
-              // Toggle all inputs/buttons in plan cards
-              document.querySelectorAll('.plan-card input, .plan-card button, .plan-card textarea').forEach(el => {
-          // Don't enable the edit icon itself
-          if (el === editBtn) return;
-          // Only enable/disable if not a remove-plan-btn (for new plans)
-          if (el.classList.contains('remove-plan-btn')) {
-            el.disabled = !enabled;
-            el.tabIndex = enabled ? 0 : -1;
-            return;
           }
-          // Only enable add/remove feature, save, and inputs
-          if (
-            el.tagName === 'INPUT' ||
-            el.classList.contains('add-feature-btn') ||
-            el.classList.contains('remove-feature-btn') ||
-            el.classList.contains('save-plan-btn')
-          ) {
-            el.disabled = !enabled;
-            el.tabIndex = enabled ? 0 : -1;
-          }
-              });
-              // Also toggle add plan and add tag buttons
-              addPlanBtn.disabled = !enabled;
-              addPlanBtn.tabIndex = enabled ? 0 : -1;
-              addTagBtn.disabled = !enabled;
-              addTagBtn.tabIndex = enabled ? 0 : -1;
-            }
-            setEditMode(false);
-            editBtn.addEventListener('click', function () {
-              editMode = !editMode;
-              setEditMode(editMode);
-            });
-          });
-        </script>
+          document.getElementById('save-all-confirm-modal').classList.add('active');
+          document.body.style.overflow = "hidden";
+        });
 
-        <!-- Tag Modal -->
-        <div id="tag-modal" class="modal">
-          <div class="modal-content max-w-sm">
-            <h3 class="text-lg font-medium text-gray-800 mb-4">Add Tag to Plan</h3>
-            <form id="tag-form" class="flex flex-col gap-3">
-              <label class="block text-xs text-gray-500 mb-1">Tag Name</label>
-              <input
-          type="text"
-          class="px-3 py-2 rounded-lg border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 text-sm"
-          id="tag-name"
-          required
-              />
-              <label class="block text-xs text-gray-500 mb-1">Tag Color</label>
-              <div class="flex gap-2 mb-2" id="tag-color-palette">
-          <button type="button" class="w-8 h-8 rounded-full border-2 border-gray-300 focus:border-primary tag-color-btn" style="background:#2563eb" data-color="#2563eb"></button>
-          <button type="button" class="w-8 h-8 rounded-full border-2 border-gray-300 focus:border-primary tag-color-btn" style="background:#22c55e" data-color="#22c55e"></button>
-          <button type="button" class="w-8 h-8 rounded-full border-2 border-gray-300 focus:border-primary tag-color-btn" style="background:#f59e42" data-color="#f59e42"></button>
-          <button type="button" class="w-8 h-8 rounded-full border-2 border-gray-300 focus:border-primary tag-color-btn" style="background:#ef4444" data-color="#ef4444"></button>
-          <button type="button" class="w-8 h-8 rounded-full border-2 border-gray-300 focus:border-primary tag-color-btn" style="background:#6366f1" data-color="#6366f1"></button>
-          <input type="color" id="tag-custom-color" class="w-8 h-8 border-2 border-gray-300 rounded-full" title="Custom color" />
-              </div>
-              <input type="hidden" id="tag-color" value="#2563eb" />
-              <label class="block text-xs text-gray-500 mb-1">Target Plan</label>
-              <select id="tag-plan" class="px-3 py-2 rounded-lg border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 text-sm" required>
-          <option value="basic">Basic</option>
-          <option value="pro">Pro</option>
-          <option value="enterprise">Enterprise</option>
-              </select>
-              <div class="flex items-center justify-end space-x-3 mt-4">
-          <button
-            type="button"
-            class="px-4 py-2 border border-gray-200 text-gray-600 rounded-button whitespace-nowrap hover:bg-gray-50"
-            id="cancel-tag-btn"
-          >
-            Cancel
-          </button>
-          <button
-            type="submit"
-            class="px-4 py-2 bg-primary text-white rounded-button whitespace-nowrap hover:bg-blue-700"
-          >
-            Add Tag
-          </button>
-              </div>
-            </form>
-          </div>
-        </div>
+        // Cancel Save All
+        document.getElementById('cancel-save-all-btn').addEventListener('click', function () {
+          document.getElementById('save-all-confirm-modal').classList.remove('active');
+          document.body.style.overflow = "";
+        });
 
-        <script>
-          // Tag modal logic
-          const tagModal = document.getElementById('tag-modal');
-          const tagForm = document.getElementById('tag-form');
-          let selectedTagColor = "#2563eb";
+        // Confirm Save All
+        document.getElementById('confirm-save-all-btn').addEventListener('click', function () {
+          document.getElementById('save-all-confirm-modal').classList.remove('active');
+          document.getElementById('save-all-success-modal').classList.add('active');
+          document.body.style.overflow = "hidden";
+          // Simulate save, clear changes
+          clearAllPlanChanges();
+        });
 
-          // Open tag modal
-          document.getElementById('add-tag-btn').addEventListener('click', function() {
-            tagModal.classList.add('active');
-            document.body.style.overflow = "hidden";
-            tagForm.reset();
-            document.getElementById('tag-color').value = "#2563eb";
-            selectedTagColor = "#2563eb";
-            // Set first color as selected
-            document.querySelectorAll('.tag-color-btn').forEach(btn => btn.classList.remove('ring', 'ring-offset-2'));
-            document.querySelector('.tag-color-btn[data-color="#2563eb"]').classList.add('ring', 'ring-offset-2');
-            // Update plan select for new plans
-            updateTagPlanOptions();
-          });
+        // Close Success Modal
+        document.getElementById('save-all-success-close-btn').addEventListener('click', function () {
+          document.getElementById('save-all-success-modal').classList.remove('active');
+          document.body.style.overflow = "";
+        });
 
-          // Cancel tag modal
-          document.getElementById('cancel-tag-btn').addEventListener('click', function() {
-            tagModal.classList.remove('active');
-            document.body.style.overflow = "";
-          });
-
-          // Color palette logic
-          document.querySelectorAll('.tag-color-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-              selectedTagColor = btn.getAttribute('data-color');
-              document.getElementById('tag-color').value = selectedTagColor;
-              document.querySelectorAll('.tag-color-btn').forEach(b => b.classList.remove('ring', 'ring-offset-2'));
-              btn.classList.add('ring', 'ring-offset-2');
-            });
-          });
-          document.getElementById('tag-custom-color').addEventListener('input', function() {
-            selectedTagColor = this.value;
-            document.getElementById('tag-color').value = selectedTagColor;
-            document.querySelectorAll('.tag-color-btn').forEach(b => b.classList.remove('ring', 'ring-offset-2'));
-          });
-
-          // Helper to update plan options in tag modal (for new plans)
-          function updateTagPlanOptions() {
-            const select = document.getElementById('tag-plan');
-            // Save current value
-            const current = select.value;
-            // Remove all options
-            select.innerHTML = "";
-            // Find all plan cards
-            document.querySelectorAll('.plan-card').forEach(card => {
-              let planId = card.id.replace('plan-', '');
-              // Try to get plan name from input[type="text"].text-xl or h3
-              let planName = planId.charAt(0).toUpperCase() + planId.slice(1);
-              const nameInput = card.querySelector('input[type="text"].text-xl');
-              if (nameInput && nameInput.value) planName = nameInput.value;
-              else {
-          // fallback for new plans (h3)
-          const h3 = card.querySelector('h3');
-          if (h3 && h3.textContent) planName = h3.textContent;
+        // If you want to also clear changes after individual plan save, you can call clearAllPlanChanges() there.
+      </script>
+      <script>
+        // Edit mode logic for plan cards
+        document.addEventListener('DOMContentLoaded', function () {
+          const editBtn = document.getElementById('edit-plans-btn');
+          const addPlanBtn = document.getElementById('add-new-plan-btn');
+          const addTagBtn = document.getElementById('add-tag-btn');
+          let editMode = false;
+          function setEditMode(enabled) {
+            // Toggle icon
+            editBtn.innerHTML = enabled
+              ? '<i class="ri-check-line ri-lg"></i>'
+              : '<i class="ri-edit-2-line ri-lg"></i>';
+            editBtn.title = enabled ? "Done Editing" : "Edit Plan cards";
+            // Toggle all inputs/buttons in plan cards
+            document.querySelectorAll('.plan-card input, .plan-card button, .plan-card textarea').forEach(el => {
+              // Don't enable the edit icon itself
+              if (el === editBtn) return;
+              // Only enable/disable if not a remove-plan-btn (for new plans)
+              if (el.classList.contains('remove-plan-btn')) {
+                el.disabled = !enabled;
+                el.tabIndex = enabled ? 0 : -1;
+                return;
               }
-              // Add option
-              const opt = document.createElement('option');
-              opt.value = planId;
-              opt.textContent = planName;
-              select.appendChild(opt);
+              // Only enable add/remove feature, save, and inputs
+              if (
+                el.tagName === 'INPUT' ||
+                el.classList.contains('add-feature-btn') ||
+                el.classList.contains('remove-feature-btn') ||
+                el.classList.contains('save-plan-btn')
+              ) {
+                el.disabled = !enabled;
+                el.tabIndex = enabled ? 0 : -1;
+              }
             });
-            // Restore previous value if possible
-            if ([...select.options].some(o => o.value === current)) select.value = current;
+            // Also toggle add plan and add tag buttons
+            addPlanBtn.disabled = !enabled;
+            addPlanBtn.tabIndex = enabled ? 0 : -1;
+            addTagBtn.disabled = !enabled;
+            addTagBtn.tabIndex = enabled ? 0 : -1;
           }
-
-          // Add tag to plan and update border
-          tagForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            const tagName = document.getElementById('tag-name').value.trim();
-            const tagColor = document.getElementById('tag-color').value;
-            const plan = document.getElementById('tag-plan').value;
-            // Find the plan card and tag container
-            const planCard = document.getElementById('plan-' + plan);
-            let tagContainer = planCard.querySelector('.flex.flex-wrap[id$="tags-container"]');
-            // If not found, create and insert
-            if (!tagContainer) {
-              tagContainer = document.createElement('div');
-              tagContainer.className = 'flex flex-wrap gap-2 absolute -top-3 left-4';
-              tagContainer.id = plan + '-tags-container';
-              planCard.insertBefore(tagContainer, planCard.firstChild);
-            }
-            // Remove existing tags and border if any (only one tag at a time)
-            tagContainer.innerHTML = "";
-
-            // Add tag
-            const tag = document.createElement('span');
-            tag.className = 'text-xs font-medium px-3 py-1 rounded-full flex items-center tag-item';
-            tag.style.background = tagColor;
-            tag.style.color = "#fff";
-            tag.innerHTML = `
-              <span class="tag-label">${tagName}</span>
-              <button type="button" class="ml-1 text-white/80 hover:text-red-200 remove-tag-btn" title="Remove Tag"><i class="ri-close-line"></i></button>
-            `;
-            tagContainer.appendChild(tag);
-
-            // Set border color
-            planCard.style.borderColor = tagColor;
-            planCard.style.borderWidth = "2px";
-
-            // Close modal
-            tagModal.classList.remove('active');
-            document.body.style.overflow = "";
+          setEditMode(false);
+          editBtn.addEventListener('click', function () {
+            editMode = !editMode;
+            setEditMode(editMode);
           });
+        });
+      </script>
 
-          // Remove tag and border logic (for all plans, including new ones)
-          document.addEventListener('click', function(e) {
-            if (e.target.closest('.remove-tag-btn')) {
-              // Find the plan card
-              let tagContainer = e.target.closest('.flex.flex-wrap[id$="tags-container"]');
-              if (!tagContainer) return;
-              const planCard = tagContainer.closest('.plan-card');
-              tagContainer.innerHTML = "";
-              planCard.style.borderColor = "#e5e7eb"; // Tailwind gray-200
-              planCard.style.borderWidth = "1px";
-            }
-          });
-
-          // When a new plan is added, update tag modal plan select
-          const plansContainer = document.getElementById('plans-container');
-          const observer = new MutationObserver(updateTagPlanOptions);
-          observer.observe(plansContainer, { childList: true, subtree: false });
-        </script>
-        </div>
-            </div>
-            <!-- Add New Plan Modal -->
-            <div id="add-plan-modal" class="modal">
+      <!-- Tag Modal -->
+      <div id="tag-modal" class="modal">
         <div class="modal-content max-w-sm">
-          <h3 class="text-lg font-medium text-gray-800 mb-4">Add New Plan</h3>
-          <form id="add-plan-form" class="flex flex-col gap-3">
-            <label class="block text-xs text-gray-500 mb-1">Plan Name</label>
-            <input
-              type="text"
+          <h3 class="text-lg font-medium text-gray-800 mb-4">Add Tag to Plan</h3>
+          <form id="tag-form" class="flex flex-col gap-3">
+            <label class="block text-xs text-gray-500 mb-1">Tag Name</label>
+            <input type="text"
               class="px-3 py-2 rounded-lg border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 text-sm"
-              id="new-plan-name"
-              required
-            />
-            <label class="block text-xs text-gray-500 mb-1">Credits</label>
-            <input
-              type="number"
-              min="0"
+              id="tag-name" required />
+            <label class="block text-xs text-gray-500 mb-1">Tag Color</label>
+            <div class="flex gap-2 mb-2" id="tag-color-palette">
+              <button type="button"
+                class="w-8 h-8 rounded-full border-2 border-gray-300 focus:border-primary tag-color-btn"
+                style="background:#2563eb" data-color="#2563eb"></button>
+              <button type="button"
+                class="w-8 h-8 rounded-full border-2 border-gray-300 focus:border-primary tag-color-btn"
+                style="background:#22c55e" data-color="#22c55e"></button>
+              <button type="button"
+                class="w-8 h-8 rounded-full border-2 border-gray-300 focus:border-primary tag-color-btn"
+                style="background:#f59e42" data-color="#f59e42"></button>
+              <button type="button"
+                class="w-8 h-8 rounded-full border-2 border-gray-300 focus:border-primary tag-color-btn"
+                style="background:#ef4444" data-color="#ef4444"></button>
+              <button type="button"
+                class="w-8 h-8 rounded-full border-2 border-gray-300 focus:border-primary tag-color-btn"
+                style="background:#6366f1" data-color="#6366f1"></button>
+              <input type="color" id="tag-custom-color" class="w-8 h-8 border-2 border-gray-300 rounded-full"
+                title="Custom color" />
+            </div>
+            <input type="hidden" id="tag-color" value="#2563eb" />
+            <label class="block text-xs text-gray-500 mb-1">Target Plan</label>
+            <select id="tag-plan"
               class="px-3 py-2 rounded-lg border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 text-sm"
-              id="new-plan-credits"
-              required
-            />
-            <label class="block text-xs text-gray-500 mb-1">Monthly Price (USDT)</label>
-            <input
-              type="number"
-              min="0"
-              class="px-3 py-2 rounded-lg border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 text-sm"
-              id="new-plan-price"
-              required
-            />
-            <label class="block text-xs text-gray-500 mb-1">Features</label>
-            <ul id="new-plan-features" class="space-y-2 mb-2 text-sm text-gray-600"></ul>
-            <button
-              type="button"
-              class="text-primary text-xs font-medium add-feature-btn"
-              id="add-new-plan-feature"
-            >
-              <i class="ri-add-line"></i> Add Feature
-            </button>
+              required>
+              <option value="basic">Basic</option>
+              <option value="pro">Pro</option>
+              <option value="enterprise">Enterprise</option>
+            </select>
             <div class="flex items-center justify-end space-x-3 mt-4">
-              <button
-          type="button"
-          class="px-4 py-2 border border-gray-200 text-gray-600 rounded-button whitespace-nowrap hover:bg-gray-50"
-          id="cancel-add-plan"
-              >
-          Cancel
+              <button type="button"
+                class="px-4 py-2 border border-gray-200 text-gray-600 rounded-button whitespace-nowrap hover:bg-gray-50"
+                id="cancel-tag-btn">
+                Cancel
               </button>
-              <button
-          type="submit"
-          class="px-4 py-2 bg-primary text-white rounded-button whitespace-nowrap hover:bg-blue-700"
-              >
-          Add Plan
+              <button type="submit"
+                class="px-4 py-2 bg-primary text-white rounded-button whitespace-nowrap hover:bg-blue-700">
+                Add Tag
               </button>
             </div>
           </form>
         </div>
+      </div>
+
+      <script>
+        // Tag modal logic
+        const tagModal = document.getElementById('tag-modal');
+        const tagForm = document.getElementById('tag-form');
+        let selectedTagColor = "#2563eb";
+
+        // Open tag modal
+        document.getElementById('add-tag-btn').addEventListener('click', function () {
+          tagModal.classList.add('active');
+          document.body.style.overflow = "hidden";
+          tagForm.reset();
+          document.getElementById('tag-color').value = "#2563eb";
+          selectedTagColor = "#2563eb";
+          // Set first color as selected
+          document.querySelectorAll('.tag-color-btn').forEach(btn => btn.classList.remove('ring', 'ring-offset-2'));
+          document.querySelector('.tag-color-btn[data-color="#2563eb"]').classList.add('ring', 'ring-offset-2');
+          // Update plan select for new plans
+          updateTagPlanOptions();
+        });
+
+        // Cancel tag modal
+        document.getElementById('cancel-tag-btn').addEventListener('click', function () {
+          tagModal.classList.remove('active');
+          document.body.style.overflow = "";
+        });
+
+        // Color palette logic
+        document.querySelectorAll('.tag-color-btn').forEach(btn => {
+          btn.addEventListener('click', function () {
+            selectedTagColor = btn.getAttribute('data-color');
+            document.getElementById('tag-color').value = selectedTagColor;
+            document.querySelectorAll('.tag-color-btn').forEach(b => b.classList.remove('ring', 'ring-offset-2'));
+            btn.classList.add('ring', 'ring-offset-2');
+          });
+        });
+        document.getElementById('tag-custom-color').addEventListener('input', function () {
+          selectedTagColor = this.value;
+          document.getElementById('tag-color').value = selectedTagColor;
+          document.querySelectorAll('.tag-color-btn').forEach(b => b.classList.remove('ring', 'ring-offset-2'));
+        });
+
+        // Helper to update plan options in tag modal (for new plans)
+        function updateTagPlanOptions() {
+          const select = document.getElementById('tag-plan');
+          // Save current value
+          const current = select.value;
+          // Remove all options
+          select.innerHTML = "";
+          // Find all plan cards
+          document.querySelectorAll('.plan-card').forEach(card => {
+            let planId = card.id.replace('plan-', '');
+            // Try to get plan name from input[type="text"].text-xl or h3
+            let planName = planId.charAt(0).toUpperCase() + planId.slice(1);
+            const nameInput = card.querySelector('input[type="text"].text-xl');
+            if (nameInput && nameInput.value) planName = nameInput.value;
+            else {
+              // fallback for new plans (h3)
+              const h3 = card.querySelector('h3');
+              if (h3 && h3.textContent) planName = h3.textContent;
+            }
+            // Add option
+            const opt = document.createElement('option');
+            opt.value = planId;
+            opt.textContent = planName;
+            select.appendChild(opt);
+          });
+          // Restore previous value if possible
+          if ([...select.options].some(o => o.value === current)) select.value = current;
+        }
+
+        // Add tag to plan and update border
+        tagForm.addEventListener('submit', function (e) {
+          e.preventDefault();
+          const tagName = document.getElementById('tag-name').value.trim();
+          const tagColor = document.getElementById('tag-color').value;
+          const plan = document.getElementById('tag-plan').value;
+          // Find the plan card and tag container
+          const planCard = document.getElementById('plan-' + plan);
+          let tagContainer = planCard.querySelector('.flex.flex-wrap[id$="tags-container"]');
+          // If not found, create and insert
+          if (!tagContainer) {
+            tagContainer = document.createElement('div');
+            tagContainer.className = 'flex flex-wrap gap-2 absolute -top-3 left-4';
+            tagContainer.id = plan + '-tags-container';
+            planCard.insertBefore(tagContainer, planCard.firstChild);
+          }
+          // Remove existing tags and border if any (only one tag at a time)
+          tagContainer.innerHTML = "";
+
+          // Add tag
+          const tag = document.createElement('span');
+          tag.className = 'text-xs font-medium px-3 py-1 rounded-full flex items-center tag-item';
+          tag.style.background = tagColor;
+          tag.style.color = "#fff";
+          tag.innerHTML = `
+              <span class="tag-label">${tagName}</span>
+              <button type="button" class="ml-1 text-white/80 hover:text-red-200 remove-tag-btn" title="Remove Tag"><i class="ri-close-line"></i></button>
+            `;
+          tagContainer.appendChild(tag);
+
+          // Set border color
+          planCard.style.borderColor = tagColor;
+          planCard.style.borderWidth = "2px";
+
+          // Close modal
+          tagModal.classList.remove('active');
+          document.body.style.overflow = "";
+        });
+
+        // Remove tag and border logic (for all plans, including new ones)
+        document.addEventListener('click', function (e) {
+          if (e.target.closest('.remove-tag-btn')) {
+            // Find the plan card
+            let tagContainer = e.target.closest('.flex.flex-wrap[id$="tags-container"]');
+            if (!tagContainer) return;
+            const planCard = tagContainer.closest('.plan-card');
+            tagContainer.innerHTML = "";
+            planCard.style.borderColor = "#e5e7eb"; // Tailwind gray-200
+            planCard.style.borderWidth = "1px";
+          }
+        });
+
+        // When a new plan is added, update tag modal plan select
+        const plansContainer = document.getElementById('plans-container');
+        const observer = new MutationObserver(updateTagPlanOptions);
+        observer.observe(plansContainer, { childList: true, subtree: false });
+      </script>
+      </div>
+      </div>
+      <!-- Add New Plan Modal -->
+      <div id="add-plan-modal" class="modal">
+        <div class="modal-content max-w-sm">
+          <h3 class="text-lg font-medium text-gray-800 mb-4">Add New Plan</h3>
+          <form id="add-plan-form" class="flex flex-col gap-3">
+            <label class="block text-xs text-gray-500 mb-1">Plan Name</label>
+            <input type="text"
+              class="px-3 py-2 rounded-lg border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 text-sm"
+              id="new-plan-name" required />
+            <label class="block text-xs text-gray-500 mb-1">Credits</label>
+            <input type="number" min="0"
+              class="px-3 py-2 rounded-lg border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 text-sm"
+              id="new-plan-credits" required />
+            <label class="block text-xs text-gray-500 mb-1">Monthly Price (USDT)</label>
+            <input type="number" min="0"
+              class="px-3 py-2 rounded-lg border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 text-sm"
+              id="new-plan-price" required />
+            <label class="block text-xs text-gray-500 mb-1">Features</label>
+            <ul id="new-plan-features" class="space-y-2 mb-2 text-sm text-gray-600"></ul>
+            <button type="button" class="text-primary text-xs font-medium add-feature-btn" id="add-new-plan-feature">
+              <i class="ri-add-line"></i> Add Feature
+            </button>
+            <div class="flex items-center justify-end space-x-3 mt-4">
+              <button type="button"
+                class="px-4 py-2 border border-gray-200 text-gray-600 rounded-button whitespace-nowrap hover:bg-gray-50"
+                id="cancel-add-plan">
+                Cancel
+              </button>
+              <button type="submit"
+                class="px-4 py-2 bg-primary text-white rounded-button whitespace-nowrap hover:bg-blue-700">
+                Add Plan
+              </button>
             </div>
-            <!-- Confirmation Modal for Plans -->
-            <div id="plan-confirm-modal" class="modal">
+          </form>
+        </div>
+      </div>
+      <!-- Confirmation Modal for Plans -->
+      <div id="plan-confirm-modal" class="modal">
         <div class="modal-content max-w-sm">
           <div class="flex items-center mb-4">
-            <div
-              class="w-12 h-12 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center mr-4"
-            >
+            <div class="w-12 h-12 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center mr-4">
               <i class="ri-question-line ri-lg"></i>
             </div>
-            <h3
-              class="text-lg font-medium text-gray-800"
-              id="plan-confirm-title"
-            >
+            <h3 class="text-lg font-medium text-gray-800" id="plan-confirm-title">
               Confirm Changes
             </h3>
           </div>
@@ -1451,59 +1379,43 @@
             the plan for all users.
           </p>
           <div class="flex items-center justify-end space-x-3">
-            <button
-              id="plan-cancel-btn"
-              class="px-4 py-2 border border-gray-200 text-gray-600 rounded-button whitespace-nowrap hover:bg-gray-50"
-            >
+            <button id="plan-cancel-btn"
+              class="px-4 py-2 border border-gray-200 text-gray-600 rounded-button whitespace-nowrap hover:bg-gray-50">
               Cancel
             </button>
-            <button
-              id="plan-confirm-btn"
-              class="px-4 py-2 bg-primary text-white rounded-button whitespace-nowrap hover:bg-blue-700"
-            >
+            <button id="plan-confirm-btn"
+              class="px-4 py-2 bg-primary text-white rounded-button whitespace-nowrap hover:bg-blue-700">
               Yes, Save
             </button>
           </div>
         </div>
-            </div>
-            <!-- Success Modal for Plans -->
-            <div id="plan-success-modal" class="modal">
+      </div>
+      <!-- Success Modal for Plans -->
+      <div id="plan-success-modal" class="modal">
         <div class="modal-content max-w-sm flex flex-col items-center">
-          <div
-            class="w-16 h-16 rounded-full bg-green-100 text-green-600 flex items-center justify-center mb-4"
-          >
+          <div class="w-16 h-16 rounded-full bg-green-100 text-green-600 flex items-center justify-center mb-4">
             <i class="ri-checkbox-circle-line ri-2x"></i>
           </div>
-          <h3
-            class="text-lg font-medium text-gray-800 mb-2"
-            id="plan-success-title"
-          >
+          <h3 class="text-lg font-medium text-gray-800 mb-2" id="plan-success-title">
             Plan Updated!
           </h3>
-          <p
-            class="text-sm text-gray-600 mb-6 text-center"
-            id="plan-success-desc"
-          >
+          <p class="text-sm text-gray-600 mb-6 text-center" id="plan-success-desc">
             The plan information has been successfully updated.
           </p>
-          <button
-            id="plan-success-close-btn"
-            class="px-4 py-2 bg-primary text-white rounded-button whitespace-nowrap hover:bg-blue-700"
-          >
+          <button id="plan-success-close-btn"
+            class="px-4 py-2 bg-primary text-white rounded-button whitespace-nowrap hover:bg-blue-700">
             Close
           </button>
         </div>
-            </div>
-            <!-- Success Toast for Plans -->
-            <div
-        id="plan-toast-success"
-        class="fixed top-6 right-0 z-50 px-4 py-2 bg-green-600 text-white rounded-lg shadow-lg flex items-center space-x-2 transition-transform duration-300 translate-x-full"
-            >
+      </div>
+      <!-- Success Toast for Plans -->
+      <div id="plan-toast-success"
+        class="fixed top-6 right-0 z-50 px-4 py-2 bg-green-600 text-white rounded-lg shadow-lg flex items-center space-x-2 transition-transform duration-300 translate-x-full">
         <i class="ri-checkbox-circle-line"></i>
         <span id="plan-toast-text">Plan saved successfully!</span>
-            </div>
+      </div>
 
-            <script>
+      <script>
         document.addEventListener("DOMContentLoaded", function () {
           // Add feature logic for existing plans
           document.querySelectorAll(".add-feature-btn").forEach(function (btn) {
@@ -1515,8 +1427,8 @@
               const li = document.createElement("li");
               li.className = "flex items-center gap-2";
               li.innerHTML =
-          '<input type="text" class="flex-1 px-2 py-1 rounded border border-gray-300" placeholder="New feature" />' +
-          '<button type="button" class="text-red-500 hover:text-red-700 remove-feature-btn"><i class="ri-delete-bin-line"></i></button>';
+                '<input type="text" class="flex-1 px-2 py-1 rounded border border-gray-300" placeholder="New feature" />' +
+                '<button type="button" class="text-red-500 hover:text-red-700 remove-feature-btn"><i class="ri-delete-bin-line"></i></button>';
               ul.appendChild(li);
             });
           });
@@ -1527,10 +1439,10 @@
             )
             .forEach(function (ul) {
               ul.addEventListener("click", function (e) {
-          if (e.target.closest(".remove-feature-btn")) {
-            const li = e.target.closest("li");
-            if (li) li.remove();
-          }
+                if (e.target.closest(".remove-feature-btn")) {
+                  const li = e.target.closest("li");
+                  if (li) li.remove();
+                }
               });
             });
 
@@ -1621,14 +1533,14 @@
               const li = document.createElement("li");
               li.className = "flex items-center gap-2";
               li.innerHTML =
-          '<input type="text" class="flex-1 px-2 py-1 rounded border border-gray-300" placeholder="New feature" />' +
-          '<button type="button" class="text-red-500 hover:text-red-700 remove-feature-btn"><i class="ri-delete-bin-line"></i></button>';
+                '<input type="text" class="flex-1 px-2 py-1 rounded border border-gray-300" placeholder="New feature" />' +
+                '<button type="button" class="text-red-500 hover:text-red-700 remove-feature-btn"><i class="ri-delete-bin-line"></i></button>';
               ul.appendChild(li);
             });
             planCard.querySelector(`#${planId}-features`).addEventListener("click", function (e) {
               if (e.target.closest(".remove-feature-btn")) {
-          const li = e.target.closest("li");
-          if (li) li.remove();
+                const li = e.target.closest("li");
+                if (li) li.remove();
               }
             });
 
@@ -1636,11 +1548,11 @@
             planCard.querySelector(".save-plan-btn").addEventListener("click", function () {
               currentPlan = planId;
               document.getElementById("plan-confirm-title").textContent =
-          "Confirm Changes";
+                "Confirm Changes";
               document.getElementById("plan-confirm-desc").textContent =
-          "Are you sure you want to save changes to the " +
-          escapeHtml(name) +
-          " plan? This will update the plan for all users.";
+                "Are you sure you want to save changes to the " +
+                escapeHtml(name) +
+                " plan? This will update the plan for all users.";
               openModal("plan-confirm-modal");
             });
 
@@ -1668,11 +1580,11 @@
               currentPlan = btn.getAttribute("data-plan");
               // Fill modal info
               document.getElementById("plan-confirm-title").textContent =
-          "Confirm Changes";
+                "Confirm Changes";
               document.getElementById("plan-confirm-desc").textContent =
-          "Are you sure you want to save changes to the " +
-          capitalize(currentPlan) +
-          " plan? This will update the plan for all users.";
+                "Are you sure you want to save changes to the " +
+                capitalize(currentPlan) +
+                " plan? This will update the plan for all users.";
               openModal("plan-confirm-modal");
             });
           });
@@ -1689,16 +1601,16 @@
               closeModal(document.getElementById("plan-confirm-modal"));
               // Simulate save, show success modal
               document.getElementById("plan-success-title").textContent =
-          capitalize(currentPlan) + " Plan Updated!";
+                capitalize(currentPlan) + " Plan Updated!";
               document.getElementById("plan-success-desc").textContent =
-          "The " +
-          capitalize(currentPlan) +
-          " plan information has been successfully updated.";
+                "The " +
+                capitalize(currentPlan) +
+                " plan information has been successfully updated.";
               openModal("plan-success-modal");
               // Show toast after modal closes
               setTimeout(() => {
-          closeModal(document.getElementById("plan-success-modal"));
-          showToast("Plan saved successfully!");
+                closeModal(document.getElementById("plan-success-modal"));
+                showToast("Plan saved successfully!");
               }, 1500);
             });
 
@@ -1735,22 +1647,22 @@
           function escapeHtml(text) {
             return text.replace(/[&<>"']/g, function (m) {
               return (
-          {
-            "&": "&amp;",
-            "<": "&lt;",
-            ">": "&gt;",
-            '"': "&quot;",
-            "'": "&#39;",
-          }[m] || m
+                {
+                  "&": "&amp;",
+                  "<": "&lt;",
+                  ">": "&gt;",
+                  '"': "&quot;",
+                  "'": "&#39;",
+                }[m] || m
               );
             });
           }
           // Expose updateTagPlanOptions globally so it can be called from new plan logic
           window.updateTagPlanOptions = updateTagPlanOptions;
         });
-            </script>
+      </script>
     </main>
-     <script id="modal-script">
+    <script id="modal-script">
       document.addEventListener("DOMContentLoaded", function () {
         const modals = document.querySelectorAll(".modal");
         const modalCloseButtons = document.querySelectorAll(".modal-close");
@@ -1943,4 +1855,5 @@
       });
     </script>
   </body>
+
 </html>

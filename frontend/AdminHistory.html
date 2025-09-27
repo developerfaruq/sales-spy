@@ -1,0 +1,1418 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Dashboard</title>
+    <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: { primary: "#1E3A8A", secondary: "#5BC0EB" },
+            borderRadius: {
+              none: "0px",
+              sm: "4px",
+              DEFAULT: "8px",
+              md: "12px",
+              lg: "16px",
+              xl: "20px",
+              "2xl": "24px",
+              "3xl": "32px",
+              full: "9999px",
+              button: "8px",
+            },
+          },
+        },
+      };
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.5.0/echarts.min.js"></script>
+    <style>
+      :where([class^="ri-"])::before {
+        content: "\f3c2";
+      }
+
+      body {
+        font-family: "Inter", sans-serif;
+        background-color: #f8f9fb;
+      }
+
+      .sidebar-transition {
+        transition: width 0.3s ease, transform 0.3s ease;
+      }
+
+      input[type="number"]::-webkit-inner-spin-button,
+      input[type="number"]::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+      }
+
+      .custom-switch {
+        position: relative;
+        display: inline-block;
+        width: 44px;
+        height: 24px;
+      }
+
+      .custom-switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+      }
+
+      .switch-slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #e2e8f0;
+        transition: 0.4s;
+        border-radius: 24px;
+      }
+
+      .switch-slider:before {
+        position: absolute;
+        content: "";
+        height: 18px;
+        width: 18px;
+        left: 3px;
+        bottom: 3px;
+        background-color: white;
+        transition: 0.4s;
+        border-radius: 50%;
+      }
+
+      input:checked + .switch-slider {
+        background-color: #3366ff;
+      }
+
+      input:checked + .switch-slider:before {
+        transform: translateX(20px);
+      }
+
+      .custom-checkbox {
+        position: relative;
+        display: inline-block;
+        width: 18px;
+        height: 18px;
+      }
+
+      .custom-checkbox input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+      }
+
+      .checkbox-mark {
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 18px;
+        width: 18px;
+        background-color: #fff;
+        border: 1px solid #d1d5db;
+        border-radius: 4px;
+      }
+
+      .custom-checkbox input:checked ~ .checkbox-mark {
+        background-color: #3366ff;
+        border-color: #3366ff;
+      }
+
+      .checkbox-mark:after {
+        content: "";
+        position: absolute;
+        display: none;
+      }
+
+      .custom-checkbox input:checked ~ .checkbox-mark:after {
+        display: block;
+      }
+
+      .custom-checkbox .checkbox-mark:after {
+        left: 6px;
+        top: 2px;
+        width: 5px;
+        height: 10px;
+        border: solid white;
+        border-width: 0 2px 2px 0;
+        transform: rotate(45deg);
+      }
+
+      .custom-radio {
+        position: relative;
+        display: inline-block;
+        width: 18px;
+        height: 18px;
+      }
+
+      .custom-radio input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+      }
+
+      .radio-mark {
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 18px;
+        width: 18px;
+        background-color: #fff;
+        border: 1px solid #d1d5db;
+        border-radius: 50%;
+      }
+
+      .custom-radio input:checked ~ .radio-mark {
+        background-color: #fff;
+        border-color: #3366ff;
+      }
+
+      .radio-mark:after {
+        content: "";
+        position: absolute;
+        display: none;
+      }
+
+      .custom-radio input:checked ~ .radio-mark:after {
+        display: block;
+      }
+
+      .custom-radio .radio-mark:after {
+        top: 4px;
+        left: 4px;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #3366ff;
+      }
+
+      .pagination-item {
+        width: 36px;
+        height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 8px;
+        cursor: pointer;
+      }
+
+      .pagination-item.active {
+        background-color: #3366ff;
+        color: white;
+      }
+
+      .custom-select {
+        position: relative;
+        display: inline-block;
+      }
+
+      .custom-select-trigger {
+        padding: 8px 12px;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        background-color: white;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        min-width: 120px;
+      }
+
+      .custom-select-options {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background-color: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        margin-top: 4px;
+        z-index: 10;
+        display: none;
+        max-height: 200px;
+        overflow-y: auto;
+      }
+
+      .custom-select-option {
+        padding: 8px 12px;
+        cursor: pointer;
+      }
+
+      .custom-select-option:hover {
+        background-color: #f1f5f9;
+      }
+
+      .custom-select.open .custom-select-options {
+        display: block;
+      }
+
+      .modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0, 0, 0, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 50;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.3s ease, visibility 0.3s ease;
+      }
+
+      .modal.active {
+        opacity: 1;
+        visibility: visible;
+      }
+
+      .modal-content {
+        background-color: white;
+        border-radius: 12px;
+        padding: 24px;
+        width: 100%;
+        max-width: 500px;
+        transform: translateY(20px);
+        transition: transform 0.3s ease;
+      }
+
+      .modal.active .modal-content {
+        transform: translateY(0);
+      }
+    </style>
+  </head>
+
+  <body class="min-h-screen">
+    <!-- Header and Sidebar (optional for standalone) -->
+    <header class="bg-white shadow-sm fixed top-0 left-0 right-0 z-30">
+      <div class="flex items-center justify-between px-4 h-16">
+        <div class="flex items-center">
+          <button
+            id="sidebar-toggle"
+            class="w-10 h-10 flex items-center justify-center text-gray-500 hover:text-primary mr-2"
+          >
+            <i class="ri-menu-line ri-lg"></i>
+          </button>
+          <div class="font-['Pacifico'] text-xl text-primary">Sales-Spy</div>
+          <span class="ml-4 text-lg font-medium hidden md:block"
+            >Admin Dashboard</span
+          >
+        </div>
+        <div class="flex items-center space-x-4">
+          <div class="relative">
+            <div class="relative group" id="notification-dropdown-wrapper">
+              <button
+                id="notification-btn"
+                class="w-10 h-10 flex items-center justify-center text-gray-500 hover:text-primary relative transition-colors duration-200"
+              >
+                <i class="ri-notification-3-line ri-lg"></i>
+                <span
+                  id="notification-count"
+                  class="absolute top-1.5 right-1.5 min-w-[14px] h-4 px-0.5 bg-red-500 text-white text-[10px] font-semibold rounded-full flex items-center justify-center transition-all duration-200"
+                  >0</span
+                >
+              </button>
+              <!-- Dropdown -->
+              <div
+                id="notification-dropdown"
+                class="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-lg border border-gray-100 z-40 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-all duration-200 translate-y-2 group-hover:translate-y-0"
+              >
+                <div
+                  class="py-2 px-4 border-b border-gray-100 flex items-center justify-between"
+                >
+                  <span class="font-medium text-gray-800 text-base"
+                    >Notifications</span
+                  >
+                  <button
+                    id="mark-all-read"
+                    class="text-xs text-primary hover:underline focus:outline-none transition-colors duration-150"
+                  >
+                    Mark all as read
+                  </button>
+                </div>
+                <ul
+                  id="notification-list"
+                  class="max-h-72 overflow-y-auto divide-y divide-gray-100"
+                >
+                  <!-- Notifications will be rendered here -->
+                </ul>
+                <div class="py-2 px-4 text-center">
+                  <a
+                    href="AdminNotifications.html"
+                    class="inline-block px-4 py-2 bg-primary text-white rounded-button text-sm font-medium hover:bg-blue-700 transition-colors duration-200"
+                    >See more</a
+                  >
+                </div>
+              </div>
+            </div>
+            <script>
+              // Dynamic notifications array (simulate fetching from backend)
+              let notifications = [];
+
+              // Store timeouts for each notification
+              let notificationTimeouts = {};
+
+              // Simulate fetching notifications from backend (replace with real fetch in production)
+              function fetchNotifications() {
+                setTimeout(() => {
+                  notifications = [
+                    {
+                      id: 1,
+                      text: "New payment received from Emma Brown.",
+                      time: "2 min ago",
+                      read: false,
+                    },
+                    {
+                      id: 2,
+                      text: "Subscription for Robert Johnson is about to expire.",
+                      time: "10 min ago",
+                      read: false,
+                    },
+                    {
+                      id: 3,
+                      text: "David Miller upgraded to Pro plan.",
+                      time: "30 min ago",
+                      read: false,
+                    },
+                    {
+                      id: 4,
+                      text: "Jessica Thompson's payment failed.",
+                      time: "1 hour ago",
+                      read: false,
+                    },
+                    {
+                      id: 5,
+                      text: "Sarah Wilson added a new wallet.",
+                      time: "2 hours ago",
+                      read: false,
+                    },
+                    {
+                      id: 6,
+                      text: "Ava Lee requested support.",
+                      time: "3 hours ago",
+                      read: true,
+                    },
+                  ];
+                  renderNotifications();
+                }, 200);
+              }
+
+              function renderNotifications() {
+                const list = document.getElementById("notification-list");
+                const count = document.getElementById("notification-count");
+                // Only show unread or recently marked-as-read notifications (pending removal)
+                const visibleNotifications = notifications.filter(
+                  (n) => !n.read
+                );
+                count.textContent = visibleNotifications.length;
+                count.style.display =
+                  visibleNotifications.length > 0 ? "flex" : "none";
+                if (visibleNotifications.length === 0) {
+                  list.innerHTML = `<li class="px-4 py-6 text-center text-gray-400 text-sm">All clear, nothing to see here</li>`;
+                  return;
+                }
+                list.innerHTML = visibleNotifications
+                  .slice(0, 5)
+                  .map(
+                    (n) => `
+                  <li class="flex items-start gap-3 px-4 py-3 bg-white hover:bg-blue-50 transition-colors duration-150" data-id="${n.id}">
+                  <div class="flex-1">
+                  <p class="text-sm text-gray-800">${n.text}</p>
+                  <span class="text-xs text-gray-400">${n.time}</span>
+                  </div>
+                  <div class="flex flex-col gap-1 ml-2">
+                  <button class="mark-read-btn px-2 py-1 text-xs font-medium text-primary border border-primary rounded transition hover:bg-primary hover:text-white focus:outline-none" data-id="${n.id}">Mark as read</button>
+                  </div>
+                  </li>
+                `
+                  )
+                  .join("");
+              }
+
+              // Dropdown hover for accessibility (also works on click for mobile)
+              const dropdown = document.getElementById("notification-dropdown");
+              const wrapper = document.getElementById(
+                "notification-dropdown-wrapper"
+              );
+              let dropdownTimeout;
+              wrapper.addEventListener("mouseenter", () => {
+                clearTimeout(dropdownTimeout);
+                dropdown.classList.add(
+                  "opacity-100",
+                  "pointer-events-auto",
+                  "translate-y-0"
+                );
+                dropdown.classList.remove(
+                  "opacity-0",
+                  "pointer-events-none",
+                  "translate-y-2"
+                );
+              });
+              wrapper.addEventListener("mouseleave", () => {
+                dropdownTimeout = setTimeout(() => {
+                  dropdown.classList.remove(
+                    "opacity-100",
+                    "pointer-events-auto",
+                    "translate-y-0"
+                  );
+                  dropdown.classList.add(
+                    "opacity-0",
+                    "pointer-events-none",
+                    "translate-y-2"
+                  );
+                }, 120);
+              });
+
+              // Mark as read logic with delayed removal
+              document.addEventListener("click", function (e) {
+                if (e.target.classList.contains("mark-read-btn")) {
+                  const id = +e.target.getAttribute("data-id");
+                  const n = notifications.find((n) => n.id === id);
+                  if (n && !n.read) {
+                    n.read = true;
+                    renderNotifications();
+                    // Remove after 2 seconds
+                    if (notificationTimeouts[id])
+                      clearTimeout(notificationTimeouts[id]);
+                    notificationTimeouts[id] = setTimeout(() => {
+                      notifications = notifications.filter(
+                        (notif) => notif.id !== id
+                      );
+                      delete notificationTimeouts[id];
+                      renderNotifications();
+                    }, 2000);
+                  }
+                }
+                if (e.target.id === "mark-all-read") {
+                  // Mark all as read and remove after 2 seconds
+                  const idsToRemove = notifications
+                    .filter((n) => !n.read)
+                    .map((n) => n.id);
+                  notifications.forEach((n) => {
+                    n.read = true;
+                  });
+                  renderNotifications();
+                  idsToRemove.forEach((id) => {
+                    if (notificationTimeouts[id])
+                      clearTimeout(notificationTimeouts[id]);
+                    notificationTimeouts[id] = setTimeout(() => {
+                      notifications = notifications.filter(
+                        (notif) => notif.id !== id
+                      );
+                      delete notificationTimeouts[id];
+                      renderNotifications();
+                    }, 2000);
+                  });
+                }
+              });
+
+              // Initial fetch and render
+              fetchNotifications();
+            </script>
+          </div>
+          <div class="relative">
+            <button id="user-menu-btn" class="flex items-center">
+              <div
+                class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center"
+              >
+                <span class="text-sm font-medium">JD</span>
+              </div>
+              <span class="ml-2 text-sm font-medium hidden md:block"
+                >John Doe</span
+              >
+              <i class="ri-arrow-down-s-line ml-1 text-gray-500"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </header>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const sidebarToggle = document.getElementById("sidebar-toggle");
+        const sidebar = document.getElementById("sidebar");
+        const main = document.querySelector("main");
+        const menuIcon = sidebarToggle.querySelector("i");
+
+        function setSidebar(open) {
+          if (open) {
+            sidebar.classList.remove("-translate-x-full");
+            sidebar.classList.add("translate-x-0");
+            menuIcon.classList.remove("ri-menu-line");
+            menuIcon.classList.add("ri-close-line");
+          } else {
+            sidebar.classList.remove("translate-x-0");
+            sidebar.classList.add("-translate-x-full");
+            menuIcon.classList.remove("ri-close-line");
+            menuIcon.classList.add("ri-menu-line");
+          }
+        }
+
+        sidebarToggle.addEventListener("click", function () {
+          const isClosed = sidebar.classList.contains("-translate-x-full");
+          setSidebar(isClosed);
+        });
+
+        function handleResize() {
+          if (window.innerWidth >= 768) {
+            sidebar.classList.remove("-translate-x-full");
+            sidebar.classList.add("translate-x-0");
+            main.classList.add("md:pl-64");
+            menuIcon.classList.remove("ri-close-line");
+            menuIcon.classList.add("ri-menu-line");
+          } else {
+            sidebar.classList.remove("translate-x-0");
+            sidebar.classList.add("-translate-x-full");
+            main.classList.remove("md:pl-64");
+            menuIcon.classList.remove("ri-close-line");
+            menuIcon.classList.add("ri-menu-line");
+          }
+        }
+
+        window.addEventListener("resize", handleResize);
+        handleResize();
+      });
+    </script>
+    <!-- Sidebar -->
+    <aside
+      id="sidebar"
+      class="fixed top-16 left-0 bottom-0 w-64 bg-white shadow-sm z-20 sidebar-transition transform md:translate-x-0 -translate-x-full"
+    >
+      <div class="h-full flex flex-col">
+        <div class="p-4 border-b">
+          <div class="flex items-center">
+            <div
+              class="w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center"
+            >
+              <span class="text-sm font-medium">JD</span>
+            </div>
+            <div class="ml-3">
+              <p class="text-sm font-medium">John Doe</p>
+              <p class="text-xs text-gray-500">Super Admin</p>
+            </div>
+          </div>
+        </div>
+        <nav class="flex-1 p-4 overflow-y-auto">
+          <ul class="space-y-1">
+            <li>
+              <a
+          href="AdminUsers.html"
+          class="nav-link w-full flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-600 hover:text-primary hover:bg-blue-50"
+              >
+          <div class="w-5 h-5 flex items-center justify-center mr-3">
+            <i class="ri-user-line"></i>
+          </div>
+          <span>Users</span>
+              </a>
+            </li>
+            <li>
+              <a
+          href="AdminSubscriptions.html"
+          class="nav-link w-full flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-600 hover:text-primary hover:bg-blue-50"
+              >
+          <div class="w-5 h-5 flex items-center justify-center mr-3">
+            <i class="ri-vip-crown-line"></i>
+          </div>
+          <span>Subscriptions</span>
+              </a>
+            </li>
+            <li>
+              <a
+          href="AdminWallets.html"
+          class="nav-link w-full flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-600 hover:text-primary hover:bg-blue-50"
+              >
+          <div class="w-5 h-5 flex items-center justify-center mr-3">
+            <i class="ri-wallet-3-line"></i>
+          </div>
+          <span>Wallets</span>
+              </a>
+            </li>
+            <li>
+              <a
+          href="AdminPlans.html"
+          class="nav-link w-full flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-600 hover:text-primary hover:bg-blue-50"
+              >
+          <div class="w-5 h-5 flex items-center justify-center mr-3">
+            <i class="ri-list-settings-line"></i>
+          </div>
+          <span>Plans</span>
+              </a>
+            </li>
+            <li>
+              <a
+          href="AdminPayments.html"
+          class="nav-link w-full flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-600 hover:text-primary hover:bg-blue-50"
+              >
+          <div class="w-5 h-5 flex items-center justify-center mr-3">
+            <i class="ri-exchange-dollar-line"></i>
+          </div>
+          <span>Payments</span>
+              </a>
+            </li>
+            <li>
+              <a
+          href="AdminPending.html"
+          class="nav-link w-full flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-600 hover:text-primary hover:bg-blue-50"
+              >
+          <div class="w-5 h-5 flex items-center justify-center mr-3">
+            <i class="ri-time-line"></i>
+          </div>
+          <span>Pending Payments</span>
+              </a>
+            </li>
+            <li>
+              <a
+          href="AdminNotifications.html"
+          class="nav-link w-full flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-600 hover:text-primary hover:bg-blue-50"
+              >
+          <div class="w-5 h-5 flex items-center justify-center mr-3">
+            <i class="ri-notification-3-line"></i>
+          </div>
+          <span>Notifications</span>
+              </a>
+            </li>
+            <li>
+              <a
+          href="Admins.html"
+          class="nav-link w-full flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-600 hover:text-primary hover:bg-blue-50"
+              >
+          <div class="w-5 h-5 flex items-center justify-center mr-3">
+            <i class="ri-shield-user-line"></i>
+          </div>
+          <span>Admins</span>
+              </a>
+            </li>
+            <li>
+              <a
+          href="AdminHistory.html"
+          class="nav-link w-full flex items-center px-3 py-2 text-sm font-medium rounded-md text-primary bg-blue-50"
+              >
+          <div class="w-5 h-5 flex items-center justify-center mr-3">
+            <i class="ri-history-line"></i>
+          </div>
+          <span>Admin History</span>
+              </a>
+            </li>
+            <li>
+              <a
+          href="AdminSettings.html"
+          class="nav-link w-full flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-600 hover:text-primary hover:bg-blue-50"
+              >
+          <div class="w-5 h-5 flex items-center justify-center mr-3">
+            <i class="ri-settings-3-line"></i>
+          </div>
+          <span>Settings</span>
+              </a>
+            </li>
+          </ul>
+        </nav>
+        <div class="p-4 border-t">
+          <button
+            id="logout-btn"
+            class="w-full flex items-center px-3 py-2 text-sm font-medium rounded-md text-red-600 hover:bg-red-50"
+          >
+            <div class="w-5 h-5 flex items-center justify-center mr-3">
+              <i class="ri-logout-box-line"></i>
+            </div>
+            <span>Logout</span>
+          </button>
+        </div>
+        <!-- Logout Confirmation Modal -->
+        <div id="logout-modal" class="modal">
+          <div class="modal-content max-w-sm">
+            <div class="flex items-center mb-4">
+              <div
+                class="w-12 h-12 rounded-full bg-red-100 text-red-600 flex items-center justify-center mr-4"
+              >
+                <i class="ri-logout-box-line ri-lg"></i>
+              </div>
+              <h3 class="text-lg font-medium text-gray-800">
+                Are you sure you want to logout?
+              </h3>
+            </div>
+            <div class="flex items-center justify-end space-x-3">
+              <button
+                id="cancel-logout"
+                class="px-4 py-2 border border-gray-200 text-gray-600 rounded-button whitespace-nowrap hover:bg-gray-50"
+              >
+                Cancel
+              </button>
+              <button
+                id="confirm-logout"
+                class="px-4 py-2 bg-red-600 text-white rounded-button whitespace-nowrap hover:bg-red-700"
+              >
+                Logout
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </aside>
+    <main class="pt-16 md:pl-64 transition-all duration-300">
+      <div id="admin-history-tab" class="tab-content p-4 md:p-6">
+        <div class="mb-6">
+          <h1 class="text-2xl font-semibold text-gray-800">Admin History</h1>
+          <p class="text-sm text-gray-500 mt-1">
+            View admin-related history and logs
+          </p>
+        </div>
+        <!-- Tab Headers -->
+        <div class="flex flex-wrap gap-2 mb-6">
+          <button
+            class="history-tab-btn px-4 py-2 rounded-button text-sm font-medium transition-colors duration-150 bg-primary/10 text-primary border border-primary focus:ring-2 focus:ring-primary"
+            data-tab="subscription"
+          >
+            Subscription History
+          </button>
+          <button
+            class="history-tab-btn px-4 py-2 rounded-button text-sm font-medium transition-colors duration-150 text-primary border border-primary/50 hover:bg-primary/10 hover:text-primary focus:ring-2 focus:ring-primary"
+            data-tab="admins"
+          >
+            Previous Admins
+          </button>
+          <button
+            class="history-tab-btn px-4 py-2 rounded-button text-sm font-medium transition-colors duration-150 text-primary border border-primary/50 hover:bg-primary/10 hover:text-primary focus:ring-2 focus:ring-primary"
+            data-tab="denied"
+          >
+            Denied Admin Requests
+          </button>
+          <button
+            class="history-tab-btn px-4 py-2 rounded-button text-sm font-medium transition-colors duration-150 text-primary border border-primary/50 hover:bg-primary/10 hover:text-primary focus:ring-2 focus:ring-primary"
+            data-tab="pending"
+          >
+            Pending Payment History
+          </button>
+        </div>
+        <!-- Tab Contents -->
+        <div id="history-tab-content-subscription" class="history-tab-content">
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-lg font-medium text-gray-800">
+              Subscription History
+            </h2>
+            <div class="flex gap-2">
+              <a
+                href="AdminSubscriptions.html"
+                class="text-primary text-sm hover:underline"
+                >Go to Subscriptions</a
+              >
+              <button
+                class="px-3 py-1 bg-primary text-white rounded-button text-sm font-medium hover:bg-blue-700 transition-colors"
+                onclick="alert('Exported!')"
+              >
+                Export
+              </button>
+            </div>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full">
+              <thead>
+                <tr class="bg-gray-50">
+                  <th
+                    class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    User
+                  </th>
+                  <th
+                    class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Plan
+                  </th>
+                  <th
+                    class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Action
+                  </th>
+                  <th
+                    class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Date
+                  </th>
+                  <th
+                    class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Actions
+                  </th>
+                </tr>
+              </thead>
+              <tbody
+                id="subscription-history-table-body"
+                class="divide-y divide-gray-200"
+              >
+                <!-- Filled by JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div id="history-tab-content-admins" class="history-tab-content hidden">
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-lg font-medium text-gray-800">Previous Admins</h2>
+            <div class="flex gap-2">
+              <a href="Admins.html" class="text-primary text-sm hover:underline"
+                >Go to Admins</a
+              >
+              <button
+                class="px-3 py-1 bg-primary text-white rounded-button text-sm font-medium hover:bg-blue-700 transition-colors"
+                onclick="alert('Exported!')"
+              >
+                Export
+              </button>
+            </div>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full">
+              <thead>
+                <tr class="bg-gray-50">
+                  <th
+                    class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Name
+                  </th>
+                  <th
+                    class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Email
+                  </th>
+                  <th
+                    class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Role
+                  </th>
+                  <th
+                    class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Removed At
+                  </th>
+                  <th
+                    class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Actions
+                  </th>
+                </tr>
+              </thead>
+              <tbody
+                id="previous-admins-table-body"
+                class="divide-y divide-gray-200"
+              >
+                <!-- Filled by JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div id="history-tab-content-denied" class="history-tab-content hidden">
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-lg font-medium text-gray-800">
+              Denied Admin Requests
+            </h2>
+            <div class="flex gap-2">
+              <a href="Admins.html" class="text-primary text-sm hover:underline"
+                >Go to Admins</a
+              >
+              <button
+                class="px-3 py-1 bg-primary text-white rounded-button text-sm font-medium hover:bg-blue-700 transition-colors"
+                onclick="alert('Exported!')"
+              >
+                Export
+              </button>
+            </div>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full">
+              <thead>
+                <tr class="bg-gray-50">
+                  <th
+                    class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Name
+                  </th>
+                  <th
+                    class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Email
+                  </th>
+                  <th
+                    class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Denied At
+                  </th>
+                  <th
+                    class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Reason
+                  </th>
+                  <th
+                    class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Actions
+                  </th>
+                </tr>
+              </thead>
+              <tbody
+                id="denied-requests-table-body"
+                class="divide-y divide-gray-200"
+              >
+                <!-- Filled by JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div
+          id="history-tab-content-pending"
+          class="history-tab-content hidden"
+        >
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-lg font-medium text-gray-800">
+              Pending Payment History
+            </h2>
+            <div class="flex gap-2">
+              <a
+                href="AdminPending.html"
+                class="text-primary text-sm hover:underline"
+                >Go to Pending Payments</a
+              >
+              <button
+                class="px-3 py-1 bg-primary text-white rounded-button text-sm font-medium hover:bg-blue-700 transition-colors"
+                onclick="alert('Exported!')"
+              >
+                Export
+              </button>
+            </div>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full">
+              <thead>
+                <tr class="bg-gray-50">
+                  <th
+                    class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    User
+                  </th>
+                  <th
+                    class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Amount
+                  </th>
+                  <th
+                    class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Status
+                  </th>
+                  <th
+                    class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Requested At
+                  </th>
+                  <th
+                    class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Actions
+                  </th>
+                </tr>
+              </thead>
+              <tbody
+                id="pending-payments-table-body"
+                class="divide-y divide-gray-200"
+              >
+                <!-- Filled by JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </main>
+  </body>
+</html>
+<script>
+  (function () {
+    // Mock data with avatar initials and badge styling
+    const subscriptionHistory = [
+      {
+        initials: "EB",
+        user: "Emma Brown",
+        email: "emma.brown@example.com",
+        plan: "Pro",
+        planColor: "bg-blue-50 text-primary",
+        action: "Upgraded",
+        date: "Jun 01, 2025",
+      },
+      {
+        initials: "RJ",
+        user: "Robert Johnson",
+        email: "robert.j@example.com",
+        plan: "Enterprise",
+        planColor: "bg-purple-50 text-purple-600",
+        action: "Renewed",
+        date: "May 15, 2025",
+      },
+      {
+        initials: "SW",
+        user: "Sarah Wilson",
+        email: "sarah.w@example.com",
+        plan: "Basic",
+        planColor: "bg-gray-100 text-gray-600",
+        action: "Trial Started",
+        date: "Jun 20, 2025",
+      },
+      {
+        initials: "DM",
+        user: "David Miller",
+        email: "david.m@example.com",
+        plan: "Pro",
+        planColor: "bg-blue-50 text-primary",
+        action: "Expired",
+        date: "Jun 01, 2025",
+      },
+    ];
+    const previousAdmins = [
+      {
+        initials: "AC",
+        name: "Alice Cooper",
+        email: "alice.cooper@company.com",
+        role: "Admin",
+        roleColor: "bg-blue-50 text-primary",
+        removedAt: "May 10, 2025",
+      },
+      {
+        initials: "BL",
+        name: "Brian Lee",
+        email: "brian.lee@company.com",
+        role: "Support",
+        roleColor: "bg-green-50 text-green-600",
+        removedAt: "Apr 22, 2025",
+      },
+    ];
+    const deniedRequests = [
+      {
+        initials: "EW",
+        name: "Emily White",
+        email: "emily.white@company.com",
+        deniedAt: "Jun 25, 2025",
+        reason: "Insufficient credentials",
+      },
+      {
+        initials: "DG",
+        name: "David Green",
+        email: "david.green@company.com",
+        deniedAt: "Jun 24, 2025",
+        reason: "Duplicate request",
+      },
+    ];
+    const pendingPayments = [
+      {
+        initials: "EB",
+        user: "Emma Brown",
+        email: "emma.brown@example.com",
+        amount: "$120.00",
+        status: "Pending",
+        statusColor: "bg-yellow-50 text-yellow-600",
+        requestedAt: "Jun 28, 2025",
+      },
+      {
+        initials: "RJ",
+        user: "Robert Johnson",
+        email: "robert.j@example.com",
+        amount: "$49.99",
+        status: "Pending",
+        statusColor: "bg-yellow-50 text-yellow-600",
+        requestedAt: "Jun 27, 2025",
+      },
+    ];
+    function renderTable(id, rows, type) {
+      const tbody = document.getElementById(id);
+      if (type === "subscription") {
+        tbody.innerHTML = rows
+          .map(
+            (row, idx) => `
+        <tr>
+          <td class="px-4 py-3 whitespace-nowrap">
+            <div class="flex items-center">
+              <div class="w-8 h-8 rounded-full bg-blue-100 text-primary flex items-center justify-center">
+                <span class="text-sm font-medium">${row.initials}</span>
+              </div>
+              <div class="ml-3">
+                <p class="text-sm font-medium text-gray-800">${row.user}</p>
+                <p class="text-xs text-gray-500">${row.email}</p>
+              </div>
+            </div>
+          </td>
+          <td class="px-4 py-3 whitespace-nowrap">
+            <span class="px-2 py-1 text-xs font-medium ${row.planColor} rounded-full">${row.plan}</span>
+          </td>
+          <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">${row.action}</td>
+          <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">${row.date}</td>
+          <td class="px-4 py-3 whitespace-nowrap text-right">
+            <button class="view-btn px-2 py-1 text-xs font-medium text-primary border border-primary rounded transition hover:bg-primary hover:text-white" data-type='${id}' data-idx='${idx}'>View</button>
+          </td>
+        </tr>
+      `
+          )
+          .join("");
+      } else if (type === "admins") {
+        tbody.innerHTML = rows
+          .map(
+            (row, idx) => `
+        <tr>
+          <td class="px-4 py-3 whitespace-nowrap">
+            <div class="flex items-center">
+              <div class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center">
+                <span class="text-sm font-medium">${row.initials}</span>
+              </div>
+              <div class="ml-3">
+                <p class="text-sm font-medium text-gray-800">${row.name}</p>
+                <p class="text-xs text-gray-500">${row.email}</p>
+              </div>
+            </div>
+          </td>
+          <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">${row.email}</td>
+          <td class="px-4 py-3 whitespace-nowrap">
+            <span class="px-2 py-1 text-xs font-medium ${row.roleColor} rounded-full">${row.role}</span>
+          </td>
+          <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">${row.removedAt}</td>
+          <td class="px-4 py-3 whitespace-nowrap text-right">
+            <button class="view-btn px-2 py-1 text-xs font-medium text-primary border border-primary rounded transition hover:bg-primary hover:text-white" data-type='${id}' data-idx='${idx}'>View</button>
+          </td>
+        </tr>
+      `
+          )
+          .join("");
+      } else if (type === "denied") {
+        tbody.innerHTML = rows
+          .map(
+            (row, idx) => `
+        <tr>
+          <td class="px-4 py-3 whitespace-nowrap">
+            <div class="flex items-center">
+              <div class="w-8 h-8 rounded-full bg-red-100 text-red-600 flex items-center justify-center">
+                <span class="text-sm font-medium">${row.initials}</span>
+              </div>
+              <div class="ml-3">
+                <p class="text-sm font-medium text-gray-800">${row.name}</p>
+                <p class="text-xs text-gray-500">${row.email}</p>
+              </div>
+            </div>
+          </td>
+          <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">${row.email}</td>
+          <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">${row.deniedAt}</td>
+          <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">${row.reason}</td>
+          <td class="px-4 py-3 whitespace-nowrap text-right">
+            <button class="view-btn px-2 py-1 text-xs font-medium text-primary border border-primary rounded transition hover:bg-primary hover:text-white" data-type='${id}' data-idx='${idx}'>View</button>
+          </td>
+        </tr>
+      `
+          )
+          .join("");
+      } else if (type === "pending") {
+        tbody.innerHTML = rows
+          .map(
+            (row, idx) => `
+        <tr>
+          <td class="px-4 py-3 whitespace-nowrap">
+            <div class="flex items-center">
+              <div class="w-8 h-8 rounded-full bg-yellow-100 text-yellow-600 flex items-center justify-center">
+                <span class="text-sm font-medium">${row.initials}</span>
+              </div>
+              <div class="ml-3">
+                <p class="text-sm font-medium text-gray-800">${row.user}</p>
+                <p class="text-xs text-gray-500">${row.email}</p>
+              </div>
+            </div>
+          </td>
+          <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">${row.amount}</td>
+          <td class="px-4 py-3 whitespace-nowrap">
+            <span class="px-2 py-1 text-xs font-medium ${row.statusColor} rounded-full">${row.status}</span>
+          </td>
+          <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-700">${row.requestedAt}</td>
+          <td class="px-4 py-3 whitespace-nowrap text-right">
+            <button class="view-btn px-2 py-1 text-xs font-medium text-primary border border-primary rounded transition hover:bg-primary hover:text-white" data-type='${id}' data-idx='${idx}'>View</button>
+          </td>
+        </tr>
+      `
+          )
+          .join("");
+      }
+    }
+    renderTable(
+      "subscription-history-table-body",
+      subscriptionHistory,
+      "subscription"
+    );
+    renderTable("previous-admins-table-body", previousAdmins, "admins");
+    renderTable("denied-requests-table-body", deniedRequests, "denied");
+    renderTable("pending-payments-table-body", pendingPayments, "pending");
+
+    // Tab switching logic
+    const tabBtns = document.querySelectorAll(".history-tab-btn");
+    const tabContents = document.querySelectorAll(".history-tab-content");
+    function setActiveTab(tab) {
+      tabContents.forEach((content) => {
+        content.classList.add("hidden");
+      });
+      document
+        .getElementById("history-tab-content-" + tab)
+        .classList.remove("hidden");
+      tabBtns.forEach((btn) => {
+        if (btn.getAttribute("data-tab") === tab) {
+          btn.classList.add(
+            "bg-blue-50",
+            "text-primary",
+            "border",
+            "border-primary"
+          );
+          btn.classList.remove(
+            "text-gray-600",
+            "hover:bg-blue-50",
+            "hover:text-primary"
+          );
+        } else {
+          btn.classList.remove(
+            "bg-blue-50",
+            "text-primary",
+            "border",
+            "border-primary"
+          );
+          btn.classList.add(
+            "text-gray-600",
+            "hover:bg-blue-50",
+            "hover:text-primary"
+          );
+        }
+      });
+    }
+    tabBtns.forEach((btn) => {
+      btn.addEventListener("click", function () {
+        setActiveTab(this.getAttribute("data-tab"));
+      });
+    });
+    setActiveTab("subscription");
+
+    // Action button logic (View)
+    document.addEventListener("click", function (e) {
+      if (e.target.classList.contains("view-btn")) {
+        const type = e.target.getAttribute("data-type");
+        const idx = +e.target.getAttribute("data-idx");
+        let data;
+        if (type === "subscription-history-table-body")
+          data = subscriptionHistory[idx];
+        else if (type === "previous-admins-table-body")
+          data = previousAdmins[idx];
+        else if (type === "denied-requests-table-body")
+          data = deniedRequests[idx];
+        else if (type === "pending-payments-table-body")
+          data = pendingPayments[idx];
+        // Create or reuse a modal for details
+        let detailsModal = document.getElementById("details-modal");
+        if (!detailsModal) {
+          detailsModal = document.createElement("div");
+          detailsModal.id = "details-modal";
+          detailsModal.className = "modal active";
+          detailsModal.innerHTML = `
+            <div class="modal-content max-w-md">
+              <div class="mb-4 flex items-center">
+            <div class="w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center mr-3">
+              <i class="ri-information-line ri-lg"></i>
+            </div>
+            <h3 class="text-lg font-medium text-gray-800">Details</h3>
+              </div>
+              <div id="details-modal-body" class="mb-4"></div>
+              <div class="flex justify-end">
+            <button id="close-details-modal" class="px-4 py-2 bg-primary text-white rounded-button hover:bg-blue-700">Close</button>
+              </div>
+            </div>
+          `;
+          document.body.appendChild(detailsModal);
+        }
+        // Fill in details based on type
+        const body = detailsModal.querySelector("#details-modal-body");
+        let html = "";
+        if (type === "subscription-history-table-body") {
+          html = `
+            <div class="flex items-center mb-3">
+              <div class="w-10 h-10 rounded-full bg-blue-100 text-primary flex items-center justify-center mr-3">
+            <span class="text-lg font-semibold">${data.initials}</span>
+              </div>
+              <div>
+            <div class="font-medium text-gray-800">${data.user}</div>
+            <div class="text-xs text-gray-500">${data.email}</div>
+              </div>
+            </div>
+            <div class="mb-2"><span class="font-semibold">Plan:</span> <span class="px-2 py-1 text-xs font-medium ${data.planColor} rounded-full">${data.plan}</span></div>
+            <div class="mb-2"><span class="font-semibold">Action:</span> ${data.action}</div>
+            <div class="mb-2"><span class="font-semibold">Date:</span> ${data.date}</div>
+          `;
+        } else if (type === "previous-admins-table-body") {
+          html = `
+            <div class="flex items-center mb-3">
+              <div class="w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center mr-3">
+            <span class="text-lg font-semibold">${data.initials}</span>
+              </div>
+              <div>
+            <div class="font-medium text-gray-800">${data.name}</div>
+            <div class="text-xs text-gray-500">${data.email}</div>
+              </div>
+            </div>
+            <div class="mb-2"><span class="font-semibold">Role:</span> <span class="px-2 py-1 text-xs font-medium ${data.roleColor} rounded-full">${data.role}</span></div>
+            <div class="mb-2"><span class="font-semibold">Removed At:</span> ${data.removedAt}</div>
+          `;
+        } else if (type === "denied-requests-table-body") {
+          html = `
+            <div class="flex items-center mb-3">
+              <div class="w-10 h-10 rounded-full bg-red-100 text-red-600 flex items-center justify-center mr-3">
+            <span class="text-lg font-semibold">${data.initials}</span>
+              </div>
+              <div>
+            <div class="font-medium text-gray-800">${data.name}</div>
+            <div class="text-xs text-gray-500">${data.email}</div>
+              </div>
+            </div>
+            <div class="mb-2"><span class="font-semibold">Denied At:</span> ${data.deniedAt}</div>
+            <div class="mb-2"><span class="font-semibold">Reason:</span> ${data.reason}</div>
+          `;
+        } else if (type === "pending-payments-table-body") {
+          html = `
+            <div class="flex items-center mb-3">
+              <div class="w-10 h-10 rounded-full bg-yellow-100 text-yellow-600 flex items-center justify-center mr-3">
+            <span class="text-lg font-semibold">${data.initials}</span>
+              </div>
+              <div>
+            <div class="font-medium text-gray-800">${data.user}</div>
+            <div class="text-xs text-gray-500">${data.email}</div>
+              </div>
+            </div>
+            <div class="mb-2"><span class="font-semibold">Amount:</span> ${data.amount}</div>
+            <div class="mb-2"><span class="font-semibold">Status:</span> <span class="px-2 py-1 text-xs font-medium ${data.statusColor} rounded-full">${data.status}</span></div>
+            <div class="mb-2"><span class="font-semibold">Requested At:</span> ${data.requestedAt}</div>
+          `;
+        }
+        body.innerHTML = html;
+        // Show modal
+        detailsModal.classList.add("active");
+        // Close logic
+        function closeModal() {
+          detailsModal.classList.remove("active");
+        }
+        detailsModal.addEventListener("click", function (e) {
+          if (e.target.id === "close-details-modal" || e.target === detailsModal) {
+            closeModal();
+          }
+        });
+      }
+    });
+  })();
+</script>

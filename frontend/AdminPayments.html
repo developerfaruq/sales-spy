@@ -29,10 +29,18 @@
     </script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
-      rel="stylesheet" />
-    <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css"
+    />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.5.0/echarts.min.js"></script>
     <style>
       :where([class^="ri-"])::before {
@@ -91,11 +99,11 @@
         border-radius: 50%;
       }
 
-      input:checked+.switch-slider {
+      input:checked + .switch-slider {
         background-color: #3366ff;
       }
 
-      input:checked+.switch-slider:before {
+      input:checked + .switch-slider:before {
         transform: translateX(20px);
       }
 
@@ -123,7 +131,7 @@
         border-radius: 4px;
       }
 
-      .custom-checkbox input:checked~.checkbox-mark {
+      .custom-checkbox input:checked ~ .checkbox-mark {
         background-color: #3366ff;
         border-color: #3366ff;
       }
@@ -134,7 +142,7 @@
         display: none;
       }
 
-      .custom-checkbox input:checked~.checkbox-mark:after {
+      .custom-checkbox input:checked ~ .checkbox-mark:after {
         display: block;
       }
 
@@ -172,7 +180,7 @@
         border-radius: 50%;
       }
 
-      .custom-radio input:checked~.radio-mark {
+      .custom-radio input:checked ~ .radio-mark {
         background-color: #fff;
         border-color: #3366ff;
       }
@@ -183,7 +191,7 @@
         display: none;
       }
 
-      .custom-radio input:checked~.radio-mark:after {
+      .custom-radio input:checked ~ .radio-mark:after {
         display: block;
       }
 
@@ -298,8 +306,10 @@
     <header class="bg-white shadow-sm fixed top-0 left-0 right-0 z-30">
       <div class="flex items-center justify-between px-4 h-16">
         <div class="flex items-center">
-          <button id="sidebar-toggle"
-            class="w-10 h-10 flex items-center justify-center text-gray-500 hover:text-primary mr-2">
+          <button
+            id="sidebar-toggle"
+            class="w-10 h-10 flex items-center justify-center text-gray-500 hover:text-primary mr-2"
+          >
             <i class="ri-menu-line ri-lg"></i>
           </button>
           <div class="font-['Pacifico'] text-xl text-primary">Sales-Spy</div>
@@ -309,15 +319,221 @@
         </div>
         <div class="flex items-center space-x-4">
           <div class="relative">
-            <button id="notification-btn"
-              class="w-10 h-10 flex items-center justify-center text-gray-500 hover:text-primary relative">
-              <i class="ri-notification-3-line ri-lg"></i>
-              <span class="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full"></span>
-            </button>
+            <div class="relative group" id="notification-dropdown-wrapper">
+              <button
+                id="notification-btn"
+                class="w-10 h-10 flex items-center justify-center text-gray-500 hover:text-primary relative transition-colors duration-200"
+              >
+                <i class="ri-notification-3-line ri-lg"></i>
+                <span
+                  id="notification-count"
+                  class="absolute top-1.5 right-1.5 min-w-[14px] h-4 px-0.5 bg-red-500 text-white text-[10px] font-semibold rounded-full flex items-center justify-center transition-all duration-200"
+                  >0</span
+                >
+              </button>
+              <!-- Dropdown -->
+              <div
+                id="notification-dropdown"
+                class="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-lg border border-gray-100 z-40 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-all duration-200 translate-y-2 group-hover:translate-y-0"
+              >
+                <div
+                  class="py-2 px-4 border-b border-gray-100 flex items-center justify-between"
+                >
+                  <span class="font-medium text-gray-800 text-base"
+                    >Notifications</span
+                  >
+                  <button
+                    id="mark-all-read"
+                    class="text-xs text-primary hover:underline focus:outline-none transition-colors duration-150"
+                  >
+                    Mark all as read
+                  </button>
+                </div>
+                <ul
+                  id="notification-list"
+                  class="max-h-72 overflow-y-auto divide-y divide-gray-100"
+                >
+                  <!-- Notifications will be rendered here -->
+                </ul>
+                <div class="py-2 px-4 text-center">
+                  <a
+                    href="AdminNotifications.html"
+                    class="inline-block px-4 py-2 bg-primary text-white rounded-button text-sm font-medium hover:bg-blue-700 transition-colors duration-200"
+                    >See more</a
+                  >
+                </div>
+              </div>
+            </div>
+            <script>
+              // Dynamic notifications array (simulate fetching from backend)
+              let notifications = [];
+
+              // Store timeouts for each notification
+              let notificationTimeouts = {};
+
+              // Simulate fetching notifications from backend (replace with real fetch in production)
+              function fetchNotifications() {
+                setTimeout(() => {
+                  notifications = [
+                    {
+                      id: 1,
+                      text: "New payment received from Emma Brown.",
+                      time: "2 min ago",
+                      read: false,
+                    },
+                    {
+                      id: 2,
+                      text: "Subscription for Robert Johnson is about to expire.",
+                      time: "10 min ago",
+                      read: false,
+                    },
+                    {
+                      id: 3,
+                      text: "David Miller upgraded to Pro plan.",
+                      time: "30 min ago",
+                      read: false,
+                    },
+                    {
+                      id: 4,
+                      text: "Jessica Thompson's payment failed.",
+                      time: "1 hour ago",
+                      read: false,
+                    },
+                    {
+                      id: 5,
+                      text: "Sarah Wilson added a new wallet.",
+                      time: "2 hours ago",
+                      read: false,
+                    },
+                    {
+                      id: 6,
+                      text: "Ava Lee requested support.",
+                      time: "3 hours ago",
+                      read: true,
+                    },
+                  ];
+                  renderNotifications();
+                }, 200);
+              }
+
+              function renderNotifications() {
+                const list = document.getElementById("notification-list");
+                const count = document.getElementById("notification-count");
+                // Only show unread or recently marked-as-read notifications (pending removal)
+                const visibleNotifications = notifications.filter(
+                  (n) => !n.read
+                );
+                count.textContent = visibleNotifications.length;
+                count.style.display =
+                  visibleNotifications.length > 0 ? "flex" : "none";
+                if (visibleNotifications.length === 0) {
+                  list.innerHTML = `<li class="px-4 py-6 text-center text-gray-400 text-sm">All clear, nothing to see here</li>`;
+                  return;
+                }
+                list.innerHTML = visibleNotifications
+                  .slice(0, 5)
+                  .map(
+                    (n) => `
+                  <li class="flex items-start gap-3 px-4 py-3 bg-white hover:bg-blue-50 transition-colors duration-150" data-id="${n.id}">
+                  <div class="flex-1">
+                  <p class="text-sm text-gray-800">${n.text}</p>
+                  <span class="text-xs text-gray-400">${n.time}</span>
+                  </div>
+                  <div class="flex flex-col gap-1 ml-2">
+                  <button class="mark-read-btn px-2 py-1 text-xs font-medium text-primary border border-primary rounded transition hover:bg-primary hover:text-white focus:outline-none" data-id="${n.id}">Mark as read</button>
+                  </div>
+                  </li>
+                `
+                  )
+                  .join("");
+              }
+
+              // Dropdown hover for accessibility (also works on click for mobile)
+              const dropdown = document.getElementById("notification-dropdown");
+              const wrapper = document.getElementById(
+                "notification-dropdown-wrapper"
+              );
+              let dropdownTimeout;
+              wrapper.addEventListener("mouseenter", () => {
+                clearTimeout(dropdownTimeout);
+                dropdown.classList.add(
+                  "opacity-100",
+                  "pointer-events-auto",
+                  "translate-y-0"
+                );
+                dropdown.classList.remove(
+                  "opacity-0",
+                  "pointer-events-none",
+                  "translate-y-2"
+                );
+              });
+              wrapper.addEventListener("mouseleave", () => {
+                dropdownTimeout = setTimeout(() => {
+                  dropdown.classList.remove(
+                    "opacity-100",
+                    "pointer-events-auto",
+                    "translate-y-0"
+                  );
+                  dropdown.classList.add(
+                    "opacity-0",
+                    "pointer-events-none",
+                    "translate-y-2"
+                  );
+                }, 120);
+              });
+
+              // Mark as read logic with delayed removal
+              document.addEventListener("click", function (e) {
+                if (e.target.classList.contains("mark-read-btn")) {
+                  const id = +e.target.getAttribute("data-id");
+                  const n = notifications.find((n) => n.id === id);
+                  if (n && !n.read) {
+                    n.read = true;
+                    renderNotifications();
+                    // Remove after 2 seconds
+                    if (notificationTimeouts[id])
+                      clearTimeout(notificationTimeouts[id]);
+                    notificationTimeouts[id] = setTimeout(() => {
+                      notifications = notifications.filter(
+                        (notif) => notif.id !== id
+                      );
+                      delete notificationTimeouts[id];
+                      renderNotifications();
+                    }, 2000);
+                  }
+                }
+                if (e.target.id === "mark-all-read") {
+                  // Mark all as read and remove after 2 seconds
+                  const idsToRemove = notifications
+                    .filter((n) => !n.read)
+                    .map((n) => n.id);
+                  notifications.forEach((n) => {
+                    n.read = true;
+                  });
+                  renderNotifications();
+                  idsToRemove.forEach((id) => {
+                    if (notificationTimeouts[id])
+                      clearTimeout(notificationTimeouts[id]);
+                    notificationTimeouts[id] = setTimeout(() => {
+                      notifications = notifications.filter(
+                        (notif) => notif.id !== id
+                      );
+                      delete notificationTimeouts[id];
+                      renderNotifications();
+                    }, 2000);
+                  });
+                }
+              });
+
+              // Initial fetch and render
+              fetchNotifications();
+            </script>
           </div>
           <div class="relative">
             <button id="user-menu-btn" class="flex items-center">
-              <div class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center">
+              <div
+                class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center"
+              >
                 <span class="text-sm font-medium">JD</span>
               </div>
               <span class="ml-2 text-sm font-medium hidden md:block">
@@ -377,12 +593,14 @@
       });
     </script>
     <!-- Sidebar -->
-    <aside id="sidebar"
-      class="fixed top-16 left-0 bottom-0 w-64 bg-white shadow-sm z-20 sidebar-transition transform md:translate-x-0 -translate-x-full">
+    <aside id="sidebar" class="fixed top-16 left-0 bottom-0 w-64 bg-white shadow-sm z-20 sidebar-transition transform md:translate-x-0 -translate-x-full"
+    >
       <div class="h-full flex flex-col">
         <div class="p-4 border-b">
           <div class="flex items-center">
-            <div class="w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center">
+            <div
+              class="w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center"
+            >
               <span class="text-sm font-medium">JD</span>
             </div>
             <div class="ml-3">
@@ -395,86 +613,121 @@
           <ul class="space-y-1">
             <li>
               <a
-            href="AdminUsers.html"
-            class="nav-link w-full flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-600 hover:text-primary hover:bg-blue-50"
+          href="AdminUsers.html"
+          class="nav-link w-full flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-600 hover:text-primary hover:bg-blue-50"
               >
-            <div class="w-5 h-5 flex items-center justify-center mr-3">
-              <i class="ri-user-line"></i>
-            </div>
-            <span>Users</span>
+          <div class="w-5 h-5 flex items-center justify-center mr-3">
+            <i class="ri-user-line"></i>
+          </div>
+          <span>Users</span>
               </a>
             </li>
             <li>
               <a
-            href="AdminSubscriptions.html"
-            class="nav-link w-full flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-600 hover:text-primary hover:bg-blue-50"
+          href="AdminSubscriptions.html"
+          class="nav-link w-full flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-600 hover:text-primary hover:bg-blue-50"
               >
-            <div class="w-5 h-5 flex items-center justify-center mr-3">
-              <i class="ri-vip-crown-line"></i>
-            </div>
-            <span>Subscriptions</span>
+          <div class="w-5 h-5 flex items-center justify-center mr-3">
+            <i class="ri-vip-crown-line"></i>
+          </div>
+          <span>Subscriptions</span>
               </a>
             </li>
             <li>
               <a
-            href="AdminWallets.html"
-             class="nav-link w-full flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-600 hover:text-primary hover:bg-blue-50"
+          href="AdminWallets.html"
+          class="nav-link w-full flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-600 hover:text-primary hover:bg-blue-50"
               >
-            <div class="w-5 h-5 flex items-center justify-center mr-3">
-              <i class="ri-wallet-3-line"></i>
-            </div>
-            <span>Wallets</span>
+          <div class="w-5 h-5 flex items-center justify-center mr-3">
+            <i class="ri-wallet-3-line"></i>
+          </div>
+          <span>Wallets</span>
               </a>
             </li>
             <li>
               <a
-            href="AdminPlans.html"
-            class="nav-link w-full flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-600 hover:text-primary hover:bg-blue-50"
+          href="AdminPlans.html"
+          class="nav-link w-full flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-600 hover:text-primary hover:bg-blue-50"
               >
-            <div class="w-5 h-5 flex items-center justify-center mr-3">
-              <i class="ri-list-settings-line"></i>
-            </div>
-            <span>Plans</span>
+          <div class="w-5 h-5 flex items-center justify-center mr-3">
+            <i class="ri-list-settings-line"></i>
+          </div>
+          <span>Plans</span>
               </a>
             </li>
             <li>
               <a
-            href="AdminPayments.html"
+          href="AdminPayments.html"
           class="nav-link w-full flex items-center px-3 py-2 text-sm font-medium rounded-md text-primary bg-blue-50"
               >
-            <div class="w-5 h-5 flex items-center justify-center mr-3">
-              <i class="ri-exchange-dollar-line"></i>
-            </div>
-            <span>Payments</span>
+          <div class="w-5 h-5 flex items-center justify-center mr-3">
+            <i class="ri-exchange-dollar-line"></i>
+          </div>
+          <span>Payments</span>
               </a>
             </li>
             <li>
               <a
-            href="AdminPending.html"
-            class="nav-link w-full flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-600 hover:text-primary hover:bg-blue-50"
+          href="AdminPending.html"
+          class="nav-link w-full flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-600 hover:text-primary hover:bg-blue-50"
               >
-            <div class="w-5 h-5 flex items-center justify-center mr-3">
-              <i class="ri-time-line"></i>
-            </div>
-            <span>Pending Payments</span>
+          <div class="w-5 h-5 flex items-center justify-center mr-3">
+            <i class="ri-time-line"></i>
+          </div>
+          <span>Pending Payments</span>
               </a>
             </li>
             <li>
               <a
-            href="AdminSettings.html"
-            class="nav-link w-full flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-600 hover:text-primary hover:bg-blue-50"
+          href="AdminNotifications.html"
+          class="nav-link w-full flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-600 hover:text-primary hover:bg-blue-50"
               >
-            <div class="w-5 h-5 flex items-center justify-center mr-3">
-              <i class="ri-settings-3-line"></i>
-            </div>
-            <span>Settings</span>
+          <div class="w-5 h-5 flex items-center justify-center mr-3">
+            <i class="ri-notification-3-line"></i>
+          </div>
+          <span>Notifications</span>
+              </a>
+            </li>
+            <li>
+              <a
+          href="Admins.html"
+          class="nav-link w-full flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-600 hover:text-primary hover:bg-blue-50"
+              >
+          <div class="w-5 h-5 flex items-center justify-center mr-3">
+            <i class="ri-shield-user-line"></i>
+          </div>
+          <span>Admins</span>
+              </a>
+            </li>
+            <li>
+              <a
+          href="AdminHistory.html"
+          class="nav-link w-full flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-600 hover:text-primary hover:bg-blue-50"
+              >
+          <div class="w-5 h-5 flex items-center justify-center mr-3">
+            <i class="ri-history-line"></i>
+          </div>
+          <span>Admin History</span>
+              </a>
+            </li>
+            <li>
+              <a
+          href="AdminSettings.html"
+          class="nav-link w-full flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-600 hover:text-primary hover:bg-blue-50"
+              >
+          <div class="w-5 h-5 flex items-center justify-center mr-3">
+            <i class="ri-settings-3-line"></i>
+          </div>
+          <span>Settings</span>
               </a>
             </li>
           </ul>
         </nav>
         <div class="p-4 border-t">
-          <button id="logout-btn"
-            class="w-full flex items-center px-3 py-2 text-sm font-medium rounded-md text-red-600 hover:bg-red-50">
+          <button
+            id="logout-btn"
+            class="w-full flex items-center px-3 py-2 text-sm font-medium rounded-md text-red-600 hover:bg-red-50"
+          >
             <div class="w-5 h-5 flex items-center justify-center mr-3">
               <i class="ri-logout-box-line"></i>
             </div>
@@ -485,7 +738,9 @@
         <div id="logout-modal" class="modal">
           <div class="modal-content max-w-sm">
             <div class="flex items-center mb-4">
-              <div class="w-12 h-12 rounded-full bg-red-100 text-red-600 flex items-center justify-center mr-4">
+              <div
+                class="w-12 h-12 rounded-full bg-red-100 text-red-600 flex items-center justify-center mr-4"
+              >
                 <i class="ri-logout-box-line ri-lg"></i>
               </div>
               <h3 class="text-lg font-medium text-gray-800">
@@ -493,12 +748,16 @@
               </h3>
             </div>
             <div class="flex items-center justify-end space-x-3">
-              <button id="cancel-logout"
-                class="px-4 py-2 border border-gray-200 text-gray-600 rounded-button whitespace-nowrap hover:bg-gray-50">
+              <button
+                id="cancel-logout"
+                class="px-4 py-2 border border-gray-200 text-gray-600 rounded-button whitespace-nowrap hover:bg-gray-50"
+              >
                 Cancel
               </button>
-              <button id="confirm-logout"
-                class="px-4 py-2 bg-red-600 text-white rounded-button whitespace-nowrap hover:bg-red-700">
+              <button
+                id="confirm-logout"
+                class="px-4 py-2 bg-red-600 text-white rounded-button whitespace-nowrap hover:bg-red-700"
+              >
                 Logout
               </button>
             </div>
@@ -1262,9 +1521,8 @@
         // End Payments Tab JS
         // =========================
       </script>
-     
     </main>
-      <script id="modal-script">
+    <script id="modal-script">
       document.addEventListener("DOMContentLoaded", function () {
         const modals = document.querySelectorAll(".modal");
         const modalCloseButtons = document.querySelectorAll(".modal-close");

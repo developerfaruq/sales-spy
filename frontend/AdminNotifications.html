@@ -1,0 +1,1504 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Dashboard - Users</title>
+    <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css"
+    />
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: { primary: "#1E3A8A", secondary: "#5BC0EB" },
+            borderRadius: {
+              none: "0px",
+              sm: "4px",
+              DEFAULT: "8px",
+              md: "12px",
+              lg: "16px",
+              xl: "20px",
+              "2xl": "24px",
+              "3xl": "32px",
+              full: "9999px",
+              button: "8px",
+            },
+          },
+        },
+      };
+    </script>
+    <style>
+      :where([class^="ri-"])::before {
+        content: "\f3c2";
+      }
+
+      body {
+        font-family: "Inter", sans-serif;
+        background-color: #f8f9fb;
+      }
+
+      .sidebar-transition {
+        transition: width 0.3s ease, transform 0.3s ease;
+      }
+
+      input[type="number"]::-webkit-inner-spin-button,
+      input[type="number"]::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+      }
+
+      .custom-switch {
+        position: relative;
+        display: inline-block;
+        width: 44px;
+        height: 24px;
+      }
+
+      .custom-switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+      }
+
+      .switch-slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #e2e8f0;
+        transition: 0.4s;
+        border-radius: 24px;
+      }
+
+      .switch-slider:before {
+        position: absolute;
+        content: "";
+        height: 18px;
+        width: 18px;
+        left: 3px;
+        bottom: 3px;
+        background-color: white;
+        transition: 0.4s;
+        border-radius: 50%;
+      }
+
+      input:checked + .switch-slider {
+        background-color: #3366ff;
+      }
+
+      input:checked + .switch-slider:before {
+        transform: translateX(20px);
+      }
+
+      .custom-checkbox {
+        position: relative;
+        display: inline-block;
+        width: 18px;
+        height: 18px;
+      }
+
+      .custom-checkbox input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+      }
+
+      .checkbox-mark {
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 18px;
+        width: 18px;
+        background-color: #fff;
+        border: 1px solid #d1d5db;
+        border-radius: 4px;
+      }
+
+      .custom-checkbox input:checked ~ .checkbox-mark {
+        background-color: #3366ff;
+        border-color: #3366ff;
+      }
+
+      .checkbox-mark:after {
+        content: "";
+        position: absolute;
+        display: none;
+      }
+
+      .custom-checkbox input:checked ~ .checkbox-mark:after {
+        display: block;
+      }
+
+      .custom-checkbox .checkbox-mark:after {
+        left: 6px;
+        top: 2px;
+        width: 5px;
+        height: 10px;
+        border: solid white;
+        border-width: 0 2px 2px 0;
+        transform: rotate(45deg);
+      }
+
+      .custom-radio {
+        position: relative;
+        display: inline-block;
+        width: 18px;
+        height: 18px;
+      }
+
+      .custom-radio input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+      }
+
+      .radio-mark {
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 18px;
+        width: 18px;
+        background-color: #fff;
+        border: 1px solid #d1d5db;
+        border-radius: 50%;
+      }
+
+      .custom-radio input:checked ~ .radio-mark {
+        background-color: #fff;
+        border-color: #3366ff;
+      }
+
+      .radio-mark:after {
+        content: "";
+        position: absolute;
+        display: none;
+      }
+
+      .custom-radio input:checked ~ .radio-mark:after {
+        display: block;
+      }
+
+      .custom-radio .radio-mark:after {
+        top: 4px;
+        left: 4px;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #3366ff;
+      }
+
+      .pagination-item {
+        width: 36px;
+        height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 8px;
+        cursor: pointer;
+      }
+
+      .pagination-item.active {
+        background-color: #3366ff;
+        color: white;
+      }
+
+      .custom-select {
+        position: relative;
+        display: inline-block;
+      }
+
+      .custom-select-trigger {
+        padding: 8px 12px;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        background-color: white;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        min-width: 120px;
+      }
+
+      .custom-select-options {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background-color: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        margin-top: 4px;
+        z-index: 10;
+        display: none;
+        max-height: 200px;
+        overflow-y: auto;
+      }
+
+      .custom-select-option {
+        padding: 8px 12px;
+        cursor: pointer;
+      }
+
+      .custom-select-option:hover {
+        background-color: #f1f5f9;
+      }
+
+      .custom-select.open .custom-select-options {
+        display: block;
+      }
+
+      .modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0, 0, 0, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 50;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.3s ease, visibility 0.3s ease;
+      }
+
+      .modal.active {
+        opacity: 1;
+        visibility: visible;
+      }
+
+      .modal-content {
+        background-color: white;
+        border-radius: 12px;
+        padding: 24px;
+        width: 100%;
+        max-width: 500px;
+        transform: translateY(20px);
+        transition: transform 0.3s ease;
+      }
+
+      .modal.active .modal-content {
+        transform: translateY(0);
+      }
+    </style>
+  </head>
+
+  <body class="min-h-screen">
+    <!-- Header and Sidebar (optional for standalone) -->
+    <header class="bg-white shadow-sm fixed top-0 left-0 right-0 z-30">
+      <div class="flex items-center justify-between px-4 h-16">
+        <div class="flex items-center">
+          <button
+            id="sidebar-toggle"
+            class="w-10 h-10 flex items-center justify-center text-gray-500 hover:text-primary mr-2"
+          >
+            <i class="ri-menu-line ri-lg"></i>
+          </button>
+          <div class="font-['Pacifico'] text-xl text-primary">Sales-Spy</div>
+          <span class="ml-4 text-lg font-medium hidden md:block"
+            >Admin Dashboard</span
+          >
+        </div>
+        <div class="flex items-center space-x-4">
+          <div class="relative">
+            <div class="relative group" id="notification-dropdown-wrapper">
+              <button
+                id="notification-btn"
+                class="w-10 h-10 flex items-center justify-center text-gray-500 hover:text-primary relative transition-colors duration-200"
+              >
+                <i class="ri-notification-3-line ri-lg"></i>
+                <span
+                  id="notification-count"
+                  class="absolute top-1.5 right-1.5 min-w-[14px] h-4 px-0.5 bg-red-500 text-white text-[10px] font-semibold rounded-full flex items-center justify-center transition-all duration-200"
+                  >0</span
+                >
+              </button>
+              <!-- Dropdown -->
+              <div
+                id="notification-dropdown"
+                class="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-lg border border-gray-100 z-40 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-all duration-200 translate-y-2 group-hover:translate-y-0"
+              >
+                <div
+                  class="py-2 px-4 border-b border-gray-100 flex items-center justify-between"
+                >
+                  <span class="font-medium text-gray-800 text-base"
+                    >Notifications</span
+                  >
+                  <button
+                    id="mark-all-read"
+                    class="text-xs text-primary hover:underline focus:outline-none transition-colors duration-150"
+                  >
+                    Mark all as read
+                  </button>
+                </div>
+                <ul
+                  id="notification-list"
+                  class="max-h-72 overflow-y-auto divide-y divide-gray-100"
+                >
+                  <!-- Notifications will be rendered here -->
+                </ul>
+                <div class="py-2 px-4 text-center">
+                  <a
+                    href="AdminNotifications.html"
+                    class="inline-block px-4 py-2 bg-primary text-white rounded-button text-sm font-medium hover:bg-blue-700 transition-colors duration-200"
+                    >See more</a
+                  >
+                </div>
+              </div>
+            </div>
+            <script>
+              // Dynamic notifications array (simulate fetching from backend)
+              let notifications = [];
+
+              // Store timeouts for each notification
+              let notificationTimeouts = {};
+
+              // Simulate fetching notifications from backend (replace with real fetch in production)
+              function fetchNotifications() {
+                setTimeout(() => {
+                  notifications = [
+                    {
+                      id: 1,
+                      text: "New payment received from Emma Brown.",
+                      time: "2 min ago",
+                      read: false,
+                    },
+                    {
+                      id: 2,
+                      text: "Subscription for Robert Johnson is about to expire.",
+                      time: "10 min ago",
+                      read: false,
+                    },
+                    {
+                      id: 3,
+                      text: "David Miller upgraded to Pro plan.",
+                      time: "30 min ago",
+                      read: false,
+                    },
+                    {
+                      id: 4,
+                      text: "Jessica Thompson's payment failed.",
+                      time: "1 hour ago",
+                      read: false,
+                    },
+                    {
+                      id: 5,
+                      text: "Sarah Wilson added a new wallet.",
+                      time: "2 hours ago",
+                      read: false,
+                    },
+                    {
+                      id: 6,
+                      text: "Ava Lee requested support.",
+                      time: "3 hours ago",
+                      read: true,
+                    },
+                  ];
+                  renderNotifications();
+                }, 200);
+              }
+
+              function renderNotifications() {
+                const list = document.getElementById("notification-list");
+                const count = document.getElementById("notification-count");
+                // Only show unread or recently marked-as-read notifications (pending removal)
+                const visibleNotifications = notifications.filter(
+                  (n) => !n.read
+                );
+                count.textContent = visibleNotifications.length;
+                count.style.display =
+                  visibleNotifications.length > 0 ? "flex" : "none";
+                if (visibleNotifications.length === 0) {
+                  list.innerHTML = `<li class="px-4 py-6 text-center text-gray-400 text-sm">All clear, nothing to see here</li>`;
+                  return;
+                }
+                list.innerHTML = visibleNotifications
+                  .slice(0, 5)
+                  .map(
+                    (n) => `
+                  <li class="flex items-start gap-3 px-4 py-3 bg-white hover:bg-blue-50 transition-colors duration-150" data-id="${n.id}">
+                  <div class="flex-1">
+                  <p class="text-sm text-gray-800">${n.text}</p>
+                  <span class="text-xs text-gray-400">${n.time}</span>
+                  </div>
+                  <div class="flex flex-col gap-1 ml-2">
+                  <button class="mark-read-btn px-2 py-1 text-xs font-medium text-primary border border-primary rounded transition hover:bg-primary hover:text-white focus:outline-none" data-id="${n.id}">Mark as read</button>
+                  </div>
+                  </li>
+                `
+                  )
+                  .join("");
+              }
+
+              // Dropdown hover for accessibility (also works on click for mobile)
+              const dropdown = document.getElementById("notification-dropdown");
+              const wrapper = document.getElementById(
+                "notification-dropdown-wrapper"
+              );
+              let dropdownTimeout;
+              wrapper.addEventListener("mouseenter", () => {
+                clearTimeout(dropdownTimeout);
+                dropdown.classList.add(
+                  "opacity-100",
+                  "pointer-events-auto",
+                  "translate-y-0"
+                );
+                dropdown.classList.remove(
+                  "opacity-0",
+                  "pointer-events-none",
+                  "translate-y-2"
+                );
+              });
+              wrapper.addEventListener("mouseleave", () => {
+                dropdownTimeout = setTimeout(() => {
+                  dropdown.classList.remove(
+                    "opacity-100",
+                    "pointer-events-auto",
+                    "translate-y-0"
+                  );
+                  dropdown.classList.add(
+                    "opacity-0",
+                    "pointer-events-none",
+                    "translate-y-2"
+                  );
+                }, 120);
+              });
+
+              // Mark as read logic with delayed removal
+              document.addEventListener("click", function (e) {
+                if (e.target.classList.contains("mark-read-btn")) {
+                  const id = +e.target.getAttribute("data-id");
+                  const n = notifications.find((n) => n.id === id);
+                  if (n && !n.read) {
+                    n.read = true;
+                    renderNotifications();
+                    // Remove after 2 seconds
+                    if (notificationTimeouts[id])
+                      clearTimeout(notificationTimeouts[id]);
+                    notificationTimeouts[id] = setTimeout(() => {
+                      notifications = notifications.filter(
+                        (notif) => notif.id !== id
+                      );
+                      delete notificationTimeouts[id];
+                      renderNotifications();
+                    }, 2000);
+                  }
+                }
+                if (e.target.id === "mark-all-read") {
+                  // Mark all as read and remove after 2 seconds
+                  const idsToRemove = notifications
+                    .filter((n) => !n.read)
+                    .map((n) => n.id);
+                  notifications.forEach((n) => {
+                    n.read = true;
+                  });
+                  renderNotifications();
+                  idsToRemove.forEach((id) => {
+                    if (notificationTimeouts[id])
+                      clearTimeout(notificationTimeouts[id]);
+                    notificationTimeouts[id] = setTimeout(() => {
+                      notifications = notifications.filter(
+                        (notif) => notif.id !== id
+                      );
+                      delete notificationTimeouts[id];
+                      renderNotifications();
+                    }, 2000);
+                  });
+                }
+              });
+
+              // Initial fetch and render
+              fetchNotifications();
+            </script>
+          </div>
+          <div class="relative">
+            <button id="user-menu-btn" class="flex items-center">
+              <div
+                class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center"
+              >
+                <span class="text-sm font-medium">JD</span>
+              </div>
+              <span class="ml-2 text-sm font-medium hidden md:block"
+                >John Doe</span
+              >
+              <i class="ri-arrow-down-s-line ml-1 text-gray-500"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+      <!-- Sidebar toggle for mobile/tablet only -->
+      <script>
+        document.addEventListener("DOMContentLoaded", function () {
+          const sidebarToggle = document.getElementById("sidebar-toggle");
+          const sidebar = document.getElementById("sidebar");
+          const main = document.querySelector("main");
+          const menuIcon = sidebarToggle.querySelector("i");
+
+          function setSidebar(open) {
+            if (open) {
+              sidebar.classList.remove("-translate-x-full");
+              sidebar.classList.add("translate-x-0");
+              menuIcon.classList.remove("ri-menu-line");
+              menuIcon.classList.add("ri-close-line");
+            } else {
+              sidebar.classList.remove("translate-x-0");
+              sidebar.classList.add("-translate-x-full");
+              menuIcon.classList.remove("ri-close-line");
+              menuIcon.classList.add("ri-menu-line");
+            }
+          }
+
+          sidebarToggle.addEventListener("click", function () {
+            const isClosed = sidebar.classList.contains("-translate-x-full");
+            setSidebar(isClosed);
+          });
+
+          function handleResize() {
+            if (window.innerWidth >= 768) {
+              sidebar.classList.remove("-translate-x-full");
+              sidebar.classList.add("translate-x-0");
+              main.classList.add("md:pl-64");
+              menuIcon.classList.remove("ri-close-line");
+              menuIcon.classList.add("ri-menu-line");
+            } else {
+              sidebar.classList.remove("translate-x-0");
+              sidebar.classList.add("-translate-x-full");
+              main.classList.remove("md:pl-64");
+              menuIcon.classList.remove("ri-close-line");
+              menuIcon.classList.add("ri-menu-line");
+            }
+          }
+
+          window.addEventListener("resize", handleResize);
+          handleResize();
+        });
+      </script>
+    </header>
+    <!-- Sidebar -->
+    <aside id="sidebar" class="fixed top-16 left-0 bottom-0 w-64 bg-white shadow-sm z-20 sidebar-transition transform md:translate-x-0 -translate-x-full"
+    >
+      <div class="h-full flex flex-col">
+        <div class="p-4 border-b">
+          <div class="flex items-center">
+            <div
+              class="w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center"
+            >
+              <span class="text-sm font-medium">JD</span>
+            </div>
+            <div class="ml-3">
+              <p class="text-sm font-medium">John Doe</p>
+              <p class="text-xs text-gray-500">Super Admin</p>
+            </div>
+          </div>
+        </div>
+        <nav class="flex-1 p-4 overflow-y-auto">
+          <ul class="space-y-1">
+            <li>
+              <a
+          href="AdminUsers.html"
+          class="nav-link w-full flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-600 hover:text-primary hover:bg-blue-50"
+              >
+          <div class="w-5 h-5 flex items-center justify-center mr-3">
+            <i class="ri-user-line"></i>
+          </div>
+          <span>Users</span>
+              </a>
+            </li>
+            <li>
+              <a
+          href="AdminSubscriptions.html"
+          class="nav-link w-full flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-600 hover:text-primary hover:bg-blue-50"
+              >
+          <div class="w-5 h-5 flex items-center justify-center mr-3">
+            <i class="ri-vip-crown-line"></i>
+          </div>
+          <span>Subscriptions</span>
+              </a>
+            </li>
+            <li>
+              <a
+          href="AdminWallets.html"
+          class="nav-link w-full flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-600 hover:text-primary hover:bg-blue-50"
+              >
+          <div class="w-5 h-5 flex items-center justify-center mr-3">
+            <i class="ri-wallet-3-line"></i>
+          </div>
+          <span>Wallets</span>
+              </a>
+            </li>
+            <li>
+              <a
+          href="AdminPlans.html"
+          class="nav-link w-full flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-600 hover:text-primary hover:bg-blue-50"
+              >
+          <div class="w-5 h-5 flex items-center justify-center mr-3">
+            <i class="ri-list-settings-line"></i>
+          </div>
+          <span>Plans</span>
+              </a>
+            </li>
+            <li>
+              <a
+          href="AdminPayments.html"
+          class="nav-link w-full flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-600 hover:text-primary hover:bg-blue-50"
+              >
+          <div class="w-5 h-5 flex items-center justify-center mr-3">
+            <i class="ri-exchange-dollar-line"></i>
+          </div>
+          <span>Payments</span>
+              </a>
+            </li>
+            <li>
+              <a
+          href="AdminPending.html"
+          class="nav-link w-full flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-600 hover:text-primary hover:bg-blue-50"
+              >
+          <div class="w-5 h-5 flex items-center justify-center mr-3">
+            <i class="ri-time-line"></i>
+          </div>
+          <span>Pending Payments</span>
+              </a>
+            </li>
+            <li>
+              <a
+          href="AdminNotifications.html"
+        class="nav-link w-full flex items-center px-3 py-2 text-sm font-medium rounded-md text-primary bg-blue-50">
+          <div class="w-5 h-5 flex items-center justify-center mr-3">
+            <i class="ri-notification-3-line"></i>
+          </div>
+          <span>Notifications</span>
+              </a>
+            </li>
+            <li>
+              <a
+          href="Admins.html"
+          class="nav-link w-full flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-600 hover:text-primary hover:bg-blue-50"
+              >
+          <div class="w-5 h-5 flex items-center justify-center mr-3">
+            <i class="ri-shield-user-line"></i>
+          </div>
+          <span>Admins</span>
+              </a>
+            </li>
+            <li>
+              <a
+          href="AdminHistory.html"
+            class="nav-link w-full flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-600 hover:text-primary hover:bg-blue-50">
+          <div class="w-5 h-5 flex items-center justify-center mr-3">
+            <i class="ri-history-line"></i>
+          </div>
+          <span>Admin History</span>
+              </a>
+            </li>
+            <li>
+              <a
+          href="AdminSettings.html"
+          class="nav-link w-full flex items-center px-3 py-2 text-sm font-medium rounded-md text-gray-600 hover:text-primary hover:bg-blue-50"
+              >
+          <div class="w-5 h-5 flex items-center justify-center mr-3">
+            <i class="ri-settings-3-line"></i>
+          </div>
+          <span>Settings</span>
+              </a>
+            </li>
+          </ul>
+        </nav>
+        <div class="p-4 border-t">
+          <button
+            id="logout-btn"
+            class="w-full flex items-center px-3 py-2 text-sm font-medium rounded-md text-red-600 hover:bg-red-50"
+          >
+            <div class="w-5 h-5 flex items-center justify-center mr-3">
+              <i class="ri-logout-box-line"></i>
+            </div>
+            <span>Logout</span>
+          </button>
+        </div>
+        <!-- Logout Confirmation Modal -->
+        <div id="logout-modal" class="modal">
+          <div class="modal-content max-w-sm">
+            <div class="flex items-center mb-4">
+              <div
+                class="w-12 h-12 rounded-full bg-red-100 text-red-600 flex items-center justify-center mr-4"
+              >
+                <i class="ri-logout-box-line ri-lg"></i>
+              </div>
+              <h3 class="text-lg font-medium text-gray-800">
+                Are you sure you want to logout?
+              </h3>
+            </div>
+            <div class="flex items-center justify-end space-x-3">
+              <button
+                id="cancel-logout"
+                class="px-4 py-2 border border-gray-200 text-gray-600 rounded-button whitespace-nowrap hover:bg-gray-50"
+              >
+                Cancel
+              </button>
+              <button
+                id="confirm-logout"
+                class="px-4 py-2 bg-red-600 text-white rounded-button whitespace-nowrap hover:bg-red-700"
+              >
+                Logout
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </aside>
+    <main class="pt-16 md:pl-64 transition-all duration-300">
+        <div id="notifications-tab" class="tab-content p-4 md:p-6">
+            <div class="mb-6">
+                <h1 class="text-2xl font-semibold text-primary">Notifications</h1>
+                <p class="text-sm text-secondary mt-1"></p>
+                    View and manage all platform notifications
+                </p>
+            </div>
+            <!-- Subheader Tabs -->
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-4">
+                <div class="flex space-x-2">
+                    <button data-tab="all" class="notif-tab-btn px-4 py-2 rounded-button text-sm font-medium transition-colors duration-150 bg-primary/10 text-primary border border-primary focus:ring-2 focus:ring-primary">All</button>
+                    <button data-tab="unread" class="notif-tab-btn px-4 py-2 rounded-button text-sm font-medium transition-colors duration-150 text-primary border border-primary/50 hover:bg-primary/10 hover:text-primary focus:ring-2 focus:ring-primary">Unread</button>
+                    <button data-tab="read" class="notif-tab-btn px-4 py-2 rounded-button text-sm font-medium transition-colors duration-150 text-primary border border-primary/50 hover:bg-primary/10 hover:text-primary focus:ring-2 focus:ring-primary">Read</button>
+                    <button data-tab="adminrequests" class="notif-tab-btn px-4 py-2 rounded-button text-sm font-medium transition-colors duration-150 text-primary border border-primary/50 hover:bg-primary/10 hover:text-primary focus:ring-2 focus:ring-primary">Admin Requests</button>
+                </div>
+                <div class="flex-1 md:ml-6">
+                    <input
+                        id="notif-search"
+                        type="text"
+                        placeholder="Search notifications..."
+                        class="w-full md:w-72 px-3 py-2 border border-secondary rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-secondary"
+                    />
+                </div>
+            </div>
+
+            <!-- Clear Notifications Button -->
+    <div class="flex justify-end mb-4">
+      <button id="clear-notifications-btn" class="px-4 py-2 bg-red-600 text-white rounded-button text-sm font-medium hover:bg-red-700 transition-colors">
+        Clear Notifications
+      </button>
+    </div>
+
+            <div class="bg-white rounded-lg shadow-sm p-0 overflow-hidden border border-primary/10">
+                <div class="divide-y divide-primary/10" id="notifications-list">
+                    <!-- Notifications will be rendered here by JS -->
+                </div>
+                <div class="flex flex-col md:flex-row md:items-center md:justify-between px-4 py-3 border-t bg-primary/5 border-primary/10 gap-2">
+                    <div class="flex items-center gap-4">
+                        <button
+                            id="mark-all-read-page"
+                            class="text-sm text-primary hover:underline hover:text-secondary transition-colors"
+                        >
+                            Mark all as read
+                        </button>
+                        <span
+                            id="notifications-count-page"
+                            class="text-xs text-secondary"
+                        ></span>
+                    </div>
+                    <div class="flex items-center space-x-1" id="notifications-pagination">
+                        <button
+                            class="pagination-item text-gray-500 hover:bg-gray-100"
+                            id="notifications-prev-page"
+                        >
+                            <i class="ri-arrow-left-s-line"></i>
+                        </button>
+                        <!-- Page numbers will be injected here -->
+                        <button
+                            class="pagination-item text-gray-600 hover:bg-gray-100 notifications-page-btn"
+                            data-page="1"
+                        >
+                            1
+                        </button>
+                        <button
+                            class="pagination-item text-gray-600 hover:bg-gray-100 notifications-page-btn"
+                            data-page="2"
+                        >
+                            2
+                        </button>
+                        <button
+                            class="pagination-item text-gray-600 hover:bg-gray-100 notifications-page-btn"
+                            data-page="3"
+                        >
+                            3
+                        </button>
+                        <button
+                            class="pagination-item text-gray-500 hover:bg-gray-100"
+                            id="notifications-next-page"
+                        >
+                            <i class="ri-arrow-right-s-line"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <script>
+            (function () {
+                // --- Pagination State ---
+                let notifCurrentPage = 1;
+                let notifPageSize = 10;
+
+                // Patch: renderNotificationsPage with pagination
+                const origRenderNotificationsPage = window.renderNotificationsPage;
+                window.renderNotificationsPage = function () {
+                    let notifications = window.adminNotifications;
+                    // Filtering logic (copied from original)
+                    let currentTab = window.currentTab || "all";
+                    let searchQuery = window.searchQuery || "";
+                    function filterNotifications() {
+                        let filtered = notifications;
+                        if (currentTab === "unread") {
+                            filtered = filtered.filter(n => !n.read);
+                        } else if (currentTab === "read") {
+                            filtered = filtered.filter(n => n.read);
+                        } else if (currentTab === "adminrequests") {
+                            filtered = filtered.filter(n => n.type === "adminrequest");
+                        }
+                        if (searchQuery) {
+                            filtered = filtered.filter(n =>
+                                n.text.toLowerCase().includes(searchQuery)
+                            );
+                        }
+                        return filtered;
+                    }
+                    const list = document.getElementById("notifications-list");
+                    const count = document.getElementById("notifications-count-page");
+                    if (!list) return;
+                    const filtered = filterNotifications();
+                    const total = filtered.length;
+                    const totalPages = Math.max(1, Math.ceil(total / notifPageSize));
+                    if (notifCurrentPage > totalPages) notifCurrentPage = totalPages;
+                    const start = (notifCurrentPage - 1) * notifPageSize;
+                    const end = Math.min(start + notifPageSize, total);
+                    const pageItems = filtered.slice(start, end);
+
+                    if (filtered.length === 0) {
+                        list.innerHTML = `<div class='px-4 py-8 text-center text-gray-400 text-sm'>All clear, nothing to see here</div>`;
+                        count.textContent = "0 notifications";
+                    } else {
+                        list.innerHTML = pageItems
+                            .map(
+                                (n) => `
+                    <div class="flex items-start gap-3 px-4 py-4 bg-white hover:bg-blue-50 transition-colors duration-150 cursor-pointer ${n.read ? "opacity-60" : ""}" data-id="${n.id}">
+                        <div class="flex-1">
+                            <p class="text-sm text-gray-800">${n.text}</p>
+                            <span class="text-xs text-gray-400">${n.time}</span>
+                        </div>
+                        <div class="flex flex-col gap-1 ml-2">
+                            ${
+                                n.type === "adminrequest"
+                                    ? n.read
+                                        ? `<span class='text-xs text-gray-400'>Read</span>`
+                                        : `<button class="mark-read-btn px-2 py-1 text-xs font-medium text-primary border border-primary rounded transition hover:bg-primary hover:text-white focus:outline-none" data-id="${n.id}">Mark as read</button>
+                                           <span class='text-xs text-blue-600 font-semibold'>Admin Request</span>`
+                                    : n.read
+                                    ? `<span class='text-xs text-gray-400'>Read</span>`
+                                    : `<button class="mark-read-btn px-2 py-1 text-xs font-medium text-primary border border-primary rounded transition hover:bg-primary hover:text-white focus:outline-none" data-id="${n.id}">Mark as read</button>`
+                            }
+                        </div>
+                    </div>
+                `
+                            )
+                            .join("");
+                        const unread = notifications.filter((n) => !n.read).length;
+                        count.textContent = `${filtered.length} notification${filtered.length !== 1 ? "s" : ""}${
+                            currentTab === "all" ? ` (${unread} unread)` : ""
+                        }`;
+                    }
+                    renderNotificationsPagination(totalPages);
+                };
+
+                function renderNotificationsPagination(totalPages) {
+                    const pag = document.getElementById("notifications-pagination");
+                    if (!pag) return;
+                    // Remove old page buttons
+                    pag.querySelectorAll(".notifications-page-btn").forEach(btn => btn.remove());
+                    // Insert new page buttons
+                    const prevBtn = document.getElementById("notifications-prev-page");
+                    const nextBtn = document.getElementById("notifications-next-page");
+                    for (let i = 1; i <= totalPages; i++) {
+                        const btn = document.createElement("button");
+                        btn.className =
+                            "pagination-item text-gray-600 hover:bg-gray-100 notifications-page-btn";
+                        btn.textContent = i;
+                        btn.setAttribute("data-page", i);
+                        if (i === notifCurrentPage)
+                            btn.classList.add("active", "bg-blue-50", "text-primary");
+                        btn.onclick = function () {
+                            notifCurrentPage = i;
+                            window.renderNotificationsPage();
+                        };
+                        pag.insertBefore(btn, nextBtn);
+                    }
+                    // Prev/next
+                    prevBtn.disabled = notifCurrentPage === 1;
+                    nextBtn.disabled = notifCurrentPage === totalPages;
+                    prevBtn.classList.toggle("opacity-50", prevBtn.disabled);
+                    prevBtn.classList.toggle("cursor-not-allowed", prevBtn.disabled);
+                    nextBtn.classList.toggle("opacity-50", nextBtn.disabled);
+                    nextBtn.classList.toggle("cursor-not-allowed", nextBtn.disabled);
+                }
+
+                // Prev/next events
+                document.getElementById("notifications-prev-page").onclick = function () {
+                    if (notifCurrentPage > 1) {
+                        notifCurrentPage--;
+                        window.renderNotificationsPage();
+                    }
+                };
+                document.getElementById("notifications-next-page").onclick = function () {
+                    let notifications = window.adminNotifications;
+                    let currentTab = window.currentTab || "all";
+                    let searchQuery = window.searchQuery || "";
+                    function filterNotifications() {
+                        let filtered = notifications;
+                        if (currentTab === "unread") {
+                            filtered = filtered.filter(n => !n.read);
+                        } else if (currentTab === "read") {
+                            filtered = filtered.filter(n => n.read);
+                        } else if (currentTab === "adminrequests") {
+                            filtered = filtered.filter(n => n.type === "adminrequest");
+                        }
+                        if (searchQuery) {
+                            filtered = filtered.filter(n =>
+                                n.text.toLowerCase().includes(searchQuery)
+                            );
+                        }
+                        return filtered;
+                    }
+                    const total = filterNotifications().length;
+                    const totalPages = Math.max(1, Math.ceil(total / notifPageSize));
+                    if (notifCurrentPage < totalPages) {
+                        notifCurrentPage++;
+                        window.renderNotificationsPage();
+                    }
+                };
+
+                // Reset page on tab/search change
+                const origSetActiveTab = window.setActiveTab;
+                window.setActiveTab = function(tab) {
+                    notifCurrentPage = 1;
+                    if (origSetActiveTab) origSetActiveTab(tab);
+                    else window.renderNotificationsPage();
+                };
+                document.getElementById("notif-search").addEventListener("input", function () {
+                    notifCurrentPage = 1;
+                });
+
+                // Initial render
+                window.renderNotificationsPage();
+            })();
+            </script>
+        </div>
+        <!-- Notification Detail Modal -->
+        <div id="notification-detail-modal" class="modal">
+            <div class="modal-content max-w-md">
+                <div class="flex items-start mb-4">
+                    <div class="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center mr-4">
+                        <i class="ri-notification-3-line ri-lg"></i>
+                    </div>
+                    <div>
+                        <h3 id="notif-modal-title" class="text-lg font-semibold text-gray-800 mb-1"></h3>
+                        <p id="notif-modal-time" class="text-xs text-gray-400"></p>
+                    </div>
+                </div>
+                <div id="notif-modal-body" class="mb-4 text-gray-700 text-sm"></div>
+                <div id="notif-modal-actions" class="flex flex-wrap gap-2 justify-end"></div>
+                <div class="mt-4 flex justify-end">
+                    <button id="notif-modal-close" class="px-4 py-2 border border-gray-200 text-gray-600 rounded-button hover:bg-gray-50">Close</button>
+                </div>
+            </div>
+        </div>
+    </main>
+    <script>
+    /**
+     * Admin Notifications Page Logic
+     * Handles rendering, filtering, marking as read, clearing, and modal interactions
+     * for the admin notifications dashboard and dropdown.
+     */
+    (function () {
+        // Simulated notifications with admin request type and details/actions
+        if (!window.adminNotifications) {
+            window.adminNotifications = [
+                {
+                    id: 1,
+                    text: "New payment received from Emma Brown.",
+                    time: "2 min ago",
+                    read: false,
+                    type: "normal",
+                    details: "Emma Brown has sent a payment of $120 for the Pro plan. Transaction ID: #TXN123456.",
+                    actions: [
+                        { label: "View Payment", type: "link", href: "AdminPayments.html" }
+                    ]
+                },
+                {
+                    id: 2,
+                    text: "Subscription for Robert Johnson is about to expire.",
+                    time: "10 min ago",
+                    read: false,
+                    type: "normal",
+                    details: "Robert Johnson's subscription will expire in 2 days. Consider sending a reminder.",
+                    actions: [
+                        { label: "Send Reminder", type: "button", action: "remind" }
+                    ]
+                },
+                {
+                    id: 3,
+                    text: "David Miller upgraded to Pro plan.",
+                    time: "30 min ago",
+                    read: false,
+                    type: "normal",
+                    details: "David Miller has successfully upgraded to the Pro plan.",
+                    actions: [
+                        { label: "View User", type: "link", href: "AdminUsers.html" }
+                    ]
+                },
+                {
+                    id: 4,
+                    text: "Jessica Thompson's payment failed.",
+                    time: "1 hour ago",
+                    read: false,
+                    type: "normal",
+                    details: "Payment attempt by Jessica Thompson failed. Please review the payment details.",
+                    actions: [
+                        { label: "Retry Payment", type: "button", action: "retry" }
+                    ]
+                },
+                {
+                    id: 5,
+                    text: "Sarah Wilson added a new wallet.",
+                    time: "2 hours ago",
+                    read: false,
+                    type: "normal",
+                    details: "Sarah Wilson has added a new wallet to her account.",
+                    actions: [
+                        { label: "View Wallets", type: "link", href: "AdminWallets.html" }
+                    ]
+                },
+                {
+                    id: 6,
+                    text: "Ava Lee requested support.",
+                    time: "3 hours ago",
+                    read: true,
+                    type: "normal",
+                    details: "Ava Lee has submitted a support request regarding her subscription.",
+                    actions: [
+                        { label: "View Request", type: "link", href: "AdminUsers.html" }
+                    ]
+                },
+                {
+                    id: 7,
+                    text: "Admin request: Approve new moderator for forum.",
+                    time: "5 min ago",
+                    read: false,
+                    type: "adminrequest",
+                    details: "A new moderator application is pending approval for the forum. Review and approve or reject the request.",
+                    actions: [
+                        { label: "Approve", type: "button", action: "approve" },
+                        { label: "Reject", type: "button", action: "reject" }
+                    ]
+                },
+                {
+                    id: 8,
+                    text: "Admin request: Review flagged content.",
+                    time: "20 min ago",
+                    read: true,
+                    type: "adminrequest",
+                    details: "Some content has been flagged by users. Please review and take appropriate action.",
+                    actions: [
+                        { label: "Review Content", type: "link", href: "AdminPending.html" }
+                    ]
+                },
+            ];
+        }
+        let notifications = window.adminNotifications;
+
+        // State
+        let currentTab = "all";
+        let searchQuery = "";
+
+        // Tab button logic
+        function setActiveTab(tab) {
+            currentTab = tab;
+            document.querySelectorAll(".notif-tab-btn").forEach(btn => {
+                if (btn.getAttribute("data-tab") === tab) {
+                    btn.classList.add("bg-blue-50", "text-primary", "border", "border-primary");
+                    btn.classList.remove("text-gray-600", "hover:bg-blue-50", "hover:text-primary");
+                } else {
+                    btn.classList.remove("bg-blue-50", "text-primary", "border", "border-primary");
+                    btn.classList.add("text-gray-600", "hover:bg-blue-50", "hover:text-primary");
+                }
+            });
+            renderNotificationsPage();
+        }
+        document.querySelectorAll(".notif-tab-btn").forEach(btn => {
+            btn.addEventListener("click", function () {
+                setActiveTab(this.getAttribute("data-tab"));
+            });
+        });
+
+        // Search logic
+        document.getElementById("notif-search").addEventListener("input", function () {
+            searchQuery = this.value.trim().toLowerCase();
+            renderNotificationsPage();
+        });
+
+        function filterNotifications() {
+            let filtered = notifications;
+            if (currentTab === "unread") {
+                filtered = filtered.filter(n => !n.read);
+            } else if (currentTab === "read") {
+                filtered = filtered.filter(n => n.read);
+            } else if (currentTab === "adminrequests") {
+                filtered = filtered.filter(n => n.type === "adminrequest");
+            }
+            if (searchQuery) {
+                filtered = filtered.filter(n =>
+                    n.text.toLowerCase().includes(searchQuery)
+                );
+            }
+            return filtered;
+        }
+
+        function renderNotificationsPage() {
+            notifications = window.adminNotifications; // Always use latest
+            const list = document.getElementById("notifications-list");
+            const count = document.getElementById("notifications-count-page");
+            if (!list) return;
+            const filtered = filterNotifications();
+            if (filtered.length === 0) {
+                list.innerHTML = `<div class='px-4 py-8 text-center text-gray-400 text-sm'>All clear, nothing to see here</div>`;
+                count.textContent = "0 notifications";
+                return;
+            }
+            list.innerHTML = filtered
+                .map(
+                    (n) => `
+        <div class="flex items-start gap-3 px-4 py-4 bg-white hover:bg-blue-50 transition-colors duration-150 cursor-pointer ${n.read ? "opacity-60" : ""}" data-id="${n.id}">
+            <div class="flex-1">
+                <p class="text-sm text-gray-800">${n.text}</p>
+                <span class="text-xs text-gray-400">${n.time}</span>
+            </div>
+            <div class="flex flex-col gap-1 ml-2">
+                ${
+                    n.type === "adminrequest"
+                        ? n.read
+                            ? `<span class='text-xs text-gray-400'>Read</span>`
+                            : `<button class="mark-read-btn px-2 py-1 text-xs font-medium text-primary border border-primary rounded transition hover:bg-primary hover:text-white focus:outline-none" data-id="${n.id}">Mark as read</button>
+                               <span class='text-xs text-blue-600 font-semibold'>Admin Request</span>`
+                        : n.read
+                        ? `<span class='text-xs text-gray-400'>Read</span>`
+                        : `<button class="mark-read-btn px-2 py-1 text-xs font-medium text-primary border border-primary rounded transition hover:bg-primary hover:text-white focus:outline-none" data-id="${n.id}">Mark as read</button>`
+                }
+            </div>
+        </div>
+    `
+                )
+                .join("");
+            const unread = notifications.filter((n) => !n.read).length;
+            count.textContent = `${filtered.length} notification${filtered.length !== 1 ? "s" : ""}${
+                currentTab === "all" ? ` (${unread} unread)` : ""
+            }`;
+        }
+
+        // Mark as read logic (page)
+        document.addEventListener("click", function (e) {
+            // Modal close
+            if (e.target.id === "notif-modal-close") {
+                document.getElementById("notification-detail-modal").classList.remove("active");
+                return;
+            }
+            // Modal action buttons
+            if (e.target.classList.contains("notif-modal-action-btn")) {
+                const id = +e.target.getAttribute("data-id");
+                const action = e.target.getAttribute("data-action");
+                // Example: handle actions here
+                if (action === "approve") {
+                    alert("Moderator approved!");
+                } else if (action === "reject") {
+                    alert("Moderator rejected!");
+                } else if (action === "remind") {
+                    alert("Reminder sent!");
+                } else if (action === "retry") {
+                    alert("Retrying payment...");
+                }
+                document.getElementById("notification-detail-modal").classList.remove("active");
+                return;
+            }
+            // Mark as read button
+            if (e.target.classList.contains("mark-read-btn")) {
+                const id = +e.target.getAttribute("data-id");
+                const n = notifications.find((n) => n.id === id);
+                if (n && !n.read) {
+                    n.read = true;
+                    window.adminNotifications = notifications;
+                    renderNotificationsPage();
+                    renderNotificationsDropdown();
+                }
+                return;
+            }
+            // Mark all as read
+            if (e.target.id === "mark-all-read-page") {
+                notifications.forEach((n) => {
+                    n.read = true;
+                });
+                window.adminNotifications = notifications;
+                renderNotificationsPage();
+                renderNotificationsDropdown();
+                return;
+            }
+            // Notification click (open modal)
+            const notifDiv = e.target.closest("#notifications-list > div[data-id]");
+            if (notifDiv) {
+                const id = +notifDiv.getAttribute("data-id");
+                const notif = notifications.find(n => n.id === id);
+                if (!notif) return;
+                // Fill modal
+                document.getElementById("notif-modal-title").textContent = notif.text;
+                document.getElementById("notif-modal-time").textContent = notif.time;
+                document.getElementById("notif-modal-body").textContent = notif.details || "No additional details.";
+                // Actions
+                const actionsDiv = document.getElementById("notif-modal-actions");
+                actionsDiv.innerHTML = "";
+                if (Array.isArray(notif.actions)) {
+                    notif.actions.forEach(action => {
+                        if (action.type === "link") {
+                            const a = document.createElement("a");
+                            a.href = action.href;
+                            a.textContent = action.label;
+                            a.className = "notif-modal-action-btn px-3 py-1 bg-primary text-white rounded-button text-xs font-medium hover:bg-blue-700 transition-colors";
+                            a.setAttribute("data-id", notif.id);
+                            a.setAttribute("target", "_blank");
+                            actionsDiv.appendChild(a);
+                        } else if (action.type === "button") {
+                            const btn = document.createElement("button");
+                            btn.textContent = action.label;
+                            btn.className = "notif-modal-action-btn px-3 py-1 bg-secondary text-white rounded-button text-xs font-medium hover:bg-blue-400 transition-colors";
+                            btn.setAttribute("data-id", notif.id);
+                            btn.setAttribute("data-action", action.action);
+                            actionsDiv.appendChild(btn);
+                        }
+                    });
+                }
+                document.getElementById("notification-detail-modal").classList.add("active");
+            }
+        });
+
+        // --- Dropdown logic (shared with header) ---
+        function renderNotificationsDropdown() {
+            notifications = window.adminNotifications; // Always use latest
+            const list = document.getElementById("notification-list");
+            const count = document.getElementById("notification-count");
+            if (!list || !count) return;
+            const visibleNotifications = notifications.filter((n) => !n.read);
+            count.textContent = visibleNotifications.length;
+            count.style.display =
+                visibleNotifications.length > 0 ? "flex" : "none";
+            if (visibleNotifications.length === 0) {
+                list.innerHTML = `<li class="px-4 py-6 text-center text-gray-400 text-sm">All clear, nothing to see here</li>`;
+                return;
+            }
+            list.innerHTML = visibleNotifications
+                .slice(0, 5)
+                .map(
+                    (n) => `
+        <li class="flex items-start gap-3 px-4 py-3 bg-white hover:bg-blue-50 transition-colors duration-150" data-id="${n.id}">
+            <div class="flex-1">
+                <p class="text-sm text-gray-800">${n.text}</p>
+                <span class="text-xs text-gray-400">${n.time}</span>
+            </div>
+            <div class="flex flex-col gap-1 ml-2">
+                <button class="mark-read-btn px-2 py-1 text-xs font-medium text-primary border border-primary rounded transition hover:bg-primary hover:text-white focus:outline-none" data-id="${n.id}">Mark as read</button>
+            </div>
+        </li>
+    `
+                )
+                .join("");
+        }
+
+        // Modal close on background click
+        document.getElementById("notification-detail-modal").addEventListener("mousedown", function (e) {
+            if (e.target === this) this.classList.remove("active");
+        });
+
+        // Initial render
+        setActiveTab("all");
+        renderNotificationsDropdown();
+
+        // Expose for other pages
+        window.renderNotificationsDropdown = renderNotificationsDropdown;
+        window.renderNotificationsPage = renderNotificationsPage;
+    })();
+    </script>
+    <div id="clear-notifications-modal" class="modal">
+      <div class="modal-content max-w-sm">
+        <h3 class="text-lg font-semibold text-gray-800 mb-4">Clear Notifications</h3>
+        <p class="text-sm text-gray-600 mb-3">Select which notifications to delete:</p>
+        <form id="clear-notifications-form" class="space-y-3 mb-4">
+          <label class="flex items-center gap-2 cursor-pointer">
+            <input type="checkbox" id="clear-all" class="form-checkbox accent-primary" />
+            <span class="text-sm">All</span>
+          </label>
+          <label class="flex items-center gap-2 cursor-pointer">
+            <input type="checkbox" id="clear-adminrequests" class="form-checkbox accent-primary clear-option" data-type="adminrequests" />
+            <span class="text-sm">Admin requests</span>
+          </label>
+          <label class="flex items-center gap-2 cursor-pointer">
+            <input type="checkbox" id="clear-read" class="form-checkbox accent-primary clear-option" data-type="read" />
+            <span class="text-sm">Read</span>
+          </label>
+          <label class="flex items-center gap-2 cursor-pointer">
+            <input type="checkbox" id="clear-unread" class="form-checkbox accent-primary clear-option" data-type="unread" />
+            <span class="text-sm">Unread</span>
+          </label>
+        </form>
+        <div class="flex justify-end gap-2">
+          <button id="cancel-clear-notifications" class="px-4 py-2 border border-gray-200 text-gray-600 rounded-button hover:bg-gray-50">Cancel</button>
+          <button id="confirm-clear-notifications" class="px-4 py-2 bg-red-600 text-white rounded-button hover:bg-red-700">Clear</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Security Confirmation Modal (hidden by default) -->
+    <div id="clear-security-modal" class="modal">
+      <div class="modal-content max-w-sm">
+        <h3 class="text-lg font-semibold text-gray-800 mb-4">Confirm Deletion</h3>
+        <p class="text-sm text-gray-600 mb-3">
+          This action cannot be undone. Please type <span class="font-mono bg-gray-100 px-1 rounded">DELETE</span> to confirm.
+        </p>
+        <input id="delete-confirm-input" type="text" class="w-full px-3 py-2 border border-gray-300 rounded mb-4 focus:outline-none focus:ring-2 focus:ring-red-400" placeholder="Type DELETE to confirm" />
+        <div class="flex justify-end gap-2">
+          <button id="cancel-security-clear" class="px-4 py-2 border border-gray-200 text-gray-600 rounded-button hover:bg-gray-50">Cancel</button>
+          <button id="final-clear-btn" class="px-4 py-2 bg-red-600 text-white rounded-button hover:bg-red-700" disabled>Delete</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Success Modal (hidden by default) -->
+    <div id="clear-success-modal" class="modal">
+      <div class="modal-content max-w-sm text-center">
+        <div class="mb-4 flex justify-center">
+          <div class="w-12 h-12 rounded-full bg-green-100 text-green-600 flex items-center justify-center">
+            <i class="ri-checkbox-circle-line ri-2x"></i>
+          </div>
+        </div>
+        <h3 class="text-lg font-semibold text-gray-800 mb-2">Notifications Cleared</h3>
+        <p class="text-sm text-gray-600 mb-4">Selected notifications have been deleted successfully.</p>
+        <button id="close-success-modal" class="px-4 py-2 bg-primary text-white rounded-button hover:bg-blue-700">OK</button>
+      </div>
+    </div>
+
+    <script>
+      // Modal helpers
+      function showModal(id) {
+        document.getElementById(id).classList.add("active");
+      }
+      function hideModal(id) {
+        document.getElementById(id).classList.remove("active");
+      }
+
+      // Open clear notifications modal
+      document.getElementById("clear-notifications-btn").addEventListener("click", function () {
+        // Reset checkboxes
+        document.getElementById("clear-all").checked = false;
+        document.querySelectorAll(".clear-option").forEach(cb => cb.checked = false);
+        showModal("clear-notifications-modal");
+      });
+
+      // Checkbox logic for "All"
+      document.getElementById("clear-all").addEventListener("change", function () {
+        const checked = this.checked;
+        document.querySelectorAll(".clear-option").forEach(cb => cb.checked = checked);
+      });
+      document.querySelectorAll(".clear-option").forEach(cb => {
+        cb.addEventListener("change", function () {
+          const allChecked = Array.from(document.querySelectorAll(".clear-option")).every(cb => cb.checked);
+          document.getElementById("clear-all").checked = allChecked;
+        });
+      });
+
+      // Cancel clear notifications
+      document.getElementById("cancel-clear-notifications").addEventListener("click", function () {
+        hideModal("clear-notifications-modal");
+      });
+
+      // Confirm clear notifications (show security modal)
+      document.getElementById("confirm-clear-notifications").addEventListener("click", function () {
+        // At least one option must be selected
+        const anyChecked = document.getElementById("clear-all").checked ||
+          Array.from(document.querySelectorAll(".clear-option")).some(cb => cb.checked);
+        if (!anyChecked) return;
+        hideModal("clear-notifications-modal");
+        document.getElementById("delete-confirm-input").value = "";
+        document.getElementById("final-clear-btn").disabled = true;
+        showModal("clear-security-modal");
+      });
+
+      // Enable delete button only if DELETE is typed
+      document.getElementById("delete-confirm-input").addEventListener("input", function () {
+        document.getElementById("final-clear-btn").disabled = this.value !== "DELETE";
+      });
+
+      // Cancel security modal
+      document.getElementById("cancel-security-clear").addEventListener("click", function () {
+        hideModal("clear-security-modal");
+      });
+
+      // Final clear logic
+      document.getElementById("final-clear-btn").addEventListener("click", function () {
+        // Determine what to clear
+        const clearAll = document.getElementById("clear-all").checked;
+        const clearAdmin = document.getElementById("clear-adminrequests").checked;
+        const clearRead = document.getElementById("clear-read").checked;
+        const clearUnread = document.getElementById("clear-unread").checked;
+
+        let notifications = window.adminNotifications || [];
+        if (clearAll) {
+          notifications = [];
+        } else {
+          notifications = notifications.filter(n => {
+            if (clearAdmin && n.type === "adminrequest") return false;
+            if (clearRead && n.read) return false;
+            if (clearUnread && !n.read) return false;
+            return true;
+          });
+        }
+        window.adminNotifications = notifications;
+        if (window.renderNotificationsPage) window.renderNotificationsPage();
+        if (window.renderNotificationsDropdown) window.renderNotificationsDropdown();
+
+        hideModal("clear-security-modal");
+        showModal("clear-success-modal");
+      });
+
+      // Close success modal
+      document.getElementById("close-success-modal").addEventListener("click", function () {
+        hideModal("clear-success-modal");
+      });
+
+      // Modal close on background click
+      ["clear-notifications-modal", "clear-security-modal", "clear-success-modal"].forEach(id => {
+        document.getElementById(id).addEventListener("mousedown", function (e) {
+          if (e.target === this) hideModal(id);
+        });
+      });
+
+      // Hide all modals by default (ensure hidden on load)
+      document.getElementById("clear-notifications-modal").classList.remove("active");
+      document.getElementById("clear-security-modal").classList.remove("active");
+      document.getElementById("clear-success-modal").classList.remove("active");
+    </script>
+  </body>
+</html>
