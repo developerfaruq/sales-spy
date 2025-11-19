@@ -1670,7 +1670,7 @@ $activeSubscriptions = $pdo->query("SELECT COUNT(*) FROM subscriptions WHERE sta
         if (confirmLogoutBtn) {
           confirmLogoutBtn.addEventListener("click", function () {
             // Clear any session data here
-            window.location.href = "/sales-spy/admin/logout/"; // Redirect to login page
+            window.location.href = "/admin/logout/"; // Redirect to login page
           });
         }
         // Unsuspend user

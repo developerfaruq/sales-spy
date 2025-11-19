@@ -1,0 +1,28 @@
+{
+  "name": "sales-spy",
+  "version": "1.0.0",
+  "description": "Sales-Spy is a tool for spying on the best-selling dropshipping products",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/developerfaruq/sales-spy.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/developerfaruq/sales-spy/issues"
+  },
+  "homepage": "https://github.com/developerfaruq/sales-spy#readme",
+  "dependencies": {
+    "body-parser": "^2.2.0",
+    "cors": "^2.8.5",
+    "express": "^5.1.0",
+    "mysql2": "^3.15.3",
+    "puppeteer": "^24.27.0"
+  }
+}

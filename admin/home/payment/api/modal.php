@@ -410,8 +410,8 @@ function getPlatformNotificationSettings($pdo) {
     // Default settings if not found
     if (!$settings) {
         return [
-            'notify_payment_success' => 1,
-            'notify_payment_failed' => 1,
+            'notify_payment_success' => 0,
+            'notify_payment_failed' => 0,
             'platform_name' => 'Sales-Spy'
         ];
     }

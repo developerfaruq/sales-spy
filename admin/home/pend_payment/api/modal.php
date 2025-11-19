@@ -233,20 +233,38 @@ try {
     // Commit database transaction first
     $pdo->commit();
     
-    // Send email after successful database commit
+    // Get platform notification settings
+    $notification_settings = getPlatformNotificationSettings($pdo);
+    
+    // Send email after successful database commit (only if notifications are enabled)
     $email_sent = false;
     $email_error = null;
     
     try {
-        if ($action === 'approve') {
+        if ($action === 'approve' && $notification_settings['notify_payment_success']) {
             $email_sent = sendTransactionEmail($transaction, 'approved', $plan_name);
-        } elseif ($action === 'decline') {
+        } elseif ($action === 'decline' && $notification_settings['notify_payment_failed']) {
             // Fixed: Pass null as plan_name for declined transactions
             $email_sent = sendTransactionEmail($transaction, 'declined', null);
         }
     } catch (Exception $e) {
         $email_error = $e->getMessage();
         error_log("Email sending failed: " . $email_error);
+    }
+    
+    // Update message based on notification settings
+    if ($action === 'approve') {
+        if ($notification_settings['notify_payment_success']) {
+            $message .= $email_sent ? ' and success notification sent to user' : ' but failed to send notification email';
+        } else {
+            $message .= ' (success notifications disabled)';
+        }
+    } elseif ($action === 'decline') {
+        if ($notification_settings['notify_payment_failed']) {
+            $message .= $email_sent ? ' and failure notification sent to user' : ' but failed to send notification email';
+        } else {
+            $message .= ' (failure notifications disabled)';
+        }
     }
     
     // Include email status in response for debugging
@@ -305,7 +323,7 @@ function sendTransactionEmail($transaction, $status, $plan_name = null) {
         $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
         $mail->Port       = $emailConfig['smtp']['port'];
         
-        // Enable debugging for testing (remove in production)
+      
         // $mail->SMTPDebug = SMTP::DEBUG_SERVER;
         
         // Recipients
@@ -448,5 +466,27 @@ function sendTransactionEmail($transaction, $status, $plan_name = null) {
         error_log("Email sending failed: " . $e->getMessage() . " | PHPMailer Error: " . $mail->ErrorInfo);
         throw $e; // Re-throw the exception to be caught in the main code
     }
+}
+
+// Get platform notification settings
+function getPlatformNotificationSettings($pdo) {
+    $stmt = $pdo->prepare("
+        SELECT notify_payment_success, notify_payment_failed, platform_name
+        FROM platform_settings 
+        WHERE id = 1
+    ");
+    $stmt->execute();
+    $settings = $stmt->fetch(PDO::FETCH_ASSOC);
+    
+    // Default settings if not found
+    if (!$settings) {
+        return [
+            'notify_payment_success' => 0,
+            'notify_payment_failed' => 0,
+            'platform_name' => 'Sales-Spy'
+        ];
+    }
+    
+    return $settings;
 }
 ?>

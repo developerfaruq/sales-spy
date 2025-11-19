@@ -309,7 +309,7 @@ display: block;
         </a>
       </li>
       <li class="mb-2">
-        <a href="../../website/" class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-r-lg hover:text-primary transition-colors">
+        <a href="../webs/" class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-r-lg hover:text-primary transition-colors">
           <div class="w-6 h-6 flex items-center justify-center mr-3 sidebar-icon">
             <i class="ri-global-line"></i>
           </div>
@@ -317,7 +317,7 @@ display: block;
         </a>
       </li> 
       <li class="mb-2">
-        <a href="../../frontend/Dashboard-ecc.html" class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-r-lg hover:text-primary transition-colors">
+        <a href="../ecommerce/" class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-r-lg hover:text-primary transition-colors">
           <div class="w-6 h-6 flex items-center justify-center mr-3 sidebar-icon">
             <i class="ri-shopping-cart-line"></i>
           </div>

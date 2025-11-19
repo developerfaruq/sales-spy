@@ -469,7 +469,7 @@ $transactions = $stmt->fetchAll(PDO::FETCH_ASSOC);*/
               </a>
               </li>
               <li class="mb-2">
-              <a href="../../website/"
+              <a href="../webs/"
                 class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-r-lg hover:text-primary transition-colors">
                 <div class="w-6 h-6 flex items-center justify-center mr-3">
                 <i class="ri-global-line"></i>
@@ -478,7 +478,7 @@ $transactions = $stmt->fetchAll(PDO::FETCH_ASSOC);*/
               </a>
               </li>
               <li class="mb-2">
-              <a href="../../frontend/Dashboard-ecc.html"
+              <a href="../ecommerce/"
                 class="flex items-center px-4 py-3 text-gray-600 hover:bg-gray-100 rounded-r-lg hover:text-primary transition-colors">
                 <div class="w-6 h-6 flex items-center justify-center mr-3">
                 <i class="ri-shopping-cart-line"></i>
